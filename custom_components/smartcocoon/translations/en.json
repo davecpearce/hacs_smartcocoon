@@ -1,0 +1,33 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "Device is already configured"
+    },
+    "error": {
+      "cannot_connect": "Failed to connect",
+      "invalid_auth": "Invalid authentication",
+      "unknown": "Unexpected error"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "username": "Username",
+          "password": "Password",
+          "enable_preset_mode": "Enable Preset Modes"
+        }
+      }
+    },
+    "title": "Smart Cocoon"
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "enable_preset_modes": "Enable Preset Modes"
+        },
+        "description": "Set the options for the SmartCocoon: \n \u2022 Preset modes (auto, eco) do not translate well in Apple Home, if you prefer to use these modes, enable them here.",
+        "title": "SmartCocoon Options"
+      }
+    }
+  }
+}

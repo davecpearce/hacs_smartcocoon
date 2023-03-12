@@ -1,0 +1,48 @@
+# Describes the format for available fan services
+
+set_eco_mode:
+  name: Set eco mode
+  description: Set the fan to eco mode.
+  target:
+    entity:
+      integration: smartcocoon
+      domain: fan
+  fields:
+    eco_mode:
+      name: Eco mode
+      description: Eco mode status
+      required: true
+      selector:
+        boolean:
+
+set_auto_mode:
+  name: Set auto mode
+  description: Set the fan to auto mode.
+  target:
+    entity:
+      integration: smartcocoon
+      domain: fan
+  fields:
+    eco_mode:
+      name: Auto mode
+      description: Auto mode status
+      required: true
+      selector:
+        boolean:
+
+set_speed:
+  name: Set speed
+  description: Set the exact speed of the fan.
+  target:
+    entity:
+      integration: smartcocoon
+      domain: fan
+  fields:
+    smartcocoon_speed:
+      name: Speed
+      description: Speed
+      required: true
+      selector:
+        number:
+          min: 1
+          max: 100
