@@ -37,7 +37,7 @@ async def async_setup_entry(
 
     for fan_id in scmanager.fans:
         _LOGGER.debug("Adding Entity for fan_id: %s", fan_id)
-        fans.append(SmartCocoonFan(hass, smartcocoon, fan_id, config_entry))
+        fans.append(SmartCocoonFan(hass, smartcocoon, fan_id))
 
     async_add_entities(fans)
 
@@ -52,7 +52,6 @@ class SmartCocoonFan(FanEntity):
         hass: HomeAssistant,
         smartcocoon: SmartCocoonController,
         fan_id: str,
-        config_entry: ConfigEntry,
     ) -> None:
 
         """Initialize the SmartCocoon entity."""

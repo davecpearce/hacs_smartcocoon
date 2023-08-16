@@ -4,7 +4,6 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-import aiohttp
 from homeassistant import config_entries
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 from homeassistant.core import HomeAssistant, callback
@@ -12,7 +11,7 @@ from homeassistant.data_entry_flow import FlowResult
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 import homeassistant.helpers.config_validation as cv
-from pysmartcocoon.client import Client
+from pysmartcocoon.manager import SmartCocoonManager
 import voluptuous as vol
 
 from .const import CONF_ENABLE_PRESET_MODES, DEFAULT_ENABLE_PRESET_MODES, DOMAIN
@@ -24,19 +23,6 @@ STEP_USER_DATA_SCHEMA = vol.Schema(
 )
 
 
-class SmartCocoonClient:
-    """SmartCocoonClient class for the pysmartcocoon API."""
-
-    def __init__(self, session: aiohttp.ClientSession) -> None:
-        """Initialize."""
-        self._client = Client(session=session)
-
-    async def authenticate(self, username: str, password: str) -> bool:
-        """Test if we can authenticate with the host."""
-
-        return await self._client.authenticate(username, password)
-
-
 async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str, Any]:
     """Validate the user input allows us to connect.
 
@@ -44,9 +30,13 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
     """
 
     session = async_get_clientsession(hass)
-    client = SmartCocoonClient(session=session)
 
-    if not await client.authenticate(data[CONF_USERNAME], data[CONF_PASSWORD]):
+    scmanager = SmartCocoonManager(session)
+
+    if not await scmanager.async_start_services(
+        data[CONF_USERNAME],
+        data[CONF_PASSWORD]
+    ):
         raise InvalidAuth
 
     return {"title": data[CONF_USERNAME]}
