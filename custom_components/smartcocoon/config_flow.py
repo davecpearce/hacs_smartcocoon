@@ -34,8 +34,7 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
     scmanager = SmartCocoonManager(session)
 
     if not await scmanager.async_start_services(
-        data[CONF_USERNAME],
-        data[CONF_PASSWORD]
+        data[CONF_USERNAME], data[CONF_PASSWORD]
     ):
         raise InvalidAuth
 
