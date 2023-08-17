@@ -25,12 +25,15 @@
         "terminal.integrated.defaultProfile.linux": "bash",
         "python.pythonPath": "/usr/local/python/bin/python",
         "python.analysis.autoSearchPaths": false,
-        "pylintArgs": ["--disable", "import-error"],
         "editor.formatOnPaste": false,
         "editor.formatOnSave": true,
         "editor.formatOnType": true,
         "files.trimTrailingWhitespace": true,
-        "yaml.customTags": ["!secret scalar"]
+        "yaml.customTags": ["!secret scalar"],
+        "[python]": {
+          "editor.defaultFormatter": "ms-python.black-formatter",
+          "editor.formatOnSave": true
+        }
       }
     }
   }

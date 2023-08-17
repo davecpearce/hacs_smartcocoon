@@ -20,21 +20,15 @@ jobs:
     steps:
       - name: Check out the repository
         uses: actions/checkout@v3.5.3
-
       - name: Set up Python ${{ env.DEFAULT_PYTHON }}
         uses: actions/setup-python@v4.6.1
         with:
           python-version: ${{ env.DEFAULT_PYTHON }}
-
-      - name: Upgrade pip
+      - name: Install dependencies
         run: |
-          pip install --constraint=.github/workflows/constraints.txt pip
-          pip --version
-
-      - name: Install Python modules
-        run: |
-          pip install --constraint=.github/workflows/constraints.txt pre-commit black flake8 reorder-python-imports
-
+          python -m pip install --upgrade pip
+          pip install -r requirements_test.txt
+          pip install -e .
       - name: Run pre-commit on all files
         run: |
           pre-commit run --all-files --color=always
