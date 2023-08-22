@@ -1,7 +1,6 @@
 """Test component setup."""
-from homeassistant.setup import async_setup_component
-
 from custom_components.smartcocoon.const import DOMAIN
+from homeassistant.setup import async_setup_component
 
 
 async def test_async_setup(hass):

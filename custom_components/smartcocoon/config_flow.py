@@ -4,6 +4,9 @@ from __future__ import annotations
 import logging
 from typing import Any
 
+from pysmartcocoon.manager import SmartCocoonManager
+import voluptuous as vol
+
 from homeassistant import config_entries
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 from homeassistant.core import HomeAssistant, callback
@@ -11,8 +14,6 @@ from homeassistant.data_entry_flow import FlowResult
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 import homeassistant.helpers.config_validation as cv
-from pysmartcocoon.manager import SmartCocoonManager
-import voluptuous as vol
 
 from .const import CONF_ENABLE_PRESET_MODES, DEFAULT_ENABLE_PRESET_MODES, DOMAIN
 

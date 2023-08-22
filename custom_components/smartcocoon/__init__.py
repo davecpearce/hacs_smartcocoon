@@ -3,13 +3,14 @@ from __future__ import annotations
 
 import logging
 
+from pysmartcocoon.errors import UnauthorizedError
+from pysmartcocoon.manager import SmartCocoonManager
+
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from pysmartcocoon.errors import UnauthorizedError
-from pysmartcocoon.manager import SmartCocoonManager
 
 from .const import CONF_ENABLE_PRESET_MODES, DEFAULT_ENABLE_PRESET_MODES, DOMAIN
 
