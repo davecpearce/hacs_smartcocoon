@@ -1,4 +1,4 @@
-"""Models for the AVM FRITZ!SmartHome integration."""
+"""Models for the SmartCocoon integration."""
 from __future__ import annotations
 
 from typing import TypedDict

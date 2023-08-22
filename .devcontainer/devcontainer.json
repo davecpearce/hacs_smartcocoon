@@ -10,33 +10,31 @@
   ],
   "customizations": {
     "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "github.vscode-pull-request-github",
+        "ryanluker.vscode-coverage-gutters",
+        "ms-python.black-formatter",
+        "ms-python.pylint",
+        "ms-python.vscode-pylance",
+        "ms-vscode-remote.vscode-remote-extensionpack"
+      ],
       "settings": {
         "files.eol": "\n",
         "editor.tabSize": 4,
         "terminal.integrated.defaultProfile.linux": "bash",
         "python.pythonPath": "/usr/local/python/bin/python",
-        "python.formatting.blackPath": "/usr/local/py-utils/bin/black",
-        "python.formatting.yapfPath": "/usr/local/py-utils/bin/yapf",
-        "python.linting.banditPath": "/usr/local/py-utils/bin/bandit",
-        "python.linting.flake8Path": "/usr/local/py-utils/bin/flake8",
         "python.analysis.autoSearchPaths": false,
-        "python.linting.pylintEnabled": true,
-        "python.linting.enabled": true,
-        "python.linting.pylintArgs": ["--disable", "import-error"],
-        "python.formatting.provider": "black",
         "editor.formatOnPaste": false,
         "editor.formatOnSave": true,
         "editor.formatOnType": true,
         "files.trimTrailingWhitespace": true,
-        "yaml.customTags": ["!secret scalar"]
-      },
-      "extensions": [
-        "ms-python.python",
-        "github.vscode-pull-request-github",
-        "ryanluker.vscode-coverage-gutters",
-        "ms-python.vscode-pylance",
-        "ms-vscode-remote.vscode-remote-extensionpack"
-      ]
+        "yaml.customTags": ["!secret scalar"],
+        "[python]": {
+          "editor.defaultFormatter": "ms-python.black-formatter",
+          "editor.formatOnSave": true
+        }
+      }
     }
   }
 }

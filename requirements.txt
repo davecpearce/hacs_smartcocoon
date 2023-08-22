@@ -2,6 +2,6 @@ homeassistant>=2023.3.0
 pysmartcocoon==0.7.9
 black
 isort
-flake8
+pylint
 pre-commit
 reorder-python-imports

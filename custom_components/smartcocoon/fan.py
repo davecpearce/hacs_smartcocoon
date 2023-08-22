@@ -3,11 +3,12 @@ from __future__ import annotations
 
 import logging
 
+from pysmartcocoon.manager import SmartCocoonManager
+
 from homeassistant.components.fan import ENTITY_ID_FORMAT, FanEntity, FanEntityFeature
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo, async_generate_entity_id
-from pysmartcocoon.manager import SmartCocoonManager
 
 from . import SmartCocoonController
 from .const import DOMAIN
@@ -37,7 +38,7 @@ async def async_setup_entry(
 
     for fan_id in scmanager.fans:
         _LOGGER.debug("Adding Entity for fan_id: %s", fan_id)
-        fans.append(SmartCocoonFan(hass, smartcocoon, fan_id, config_entry))
+        fans.append(SmartCocoonFan(hass, smartcocoon, fan_id))
 
     async_add_entities(fans)
 
@@ -52,7 +53,6 @@ class SmartCocoonFan(FanEntity):
         hass: HomeAssistant,
         smartcocoon: SmartCocoonController,
         fan_id: str,
-        config_entry: ConfigEntry,
     ) -> None:
 
         """Initialize the SmartCocoon entity."""

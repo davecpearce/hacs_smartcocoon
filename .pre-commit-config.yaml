@@ -19,10 +19,16 @@ repos:
         args:
           - --safe
           - --quiet
-  - repo: https://github.com/pycqa/flake8
-    rev: 5.0.4
+  - repo: local
     hooks:
-      - id: flake8
+      - id: pylint
+        name: pylint
+        entry: pylint
+        language: system
+        types: [python]
+        args:
+          - --max-line-length=79
+          - --ignore-imports=yes
   - repo: https://github.com/PyCQA/bandit
     rev: 1.7.4
     hooks:
