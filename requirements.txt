@@ -1,7 +1,7 @@
 homeassistant>=2023.3.0
 pysmartcocoon==0.8.0
+isort==5.13.2
 black==24.2.0
-isort==5.13.0
 pylint==3.0.2
 pre-commit==3.6.2
 reorder-python-imports==3.12.0
