@@ -8,5 +8,5 @@
   "issue_tracker": "https://github.com/davecpearce/hacs_smartcocoon/issues",
   "loggers": ["smartcocoon"],
   "requirements": ["pysmartcocoon==0.8.1"],
-  "version": "1.0.2"
+  "version": "1.0.3"
 }

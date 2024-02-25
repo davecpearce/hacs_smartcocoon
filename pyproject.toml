@@ -1,6 +1,6 @@
 [project]
 name        = "hacs_smartcocoon"
-version     = "v1.0.2"
+version     = "v1.0.3"
 license     = {text = "MIT"}
 description = "SmartCocoon integration with Home Assistant."
 readme      = "README.md"
