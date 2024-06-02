@@ -11,17 +11,16 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo, async_generate_entity_id
 
 from . import SmartCocoonController
-from .const import DOMAIN
+from .const import (
+    ATTR_ROOM_NAME,
+    DOMAIN,
+    SC_PRESET_MODE_AUTO,
+    SC_PRESET_MODE_ECO,
+    SC_PRESET_MODES,
+)
 from .model import FanExtraAttributes
 
 _LOGGER = logging.getLogger(__name__)
-
-ATTR_ROOM_NAME = "room_name"
-
-SC_PRESET_MODE_AUTO = "auto"
-SC_PRESET_MODE_ECO = "eco"
-
-SC_PRESET_MODES = [SC_PRESET_MODE_AUTO, SC_PRESET_MODE_ECO]
 
 
 async def async_setup_entry(
@@ -54,7 +53,6 @@ class SmartCocoonFan(FanEntity):
         smartcocoon: SmartCocoonController,
         fan_id: str,
     ) -> None:
-
         """Initialize the SmartCocoon entity."""
 
         self._fan_id = fan_id
@@ -169,7 +167,7 @@ class SmartCocoonFan(FanEntity):
         return "_".join([DOMAIN, "fan", self._fan_id]).lower()
 
     async def async_update_fan_callback(self) -> None:
-        """Callback to receive updates from the SmartCocoon mobile app directly."""
+        """Update state from callback."""
         _LOGGER.debug("Fan ID: %s - Received update callback", self.fan_id)
         self.async_write_ha_state()
 
