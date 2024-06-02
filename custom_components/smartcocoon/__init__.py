@@ -57,7 +57,7 @@ class SmartCocoonController:
 
         try:
             await self._scmanager.async_start_services(
-                username=self._username, password=self._password, use_mqtt=False
+                username=self._username, password=self._password
             )
         except (UnauthorizedError,) as exc:
             raise ConfigEntryAuthFailed() from exc
@@ -69,14 +69,6 @@ class SmartCocoonController:
         _LOGGER.debug("scmanager.rooms: %s", self._scmanager.rooms)
         _LOGGER.debug("scmanager.fans: %s", self._scmanager.fans)
 
-        return True
-
-    async def async_stop(self) -> bool:
-        """Stop the SmartCocoon Manager."""
-
-        _LOGGER.debug("Stopping SmartCocoon services")
-
-        await self._scmanager.async_stop_services()
         return True
 
 
@@ -121,12 +113,9 @@ async def async_update_options(hass: HomeAssistant, config_entry: ConfigEntry) -
 async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
     """Unload a config entry."""
 
-    smartcocoon: SmartCocoonController = hass.data[DOMAIN][config_entry.entry_id]
     unload_ok = await hass.config_entries.async_unload_platforms(
         config_entry, PLATFORMS
     )
-
-    await smartcocoon.async_stop()
 
     if unload_ok:
         hass.data[DOMAIN].pop(config_entry.entry_id)

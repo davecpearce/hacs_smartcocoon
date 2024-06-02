@@ -1,0 +1,18 @@
+{
+  "entity": {
+    "fan": {
+      "fan": {
+        "default": "mdi:fan",
+        "state_attributes": {
+          "preset_mode": {
+            "default": "mdi:fan",
+            "state": {
+              "auto": "mdi:fan-auto",
+              "eco": "mdi:fan-clock"
+            }
+          }
+        }
+      }
+    }
+  }
+}
