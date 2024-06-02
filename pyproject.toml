@@ -1,6 +1,6 @@
 [project]
 name        = "hacs_smartcocoon"
-version     = "v1.0.3"
+version     = "v1.1.0"
 license     = {text = "MIT"}
 description = "SmartCocoon integration with Home Assistant."
 readme      = "README.md"
@@ -59,9 +59,7 @@ disable = [
     "too-many-public-methods",
     "too-many-boolean-expressions",
     "wrong-import-order",
-    "consider-using-f-string",
-    "consider-using-namedtuple-or-dataclass",
-    "consider-using-assignment-expr"
+    "consider-using-f-string"
 ]
 
 [tool.pylint.REPORTS]
