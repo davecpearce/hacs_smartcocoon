@@ -14,10 +14,10 @@ classifiers = [
     "Intended Audience :: Developers",
     "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Topic :: Home Automation",
 ]
-requires-python = ">=3.11.0"
+requires-python = ">=3.12.0"
 
 [tool.pylint.BASIC]
 class-const-naming-style = "any"
@@ -35,7 +35,7 @@ good-names = [
 ]
 
 [tool.pylint.MAIN]
-py-version = "3.11"
+py-version = "3.12"
 ignore = [
     "tests",
 ]
