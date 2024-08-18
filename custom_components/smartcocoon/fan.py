@@ -157,6 +157,8 @@ class SmartCocoonFan(FanEntity):
         """Flag supported features."""
         flags = FanEntityFeature(0)
         flags |= FanEntityFeature.SET_SPEED
+        flags |= FanEntityFeature.TURN_OFF
+        flags |= FanEntityFeature.TURN_ON
         if self._enable_preset_modes:
             flags |= FanEntityFeature.PRESET_MODE
         return flags
