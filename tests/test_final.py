@@ -1,17 +1,27 @@
 """Final comprehensive tests for SmartCocoon integration with high coverage."""
 from __future__ import annotations
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from homeassistant.core import HomeAssistant
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.exceptions import ConfigEntryAuthFailed
+# Import for testing
+from pysmartcocoon.errors import UnauthorizedError
+import pytest
 
-from custom_components.smartcocoon import SmartCocoonController, async_setup_entry, async_unload_entry, async_update_options
-from custom_components.smartcocoon.const import DOMAIN
-from custom_components.smartcocoon.fan import SmartCocoonFan, async_setup_entry as fan_async_setup_entry
-from custom_components.smartcocoon.config_flow import validate_input, CannotConnect, InvalidAuth
+from custom_components.smartcocoon import SmartCocoonController, async_update_options
+from custom_components.smartcocoon.config_flow import (
+    CannotConnect,
+    InvalidAuth,
+    validate_input,
+)
+from custom_components.smartcocoon.const import DOMAIN, SC_PRESET_MODES
+from custom_components.smartcocoon.fan import (
+    SmartCocoonFan,
+    async_setup_entry as fan_async_setup_entry,
+)
+from homeassistant.components.fan import FanEntityFeature
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import ConfigEntryAuthFailed
 
 from .const import MOCK_USER_INPUT
 
@@ -79,8 +89,6 @@ async def test_smartcocoon_controller_properties(hass: HomeAssistant) -> None:
 
 async def test_smartcocoon_controller_async_start_unauthorized(hass: HomeAssistant) -> None:
     """Test async_start with unauthorized error."""
-    from pysmartcocoon.errors import UnauthorizedError
-    
     controller = SmartCocoonController(
         username="test@example.com",
         password="password",
@@ -324,7 +332,6 @@ async def test_smartcocoon_fan_turn_on_with_percentage(hass: HomeAssistant) -> N
 
 def test_smartcocoon_fan_without_preset_modes(hass: HomeAssistant) -> None:
     """Test SmartCocoonFan without preset modes enabled."""
-    from homeassistant.components.fan import FanEntityFeature
     
     controller = MagicMock(spec=SmartCocoonController)
     controller.enable_preset_modes = False
@@ -452,7 +459,6 @@ def test_smartcocoon_fan_basic_properties(hass: HomeAssistant) -> None:
 
 def test_smartcocoon_fan_supported_features(hass: HomeAssistant) -> None:
     """Test SmartCocoonFan supported features."""
-    from homeassistant.components.fan import FanEntityFeature
     
     controller = MagicMock(spec=SmartCocoonController)
     controller.enable_preset_modes = True
@@ -481,7 +487,6 @@ def test_smartcocoon_fan_supported_features(hass: HomeAssistant) -> None:
 
 def test_smartcocoon_fan_preset_modes(hass: HomeAssistant) -> None:
     """Test SmartCocoonFan preset modes."""
-    from custom_components.smartcocoon.const import SC_PRESET_MODES
     
     controller = MagicMock(spec=SmartCocoonController)
     controller.enable_preset_modes = True

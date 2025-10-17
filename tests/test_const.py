@@ -1,8 +1,6 @@
 """Test constants for the SmartCocoon integration."""
 from __future__ import annotations
 
-import pytest
-
 from custom_components.smartcocoon.const import (
     ATTR_ROOM_NAME,
     CONF_ENABLE_PRESET_MODES,
@@ -61,7 +59,7 @@ def test_preset_modes_immutability() -> None:
     for mode in SC_PRESET_MODES:
         assert isinstance(mode, str)
         assert mode in ["auto", "eco"]
-    
+
     # Should be able to check membership
     assert "auto" in SC_PRESET_MODES
     assert "eco" in SC_PRESET_MODES
@@ -77,7 +75,7 @@ def test_constants_are_strings() -> None:
         SC_PRESET_MODE_AUTO,
         SC_PRESET_MODE_ECO,
     ]
-    
+
     for constant in string_constants:
         assert isinstance(constant, str), f"{constant} should be a string"
 
@@ -99,7 +97,7 @@ def test_preset_modes_usage() -> None:
     # Simulate validation logic
     def is_valid_preset_mode(mode: str) -> bool:
         return mode in SC_PRESET_MODES
-    
+
     assert is_valid_preset_mode("auto") is True
     assert is_valid_preset_mode("eco") is True
     assert is_valid_preset_mode("invalid") is False
@@ -108,15 +106,5 @@ def test_preset_modes_usage() -> None:
 
 def test_constants_import() -> None:
     """Test that all constants can be imported."""
-    from custom_components.smartcocoon.const import (
-        ATTR_ROOM_NAME,
-        CONF_ENABLE_PRESET_MODES,
-        DEFAULT_ENABLE_PRESET_MODES,
-        DOMAIN,
-        SC_PRESET_MODE_AUTO,
-        SC_PRESET_MODE_ECO,
-        SC_PRESET_MODES,
-    )
-    
     # If we get here without ImportError, the test passes
     assert True

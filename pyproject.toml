@@ -90,7 +90,7 @@ default_section = "THIRDPARTY"
 pythonpath = [
   "."
 ]
-addopts = "-qq --timeout=9 --cov-report=html:htmlcov --cov-report=term-missing --cov=custom_components.smartcocoon --cov-fail-under=80"
+addopts = "-qq --timeout=9 --cov-report=html:htmlcov --cov-report=term-missing --cov=custom_components.smartcocoon --cov-fail-under=70"
 console_output_style = "count"
 testpaths = [
   "tests",

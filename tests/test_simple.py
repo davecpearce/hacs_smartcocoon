@@ -1,14 +1,15 @@
 """Simple tests for SmartCocoon integration."""
 from __future__ import annotations
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from homeassistant.core import HomeAssistant
-from homeassistant.config_entries import ConfigEntry
-
+from custom_components.smartcocoon import SmartCocoonController
 from custom_components.smartcocoon.const import DOMAIN
+from custom_components.smartcocoon.fan import SmartCocoonFan
 from custom_components.smartcocoon.model import FanExtraAttributes
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import HomeAssistant
+
 from .const import MOCK_USER_INPUT
 
 
@@ -33,7 +34,7 @@ def test_mock_user_input() -> None:
 async def test_async_setup_component(hass: HomeAssistant) -> None:
     """Test component setup."""
     from homeassistant.setup import async_setup_component
-    
+
     # This will fail because the integration isn't properly loaded
     # but we can test the basic structure
     result = await async_setup_component(hass, DOMAIN, {})
@@ -63,8 +64,6 @@ def test_config_entry_creation() -> None:
 
 async def test_smartcocoon_controller_init(hass: HomeAssistant) -> None:
     """Test SmartCocoonController initialization."""
-    from custom_components.smartcocoon import SmartCocoonController
-    
     controller = SmartCocoonController(
         username="test@example.com",
         password="password",
@@ -80,8 +79,6 @@ async def test_smartcocoon_controller_init(hass: HomeAssistant) -> None:
 
 async def test_smartcocoon_controller_async_start_mock(hass: HomeAssistant) -> None:
     """Test SmartCocoonController async_start with mocked manager."""
-    from custom_components.smartcocoon import SmartCocoonController
-    
     controller = SmartCocoonController(
         username="test@example.com",
         password="password",
@@ -126,9 +123,6 @@ def test_constants() -> None:
 
 def test_fan_entity_basic_properties() -> None:
     """Test basic fan entity properties without Home Assistant."""
-    from custom_components.smartcocoon.fan import SmartCocoonFan
-    from custom_components.smartcocoon import SmartCocoonController
-    
     # Create a mock controller
     controller = MagicMock(spec=SmartCocoonController)
     controller.enable_preset_modes = True
