@@ -2,7 +2,6 @@
 pytest-homeassistant-custom-component==0.13.287
 isort==5.13.2
 black==25.9.0
-pylint==3.3.5
+pylint>=4.0.1,<5
 pre-commit==4.3.0
 reorder-python-imports==3.14.0
-pre-commit==4.3.0
