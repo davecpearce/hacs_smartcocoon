@@ -1,6 +1,6 @@
 -r requirements.txt
 pytest-homeassistant-custom-component==0.13.287
-isort==5.13.2
+isort==7.0.0
 black==25.9.0
 pylint>=4.0.1,<5
 pre-commit==4.3.0
