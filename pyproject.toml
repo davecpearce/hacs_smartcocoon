@@ -17,7 +17,7 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
     "Topic :: Home Automation",
 ]
-requires-python = ">=3.13.0"
+requires-python = ">=3.13.2"
 
 [tool.pylint.BASIC]
 class-const-naming-style = "any"
