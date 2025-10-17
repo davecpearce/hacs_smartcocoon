@@ -1,4 +1,5 @@
 """Test constants for the SmartCocoon integration."""
+
 from __future__ import annotations
 
 from custom_components.smartcocoon.const import (
@@ -94,6 +95,7 @@ def test_constants_are_immutable() -> None:
 
 def test_preset_modes_usage() -> None:
     """Test how SC_PRESET_MODES would be used in practice."""
+
     # Simulate validation logic
     def is_valid_preset_mode(mode: str) -> bool:
         return mode in SC_PRESET_MODES

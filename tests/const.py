@@ -1,4 +1,5 @@
 """Test constants and mock data for SmartCocoon integration tests."""
+
 from __future__ import annotations
 
 # Mock user input for testing

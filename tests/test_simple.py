@@ -1,14 +1,24 @@
 """Simple tests for SmartCocoon integration."""
+
 from __future__ import annotations
 
 from unittest.mock import AsyncMock, MagicMock, patch
 
 from custom_components.smartcocoon import SmartCocoonController
-from custom_components.smartcocoon.const import DOMAIN
+from custom_components.smartcocoon.const import (
+    ATTR_ROOM_NAME,
+    CONF_ENABLE_PRESET_MODES,
+    DEFAULT_ENABLE_PRESET_MODES,
+    DOMAIN,
+    SC_PRESET_MODE_AUTO,
+    SC_PRESET_MODE_ECO,
+    SC_PRESET_MODES,
+)
 from custom_components.smartcocoon.fan import SmartCocoonFan
 from custom_components.smartcocoon.model import FanExtraAttributes
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.setup import async_setup_component
 
 from .const import MOCK_USER_INPUT
 
@@ -33,8 +43,6 @@ def test_mock_user_input() -> None:
 
 async def test_async_setup_component(hass: HomeAssistant) -> None:
     """Test component setup."""
-    from homeassistant.setup import async_setup_component
-
     # This will fail because the integration isn't properly loaded
     # but we can test the basic structure
     result = await async_setup_component(hass, DOMAIN, {})
@@ -56,7 +64,7 @@ def test_config_entry_creation() -> None:
         discovery_keys=set(),
         subentries_data=[],
     )
-    
+
     assert config_entry.domain == DOMAIN
     assert config_entry.title == "test@example.com"
     assert config_entry.data == MOCK_USER_INPUT
@@ -70,7 +78,8 @@ async def test_smartcocoon_controller_init(hass: HomeAssistant) -> None:
         enable_preset_modes=True,
         hass=hass,
     )
-    
+
+    # pylint: disable=protected-access
     assert controller._username == "test@example.com"
     assert controller._password == "password"
     assert controller._enable_preset_modes is True
@@ -85,7 +94,7 @@ async def test_smartcocoon_controller_async_start_mock(hass: HomeAssistant) -> N
         enable_preset_modes=True,
         hass=hass,
     )
-    
+
     # Mock the SmartCocoonManager
     mock_scmanager = MagicMock()
     mock_scmanager.async_start_services = AsyncMock(return_value=True)
@@ -93,26 +102,20 @@ async def test_smartcocoon_controller_async_start_mock(hass: HomeAssistant) -> N
     mock_scmanager.thermostats = {"thermo1": "Thermostat 1"}
     mock_scmanager.rooms = {"room1": "Room 1"}
     mock_scmanager.fans = {"fan1": "Fan 1"}
-    
-    with patch("custom_components.smartcocoon.SmartCocoonManager", return_value=mock_scmanager):
+
+    with patch(
+        "custom_components.smartcocoon.SmartCocoonManager", return_value=mock_scmanager
+    ):
         result = await controller.async_start()
-        
+
         assert result is True
+        # pylint: disable=protected-access
         assert controller._scmanager == mock_scmanager
         assert controller._session is not None
 
 
 def test_constants() -> None:
     """Test all constants are properly defined."""
-    from custom_components.smartcocoon.const import (
-        ATTR_ROOM_NAME,
-        CONF_ENABLE_PRESET_MODES,
-        DEFAULT_ENABLE_PRESET_MODES,
-        SC_PRESET_MODE_AUTO,
-        SC_PRESET_MODE_ECO,
-        SC_PRESET_MODES,
-    )
-    
     assert ATTR_ROOM_NAME == "room_name"
     assert CONF_ENABLE_PRESET_MODES == "enable_preset_modes"
     assert DEFAULT_ENABLE_PRESET_MODES is False
@@ -137,12 +140,12 @@ def test_fan_entity_basic_properties() -> None:
             firmware_version="1.0.0",
         )
     }
-    
+
     # Create a mock hass
     hass = MagicMock()
-    
+
     fan = SmartCocoonFan(hass, controller, "fan_1")
-    
+
     # Test basic properties
     assert fan.fan_id == "fan_1"
     assert fan.available is True
