@@ -8,13 +8,24 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from pysmartcocoon.errors import UnauthorizedError
 import pytest
 
-from custom_components.smartcocoon import SmartCocoonController, async_update_options
+from custom_components.smartcocoon import (
+    SmartCocoonController,
+    async_setup_entry,
+    async_unload_entry,
+    async_update_options,
+)
 from custom_components.smartcocoon.config_flow import (
     CannotConnect,
+    ConfigFlow,
     InvalidAuth,
+    OptionsFlowHandler,
     validate_input,
 )
-from custom_components.smartcocoon.const import DOMAIN, SC_PRESET_MODES
+from custom_components.smartcocoon.const import (
+    CONF_ENABLE_PRESET_MODES,
+    DOMAIN,
+    SC_PRESET_MODES,
+)
 from custom_components.smartcocoon.fan import (
     SmartCocoonFan,
     async_setup_entry as fan_async_setup_entry,
@@ -87,8 +98,6 @@ async def test_validate_input_exception(hass: HomeAssistant) -> None:
 
 async def test_config_flow_user_step_no_input(hass: HomeAssistant) -> None:
     """Test config flow user step with no input."""
-    from custom_components.smartcocoon.config_flow import ConfigFlow
-
     flow = ConfigFlow()
     flow.hass = hass
 
@@ -98,12 +107,8 @@ async def test_config_flow_user_step_no_input(hass: HomeAssistant) -> None:
     assert result["step_id"] == "user"
 
 
-
-
 async def test_options_flow_handler_init(hass: HomeAssistant) -> None:
     """Test OptionsFlowHandler initialization."""
-    from custom_components.smartcocoon.config_flow import OptionsFlowHandler
-
     config_entry = ConfigEntry(
         version=1,
         domain=DOMAIN,
@@ -123,8 +128,6 @@ async def test_options_flow_handler_init(hass: HomeAssistant) -> None:
 
 async def test_options_flow_step_init_no_input(hass: HomeAssistant) -> None:
     """Test options flow init step with no input."""
-    from custom_components.smartcocoon.config_flow import OptionsFlowHandler
-
     config_entry = ConfigEntry(
         version=1,
         domain=DOMAIN,
@@ -149,9 +152,6 @@ async def test_options_flow_step_init_no_input(hass: HomeAssistant) -> None:
 
 async def test_options_flow_step_init_with_input(hass: HomeAssistant) -> None:
     """Test options flow init step with user input."""
-    from custom_components.smartcocoon.config_flow import OptionsFlowHandler
-    from custom_components.smartcocoon.const import CONF_ENABLE_PRESET_MODES
-
     config_entry = ConfigEntry(
         version=1,
         domain=DOMAIN,
@@ -177,8 +177,6 @@ async def test_options_flow_step_init_with_input(hass: HomeAssistant) -> None:
 
 async def test_config_flow_async_get_options_flow(hass: HomeAssistant) -> None:
     """Test async_get_options_flow returns OptionsFlowHandler."""
-    from custom_components.smartcocoon.config_flow import ConfigFlow, OptionsFlowHandler
-
     config_entry = ConfigEntry(
         version=1,
         domain=DOMAIN,
@@ -210,7 +208,9 @@ async def test_smartcocoon_controller_properties(hass: HomeAssistant) -> None:
     assert controller.scmanager is None
 
 
-async def test_smartcocoon_controller_preset_modes_disabled(hass: HomeAssistant) -> None:
+async def test_smartcocoon_controller_preset_modes_disabled(
+    hass: HomeAssistant,
+) -> None:
     """Test SmartCocoonController with preset modes disabled."""
     controller = SmartCocoonController(
         username="test@example.com",
@@ -310,13 +310,16 @@ async def test_fan_async_setup_entry(hass: HomeAssistant) -> None:
 
     hass.data[DOMAIN] = {config_entry.entry_id: mock_controller}
 
-    entities = []
+    entities: list[SmartCocoonFan] = []
+
+    def add_entities(fans: list[SmartCocoonFan]) -> None:
+        entities.extend(fans)
 
     with patch("custom_components.smartcocoon.fan.SmartCocoonFan") as mock_fan_class:
         mock_fan = MagicMock()
         mock_fan_class.return_value = mock_fan
 
-        await fan_async_setup_entry(hass, config_entry, entities.append)
+        await fan_async_setup_entry(hass, config_entry, add_entities)
 
         assert len(entities) == 1
         mock_fan_class.assert_called_once()
@@ -421,7 +424,9 @@ async def test_smartcocoon_fan_unsupported_preset_mode(hass: HomeAssistant) -> N
     # Test with a mode that's in SC_PRESET_MODES but not implemented
     # Since SC_PRESET_MODES only has 'auto' and 'eco', we need to test the else branch
     # by patching SC_PRESET_MODES temporarily
-    with patch("custom_components.smartcocoon.fan.SC_PRESET_MODES", ["auto", "eco", "test"]):
+    with patch(
+        "custom_components.smartcocoon.fan.SC_PRESET_MODES", ["auto", "eco", "test"]
+    ):
         with pytest.raises(ValueError, match="Unsupported preset mode"):
             await fan.async_set_preset_mode("test")
 
@@ -687,18 +692,16 @@ def test_smartcocoon_fan_get_fan_data_without_scmanager(hass: HomeAssistant) -> 
     }
 
     fan = SmartCocoonFan(hass, controller, "fan_1")
-    
+
     # Now set scmanager to None to trigger the error in _get_fan_data
-    fan._scmanager = None
+    fan._scmanager = None  # pylint: disable=protected-access
 
     with pytest.raises(ValueError, match="SmartCocoonManager is not initialized"):
-        fan._get_fan_data()
+        fan._get_fan_data()  # pylint: disable=protected-access
 
 
 async def test_async_setup_entry(hass: HomeAssistant) -> None:
     """Test async_setup_entry function."""
-    from custom_components.smartcocoon import async_setup_entry
-    from custom_components.smartcocoon.const import CONF_ENABLE_PRESET_MODES
 
     config_entry = ConfigEntry(
         version=1,
@@ -737,7 +740,6 @@ async def test_async_setup_entry(hass: HomeAssistant) -> None:
 
 async def test_async_unload_entry(hass: HomeAssistant) -> None:
     """Test async_unload_entry function."""
-    from custom_components.smartcocoon import async_unload_entry
 
     config_entry = ConfigEntry(
         version=1,
@@ -767,7 +769,6 @@ async def test_async_unload_entry(hass: HomeAssistant) -> None:
 
 async def test_async_unload_entry_failure(hass: HomeAssistant) -> None:
     """Test async_unload_entry function when unload fails."""
-    from custom_components.smartcocoon import async_unload_entry
 
     config_entry = ConfigEntry(
         version=1,

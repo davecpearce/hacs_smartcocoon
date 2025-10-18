@@ -29,13 +29,11 @@ def test_fan_extra_attributes_creation() -> None:
     attrs_empty: FanExtraAttributes = {}
     assert len(attrs_empty) == 0
 
-    # Test with additional keys (should work due to total=False)
+    # Test with only the defined key
     attrs_extra: FanExtraAttributes = {
         "room_name": "Bedroom",
-        "extra_key": "extra_value",  # This should be allowed
     }
     assert attrs_extra["room_name"] == "Bedroom"
-    assert attrs_extra["extra_key"] == "extra_value"
 
 
 def test_fan_extra_attributes_type_hints() -> None:
@@ -55,9 +53,9 @@ def test_fan_extra_attributes_immutability() -> None:
     attrs["room_name"] = "Dining Room"
     assert attrs["room_name"] == "Dining Room"
 
-    # Should be able to add new keys
-    attrs["new_key"] = "new_value"
-    assert attrs["new_key"] == "new_value"
+    # Should be able to modify existing keys
+    attrs["room_name"] = "Updated Room"
+    assert attrs["room_name"] == "Updated Room"
 
 
 def test_fan_extra_attributes_usage_in_fan_entity() -> None:

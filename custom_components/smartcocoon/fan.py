@@ -9,12 +9,11 @@ from pysmartcocoon.manager import SmartCocoonManager
 from homeassistant.components.fan import ENTITY_ID_FORMAT, FanEntity, FanEntityFeature
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity import async_generate_entity_id
 from homeassistant.helpers.device_registry import DeviceInfo
+from homeassistant.helpers.entity import async_generate_entity_id
 
 from . import SmartCocoonController
 from .const import (
-    ATTR_ROOM_NAME,
     DOMAIN,
     SC_PRESET_MODE_AUTO,
     SC_PRESET_MODE_ECO,
@@ -26,7 +25,9 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, config_entry: ConfigEntry, async_add_entities: Callable[[list[SmartCocoonFan]], None]
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    async_add_entities: Callable[[list[SmartCocoonFan]], None],
 ) -> None:
     """Initialize sensor platform from config entry."""
 
@@ -46,7 +47,7 @@ async def async_setup_entry(
     _LOGGER.debug("Completed async_setup_entry")
 
 
-class SmartCocoonFan(FanEntity):
+class SmartCocoonFan(FanEntity):  # type: ignore[misc]
     """A SmartCocoon fan entity."""
 
     def __init__(
@@ -60,10 +61,10 @@ class SmartCocoonFan(FanEntity):
         self._fan_id = fan_id
         self._scmanager = smartcocoon.scmanager
         self._enable_preset_modes = smartcocoon.enable_preset_modes
-        
+
         if self._scmanager is None:
             raise ValueError("SmartCocoonManager is not initialized")
-            
+
         self.entity_id = async_generate_entity_id(
             ENTITY_ID_FORMAT,
             f"{self._scmanager.fans[self._fan_id].room_name}_{self._fan_id}",
@@ -111,9 +112,7 @@ class SmartCocoonFan(FanEntity):
     def extra_state_attributes(self) -> FanExtraAttributes:
         """Return the device specific state attributes."""
         fan_data = self._get_fan_data()
-        attrs: FanExtraAttributes = {
-            "room_name": fan_data.room_name
-        }
+        attrs: FanExtraAttributes = {"room_name": fan_data.room_name}
 
         return attrs
 
@@ -203,7 +202,7 @@ class SmartCocoonFan(FanEntity):
         """Set new preset mode."""
         if self._scmanager is None:
             raise ValueError("SmartCocoonManager is not initialized")
-            
+
         if preset_mode not in SC_PRESET_MODES:
             raise ValueError(
                 "{preset_mode} is not a valid preset_mode: {SC_PRESET_MODES}"
@@ -234,7 +233,7 @@ class SmartCocoonFan(FanEntity):
         """Turn on the entity."""
         if self._scmanager is None:
             raise ValueError("SmartCocoonManager is not initialized")
-            
+
         if preset_mode:
             await self.async_set_preset_mode(preset_mode)
             return

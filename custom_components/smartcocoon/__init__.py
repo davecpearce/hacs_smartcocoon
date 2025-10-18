@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import logging
 
+from aiohttp import ClientSession
 from pysmartcocoon.errors import UnauthorizedError
 from pysmartcocoon.manager import SmartCocoonManager
 
@@ -11,7 +12,6 @@ from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from aiohttp import ClientSession
 
 from .const import CONF_ENABLE_PRESET_MODES, DEFAULT_ENABLE_PRESET_MODES, DOMAIN
 
@@ -24,7 +24,11 @@ class SmartCocoonController:
     """SmartCocoon main class."""
 
     def __init__(
-        self, username: str, password: str, enable_preset_modes: bool, hass: HomeAssistant
+        self,
+        username: str,
+        password: str,
+        enable_preset_modes: bool,
+        hass: HomeAssistant,
     ) -> None:
         """Initialize."""
         self._username = username
@@ -118,4 +122,4 @@ async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> 
     if unload_ok:
         hass.data[DOMAIN].pop(config_entry.entry_id)
 
-    return unload_ok
+    return unload_ok  # type: ignore[no-any-return]
