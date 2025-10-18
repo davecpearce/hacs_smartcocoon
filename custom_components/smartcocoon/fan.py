@@ -2,13 +2,15 @@
 from __future__ import annotations
 
 import logging
+from typing import Any, Callable
 
 from pysmartcocoon.manager import SmartCocoonManager
 
 from homeassistant.components.fan import ENTITY_ID_FORMAT, FanEntity, FanEntityFeature
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity import DeviceInfo, async_generate_entity_id
+from homeassistant.helpers.entity import async_generate_entity_id
+from homeassistant.helpers.device_registry import DeviceInfo
 
 from . import SmartCocoonController
 from .const import (
@@ -24,8 +26,8 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, config_entry: ConfigEntry, async_add_entities
-):
+    hass: HomeAssistant, config_entry: ConfigEntry, async_add_entities: Callable[[list[SmartCocoonFan]], None]
+) -> None:
     """Initialize sensor platform from config entry."""
 
     _LOGGER.debug("Starting async_setup_entry")
@@ -58,6 +60,10 @@ class SmartCocoonFan(FanEntity):
         self._fan_id = fan_id
         self._scmanager = smartcocoon.scmanager
         self._enable_preset_modes = smartcocoon.enable_preset_modes
+        
+        if self._scmanager is None:
+            raise ValueError("SmartCocoonManager is not initialized")
+            
         self.entity_id = async_generate_entity_id(
             ENTITY_ID_FORMAT,
             f"{self._scmanager.fans[self._fan_id].room_name}_{self._fan_id}",
@@ -71,10 +77,16 @@ class SmartCocoonFan(FanEntity):
 
         _LOGGER.debug("Initialized fan_id: %s", self._fan_id)
 
+    def _get_fan_data(self) -> Any:
+        """Get fan data from scmanager, ensuring it's not None."""
+        if self._scmanager is None:
+            raise ValueError("SmartCocoonManager is not initialized")
+        return self._scmanager.fans[self._fan_id]
+
     @property
-    def available(self):
+    def available(self) -> bool:
         """Return True if entity is available."""
-        return self._scmanager.fans[self._fan_id].connected
+        return self._get_fan_data().connected
 
     @property
     def device_info(self) -> DeviceInfo:
@@ -104,17 +116,17 @@ class SmartCocoonFan(FanEntity):
         return attrs
 
     @property
-    def is_connected(self):
+    def is_connected(self) -> bool:
         """Return whether the mock bridge is connected."""
         return self._scmanager.fans[self._fan_id].connected
 
     @property
-    def is_on(self):
+    def is_on(self) -> bool:
         """Return true if the fan is on."""
         return self._scmanager.fans[self._fan_id].fan_on
 
     @property
-    def fan_id(self):
+    def fan_id(self) -> str:
         """Return the physical ID of the fan."""
         return self._fan_id
 
@@ -126,7 +138,7 @@ class SmartCocoonFan(FanEntity):
     @property
     def percentage(self) -> int | None:
         """Return the current speed."""
-        return self._scmanager.fans[self._fan_id].power / 100
+        return int(self._scmanager.fans[self._fan_id].power)
 
     @property
     def preset_mode(self) -> str | None:
@@ -134,7 +146,7 @@ class SmartCocoonFan(FanEntity):
         return self._scmanager.fans[self._fan_id].mode
 
     @property
-    def preset_modes(self):
+    def preset_modes(self) -> list[str] | None:
         """List of available preset modes."""
 
         if self._enable_preset_modes:
@@ -143,7 +155,7 @@ class SmartCocoonFan(FanEntity):
         return None
 
     @property
-    def should_poll(self):
+    def should_poll(self) -> bool:
         """No polling needed, updates come from MQTT."""
         return False
 
@@ -195,16 +207,16 @@ class SmartCocoonFan(FanEntity):
 
         self.async_write_ha_state()
 
-    async def async_turn_off(self, **kwargs) -> None:
+    async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn off the entity."""
         await self._scmanager.async_fan_turn_off(self._fan_id)
         self.async_write_ha_state()
 
     async def async_turn_on(
         self,
-        percentage: int = None,
-        preset_mode: str = None,
-        **kwargs,
+        percentage: int | None = None,
+        preset_mode: str | None = None,
+        **kwargs: Any,
     ) -> None:
         """Turn on the entity."""
         if preset_mode:

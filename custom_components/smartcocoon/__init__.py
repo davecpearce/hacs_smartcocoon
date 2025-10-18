@@ -11,6 +11,7 @@ from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from aiohttp import ClientSession
 
 from .const import CONF_ENABLE_PRESET_MODES, DEFAULT_ENABLE_PRESET_MODES, DOMAIN
 
@@ -23,14 +24,14 @@ class SmartCocoonController:
     """SmartCocoon main class."""
 
     def __init__(
-        self, username, password, enable_preset_modes: bool, hass: HomeAssistant
+        self, username: str, password: str, enable_preset_modes: bool, hass: HomeAssistant
     ) -> None:
         """Initialize."""
         self._username = username
         self._password = password
-        self._scmanager: SmartCocoonManager = None
+        self._scmanager: SmartCocoonManager | None = None
         self._hass: HomeAssistant = hass
-        self._session = None
+        self._session: ClientSession | None = None
 
         if enable_preset_modes:
             self._enable_preset_modes = True
@@ -38,12 +39,12 @@ class SmartCocoonController:
             self._enable_preset_modes = False
 
     @property
-    def enable_preset_modes(self):
+    def enable_preset_modes(self) -> bool:
         """Return the Enable Preset Mode flag."""
         return self._enable_preset_modes
 
     @property
-    def scmanager(self):
+    def scmanager(self) -> SmartCocoonManager | None:
         """Return the SmartCocoonManager object."""
         return self._scmanager
 
