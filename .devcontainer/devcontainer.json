@@ -3,11 +3,15 @@
   "name": "SmartCocoon",
   "dockerFile": "Dockerfile",
   "context": "..",
-  "appPort": ["9123:9123"],
-  "runArgs": [
-    "-v",
-    "${env:HOME}${env:USERPROFILE}/.ssh:/tmp/.ssh" // This is added so you can push from inside the container
+  "appPort": [
+    "9123:9123"
   ],
+  "postCreateCommand": "/usr/local/bin/setup-git.sh",
+  "containerEnv": {
+    "GIT_USER_NAME": "${localEnv:GIT_USER_NAME}",
+    "GIT_USER_EMAIL": "${localEnv:GIT_USER_EMAIL}",
+    "GITHUB_TOKEN": "${localEnv:GITHUB_TOKEN}"
+  },
   "customizations": {
     "vscode": {
       "extensions": [
@@ -29,7 +33,9 @@
         "editor.formatOnSave": true,
         "editor.formatOnType": true,
         "files.trimTrailingWhitespace": true,
-        "yaml.customTags": ["!secret scalar"],
+        "yaml.customTags": [
+          "!secret scalar"
+        ],
         "[python]": {
           "editor.defaultFormatter": "ms-python.black-formatter",
           "editor.formatOnSave": true

@@ -5,3 +5,6 @@ pythonenv*
 venv
 .venv
 .DS_Store
+
+# Devcontainer
+.devcontainer/.env
