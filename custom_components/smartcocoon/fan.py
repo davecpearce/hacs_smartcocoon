@@ -137,8 +137,9 @@ class SmartCocoonFan(FanEntity):
 
     @property
     def percentage(self) -> int | None:
-        """Return the current speed."""
-        return int(self._scmanager.fans[self._fan_id].power)
+        """Return the current speed as a percentage (0-100)."""
+        power = self._scmanager.fans[self._fan_id].power
+        return int(power)
 
     @property
     def preset_mode(self) -> str | None:

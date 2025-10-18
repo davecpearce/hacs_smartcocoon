@@ -151,6 +151,6 @@ def test_fan_entity_basic_properties() -> None:
     assert fan.available is True
     assert fan.is_connected is True
     assert fan.is_on is True
-    assert fan.percentage == 0.75
+    assert fan.percentage == 75
     assert fan.preset_mode == "auto"
     assert fan.speed_count == 100

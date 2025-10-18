@@ -474,7 +474,7 @@ def test_smartcocoon_fan_basic_properties(hass: HomeAssistant) -> None:
     assert fan.is_on is True
     assert fan.fan_id == "fan_1"
     assert fan.name == "SmartCocoon Fan - Living Room:fan_1"
-    assert fan.percentage == 0.75  # 75/100
+    assert fan.percentage == 75  # 75/100
     assert fan.preset_mode == "auto"
     assert fan.should_poll is False
     assert fan.speed_count == 100
