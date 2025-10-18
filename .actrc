@@ -1,0 +1,17 @@
+# act configuration file
+# See: https://github.com/nektos/act#configuration
+
+# Use a specific runner image
+-P ubuntu-latest=catthehacker/ubuntu:act-latest
+
+# Bind mount the current directory
+-W /workspaces/hacs_smartcocoon
+
+# Use secrets from .env file if it exists
+--secret-file .devcontainer/.env
+
+# Enable verbose output
+-v
+
+# Don't pull images if they exist locally
+--pull=false
