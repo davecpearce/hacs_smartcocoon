@@ -409,7 +409,7 @@ async def test_smartcocoon_fan_async_methods(hass: HomeAssistant) -> None:
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power=75,
+            power=7500,  # API returns 0-10000 scale, 75% = 7500
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -427,7 +427,8 @@ async def test_smartcocoon_fan_async_methods(hass: HomeAssistant) -> None:
     # Test async_set_percentage
     with patch.object(fan, "async_write_ha_state") as mock_write:
         await fan.async_set_percentage(50)
-        controller.scmanager.async_set_fan_speed.assert_called_once_with("fan_1", 50)
+        # API expects 0-10000 scale, so 50% becomes 5000
+        controller.scmanager.async_set_fan_speed.assert_called_once_with("fan_1", 5000)
         mock_write.assert_called_once()
 
     # Test async_set_preset_mode_auto
@@ -465,7 +466,7 @@ async def test_smartcocoon_fan_invalid_preset_mode(hass: HomeAssistant) -> None:
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power=75,
+            power=7500,  # API returns 0-10000 scale, 75% = 7500
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -487,7 +488,7 @@ async def test_smartcocoon_fan_unsupported_preset_mode(hass: HomeAssistant) -> N
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power=75,
+            power=7500,  # API returns 0-10000 scale, 75% = 7500
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -515,7 +516,7 @@ async def test_smartcocoon_fan_turn_on_with_preset_mode(hass: HomeAssistant) -> 
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power=75,
+            power=7500,  # API returns 0-10000 scale, 75% = 7500
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -542,7 +543,7 @@ async def test_smartcocoon_fan_turn_on_with_percentage(hass: HomeAssistant) -> N
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power=75,
+            power=7500,  # API returns 0-10000 scale, 75% = 7500
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -573,7 +574,7 @@ def test_smartcocoon_fan_without_preset_modes(hass: HomeAssistant) -> None:
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power=75,
+            power=7500,  # API returns 0-10000 scale, 75% = 7500
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -595,7 +596,7 @@ def test_smartcocoon_fan_device_info(hass: HomeAssistant) -> None:
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power=75,
+            power=7500,  # API returns 0-10000 scale, 75% = 7500
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -622,7 +623,7 @@ def test_smartcocoon_fan_extra_state_attributes(hass: HomeAssistant) -> None:
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power=75,
+            power=7500,  # API returns 0-10000 scale, 75% = 7500
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -645,7 +646,7 @@ async def test_smartcocoon_fan_update_callback(hass: HomeAssistant) -> None:
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power=75,
+            power=7500,  # API returns 0-10000 scale, 75% = 7500
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -668,7 +669,7 @@ def test_smartcocoon_fan_basic_properties(hass: HomeAssistant) -> None:
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power=75,
+            power=7500,  # API returns 0-10000 scale, 75% = 7500
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -700,7 +701,7 @@ def test_smartcocoon_fan_supported_features(hass: HomeAssistant) -> None:
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power=75,
+            power=7500,  # API returns 0-10000 scale, 75% = 7500
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -728,7 +729,7 @@ def test_smartcocoon_fan_preset_modes(hass: HomeAssistant) -> None:
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power=75,
+            power=7500,  # API returns 0-10000 scale, 75% = 7500
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -759,7 +760,7 @@ def test_smartcocoon_fan_get_fan_data_without_scmanager(hass: HomeAssistant) -> 
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power=75,
+            power=7500,  # API returns 0-10000 scale, 75% = 7500
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -893,7 +894,7 @@ async def test_smartcocoon_fan_error_handling_invalid_preset_mode_format(
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power=75,
+            power=7500,  # API returns 0-10000 scale, 75% = 7500
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -918,7 +919,7 @@ async def test_smartcocoon_fan_error_handling_preset_mode_fstring_fixed(
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power=75,
+            power=7500,  # API returns 0-10000 scale, 75% = 7500
             mode="auto",
             firmware_version="1.0.0",
         )

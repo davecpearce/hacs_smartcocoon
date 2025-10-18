@@ -135,7 +135,7 @@ def test_fan_entity_basic_properties() -> None:
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power=75,
+            power=7500,  # API returns 0-10000 scale, 75% = 7500
             mode="auto",
             firmware_version="1.0.0",
         )

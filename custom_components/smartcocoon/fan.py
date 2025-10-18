@@ -143,7 +143,9 @@ class SmartCocoonFan(FanEntity):  # type: ignore[misc]
         """Return the current speed as a percentage (0-100)."""
         fan_data = self._get_fan_data()
         power = fan_data.power
-        return int(power)
+        # Convert from SmartCocoon API scale (0-10000) to HA percentage (0-100)
+        # SmartCocoon API returns values in range 0-10000, not 0-100
+        return int(power / 100)
 
     @property
     def preset_mode(self) -> str | None:
@@ -194,8 +196,10 @@ class SmartCocoonFan(FanEntity):  # type: ignore[misc]
     async def async_set_percentage(self, percentage: int) -> None:
         """Set the speed of the fan, as a percentage."""
         assert self._scmanager is not None  # Checked in constructor
-        await self._scmanager.async_set_fan_speed(self._fan_id, percentage)
-        # self._power = percentage * 100
+        # Convert HA percentage (0-100) to SmartCocoon API scale (0-10000)
+        # SmartCocoon API expects values in range 0-10000, not 0-100
+        api_speed = percentage * 100
+        await self._scmanager.async_set_fan_speed(self._fan_id, api_speed)
         self.async_write_ha_state()
 
     async def async_set_preset_mode(self, preset_mode: str) -> None:
