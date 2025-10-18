@@ -5,6 +5,9 @@ ENV PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1
 
+# Source .env file if it exists (mounted from host)
+RUN echo 'if [ -f /workspaces/hacs_smartcocoon/.devcontainer/.env ]; then set -a && source /workspaces/hacs_smartcocoon/.devcontainer/.env && set +a; fi' >> /etc/bash.bashrc
+
 # Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
@@ -42,6 +45,6 @@ RUN python3 -m pip install -r requirements_test.txt
 
 # Create symlink script
 RUN echo '#!/bin/bash\n\
-ln -sf /workspaces/hacs_smartcocoon/custom_components/smartcocoon /opt/hass/homeassistant/components/smartcocoon\n\
-echo "Created symlink for smartcocoon component"' > /usr/local/bin/setup-component.sh \
+    ln -sf /workspaces/hacs_smartcocoon/custom_components/smartcocoon /opt/hass/homeassistant/components/smartcocoon\n\
+    echo "Created symlink for smartcocoon component"' > /usr/local/bin/setup-component.sh \
     && chmod +x /usr/local/bin/setup-component.sh
