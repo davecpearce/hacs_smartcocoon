@@ -90,10 +90,43 @@ default_section = "THIRDPARTY"
 pythonpath = [
   "."
 ]
-addopts = "-qq --timeout=9 --cov-report=html:htmlcov --cov-report=term-missing --cov=custom_components.smartcocoon --cov-fail-under=70"
+addopts = "-qq --timeout=9 --cov-report=html:htmlcov --cov-report=term-missing --cov=custom_components.smartcocoon --cov-fail-under=70 --cov-branch --cov-context=test"
 console_output_style = "count"
 testpaths = [
   "tests",
 ]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
+
+[tool.coverage.run]
+source = [
+    "custom_components",
+]
+omit = [
+    "*/tests/*",
+    "*/test_*",
+    "*/__pycache__/*",
+    "*/.*",
+]
+branch = true
+parallel = true
+concurrency = [
+    "thread",
+    "multiprocessing",
+]
+
+[tool.coverage.report]
+show_missing = true
+precision = 2
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
