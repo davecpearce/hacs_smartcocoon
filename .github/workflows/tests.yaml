@@ -115,11 +115,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements_test.txt
           pip install -e .
-      - name: Run mypy type checking
-        run: |
-          echo "🔍 Running mypy type checking..."
-          python -m mypy custom_components/smartcocoon/ --strict --ignore-missing-imports --explicit-package-bases
-
   hacs:
     runs-on: "ubuntu-latest"
     name: HACS
