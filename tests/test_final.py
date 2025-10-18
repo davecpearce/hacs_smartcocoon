@@ -409,7 +409,7 @@ async def test_smartcocoon_fan_async_methods(hass: HomeAssistant) -> None:
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power=75,
+            power=75,  # API returns 0-100 scale, same as HA
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -427,6 +427,7 @@ async def test_smartcocoon_fan_async_methods(hass: HomeAssistant) -> None:
     # Test async_set_percentage
     with patch.object(fan, "async_write_ha_state") as mock_write:
         await fan.async_set_percentage(50)
+        # API expects 0-100 scale, same as HA
         controller.scmanager.async_set_fan_speed.assert_called_once_with("fan_1", 50)
         mock_write.assert_called_once()
 
@@ -465,7 +466,7 @@ async def test_smartcocoon_fan_invalid_preset_mode(hass: HomeAssistant) -> None:
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power=75,
+            power=75,  # API returns 0-100 scale, same as HA
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -487,7 +488,7 @@ async def test_smartcocoon_fan_unsupported_preset_mode(hass: HomeAssistant) -> N
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power=75,
+            power=75,  # API returns 0-100 scale, same as HA
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -515,7 +516,7 @@ async def test_smartcocoon_fan_turn_on_with_preset_mode(hass: HomeAssistant) -> 
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power=75,
+            power=75,  # API returns 0-100 scale, same as HA
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -542,7 +543,7 @@ async def test_smartcocoon_fan_turn_on_with_percentage(hass: HomeAssistant) -> N
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power=75,
+            power=75,  # API returns 0-100 scale, same as HA
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -573,7 +574,7 @@ def test_smartcocoon_fan_without_preset_modes(hass: HomeAssistant) -> None:
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power=75,
+            power=75,  # API returns 0-100 scale, same as HA
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -595,7 +596,7 @@ def test_smartcocoon_fan_device_info(hass: HomeAssistant) -> None:
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power=75,
+            power=75,  # API returns 0-100 scale, same as HA
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -622,7 +623,7 @@ def test_smartcocoon_fan_extra_state_attributes(hass: HomeAssistant) -> None:
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power=75,
+            power=75,  # API returns 0-100 scale, same as HA
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -645,7 +646,7 @@ async def test_smartcocoon_fan_update_callback(hass: HomeAssistant) -> None:
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power=75,
+            power=75,  # API returns 0-100 scale, same as HA
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -668,7 +669,7 @@ def test_smartcocoon_fan_basic_properties(hass: HomeAssistant) -> None:
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power=75,
+            power=75,  # API returns 0-100 scale, same as HA
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -700,7 +701,7 @@ def test_smartcocoon_fan_supported_features(hass: HomeAssistant) -> None:
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power=75,
+            power=75,  # API returns 0-100 scale, same as HA
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -728,7 +729,7 @@ def test_smartcocoon_fan_preset_modes(hass: HomeAssistant) -> None:
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power=75,
+            power=75,  # API returns 0-100 scale, same as HA
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -759,7 +760,7 @@ def test_smartcocoon_fan_get_fan_data_without_scmanager(hass: HomeAssistant) -> 
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power=75,
+            power=75,  # API returns 0-100 scale, same as HA
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -868,3 +869,69 @@ async def test_async_unload_entry_failure(hass: HomeAssistant) -> None:
         assert result is False
         assert config_entry.entry_id in hass.data[DOMAIN]  # Should still be there
         mock_unload.assert_called_once()
+
+
+async def test_smartcocoon_fan_constructor_error_handling(hass: HomeAssistant) -> None:
+    """Test SmartCocoonFan constructor error handling when scmanager is None."""
+    controller = MagicMock(spec=SmartCocoonController)
+    controller.enable_preset_modes = True
+    controller.scmanager = None  # This is the key - scmanager is None
+
+    # Test that constructor raises error when scmanager is None
+    with pytest.raises(ValueError, match="SmartCocoonManager is not initialized"):
+        SmartCocoonFan(hass, controller, "fan_1")
+
+
+async def test_smartcocoon_fan_error_handling_invalid_preset_mode_format(
+    hass: HomeAssistant,
+) -> None:
+    """Test SmartCocoonFan error handling for invalid preset mode format."""
+    controller = MagicMock(spec=SmartCocoonController)
+    controller.enable_preset_modes = True
+    controller.scmanager = MagicMock()
+    controller.scmanager.fans = {
+        "fan_1": MagicMock(
+            room_name="Living Room",
+            connected=True,
+            fan_on=True,
+            power=75,  # API returns 0-100 scale, same as HA
+            mode="auto",
+            firmware_version="1.0.0",
+        )
+    }
+
+    fan = SmartCocoonFan(hass, controller, "fan_1")
+
+    # Test with invalid preset mode (should hit the first validation)
+    with pytest.raises(ValueError, match="is not a valid preset_mode"):
+        await fan.async_set_preset_mode("unsupported_mode")
+
+
+async def test_smartcocoon_fan_error_handling_preset_mode_fstring_fixed(
+    hass: HomeAssistant,
+) -> None:
+    """Test SmartCocoonFan error handling for preset mode with proper f-string."""
+    controller = MagicMock(spec=SmartCocoonController)
+    controller.enable_preset_modes = True
+    controller.scmanager = MagicMock()
+    controller.scmanager.fans = {
+        "fan_1": MagicMock(
+            room_name="Living Room",
+            connected=True,
+            fan_on=True,
+            power=75,  # API returns 0-100 scale, same as HA
+            mode="auto",
+            firmware_version="1.0.0",
+        )
+    }
+
+    fan = SmartCocoonFan(hass, controller, "fan_1")
+
+    # Test the fixed f-string in the ValueError message
+    with pytest.raises(ValueError) as exc_info:
+        await fan.async_set_preset_mode("invalid_mode")
+
+    # The error message should now be properly formatted with f-string
+    error_msg = str(exc_info.value)
+    assert "invalid_mode" in error_msg
+    assert "['auto', 'eco']" in error_msg
