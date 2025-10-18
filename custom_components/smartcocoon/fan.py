@@ -86,31 +86,33 @@ class SmartCocoonFan(FanEntity):
     @property
     def available(self) -> bool:
         """Return True if entity is available."""
-        return self._get_fan_data().connected
+        return self._get_fan_data().connected  # type: ignore[no-any-return]
 
     @property
     def device_info(self) -> DeviceInfo:
         """Return info for device registry."""
+        fan_data = self._get_fan_data()
 
         _LOGGER.debug(
             "device_info: fan_id: %s, sw_version: %s",
             self._fan_id,
-            self._scmanager.fans[self._fan_id].firmware_version,
+            fan_data.firmware_version,
         )
 
         return {
             "identifiers": {(DOMAIN, f"smartcocoon_fan_{self._fan_id}")},
-            "name": f"{self._scmanager.fans[self._fan_id].room_name}:{self._fan_id}",
+            "name": f"{fan_data.room_name}:{self._fan_id}",
             "model": "Smart Vent",
-            "sw_version": self._scmanager.fans[self._fan_id].firmware_version,
+            "sw_version": fan_data.firmware_version,
             "manufacturer": "SmartCocoon",
         }
 
     @property
     def extra_state_attributes(self) -> FanExtraAttributes:
         """Return the device specific state attributes."""
+        fan_data = self._get_fan_data()
         attrs: FanExtraAttributes = {
-            ATTR_ROOM_NAME: self._scmanager.fans[self._fan_id].room_name
+            "room_name": fan_data.room_name
         }
 
         return attrs
@@ -118,12 +120,12 @@ class SmartCocoonFan(FanEntity):
     @property
     def is_connected(self) -> bool:
         """Return whether the mock bridge is connected."""
-        return self._scmanager.fans[self._fan_id].connected
+        return self._get_fan_data().connected  # type: ignore[no-any-return]
 
     @property
     def is_on(self) -> bool:
         """Return true if the fan is on."""
-        return self._scmanager.fans[self._fan_id].fan_on
+        return self._get_fan_data().fan_on  # type: ignore[no-any-return]
 
     @property
     def fan_id(self) -> str:
@@ -133,18 +135,21 @@ class SmartCocoonFan(FanEntity):
     @property
     def name(self) -> str:
         """Get entity name."""
-        return f"SmartCocoon Fan - {self._scmanager.fans[self._fan_id].room_name}:{self._fan_id}"
+        fan_data = self._get_fan_data()
+        return f"SmartCocoon Fan - {fan_data.room_name}:{self._fan_id}"
 
     @property
     def percentage(self) -> int | None:
         """Return the current speed as a percentage (0-100)."""
-        power = self._scmanager.fans[self._fan_id].power
+        fan_data = self._get_fan_data()
+        power = fan_data.power
         return int(power)
 
     @property
     def preset_mode(self) -> str | None:
         """Return the current preset mode, e.g., auto, smart, interval, favorite."""
-        return self._scmanager.fans[self._fan_id].mode
+        fan_data = self._get_fan_data()
+        return fan_data.mode  # type: ignore[no-any-return]
 
     @property
     def preset_modes(self) -> list[str] | None:
@@ -166,7 +171,7 @@ class SmartCocoonFan(FanEntity):
         return 100
 
     @property
-    def supported_features(self) -> int:
+    def supported_features(self) -> FanEntityFeature:
         """Flag supported features."""
         flags = FanEntityFeature(0)
         flags |= FanEntityFeature.SET_SPEED
@@ -188,12 +193,17 @@ class SmartCocoonFan(FanEntity):
 
     async def async_set_percentage(self, percentage: int) -> None:
         """Set the speed of the fan, as a percentage."""
+        if self._scmanager is None:
+            raise ValueError("SmartCocoonManager is not initialized")
         await self._scmanager.async_set_fan_speed(self._fan_id, percentage)
         # self._power = percentage * 100
         self.async_write_ha_state()
 
     async def async_set_preset_mode(self, preset_mode: str) -> None:
         """Set new preset mode."""
+        if self._scmanager is None:
+            raise ValueError("SmartCocoonManager is not initialized")
+            
         if preset_mode not in SC_PRESET_MODES:
             raise ValueError(
                 "{preset_mode} is not a valid preset_mode: {SC_PRESET_MODES}"
@@ -210,6 +220,8 @@ class SmartCocoonFan(FanEntity):
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn off the entity."""
+        if self._scmanager is None:
+            raise ValueError("SmartCocoonManager is not initialized")
         await self._scmanager.async_fan_turn_off(self._fan_id)
         self.async_write_ha_state()
 
@@ -220,6 +232,9 @@ class SmartCocoonFan(FanEntity):
         **kwargs: Any,
     ) -> None:
         """Turn on the entity."""
+        if self._scmanager is None:
+            raise ValueError("SmartCocoonManager is not initialized")
+            
         if preset_mode:
             await self.async_set_preset_mode(preset_mode)
             return
