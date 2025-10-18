@@ -1,7 +1,30 @@
-__pycache__
-pythonenv*
-.python-version
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Testing
 .coverage
-venv
-.venv
+.pytest_cache/
+htmlcov/
+coverage.xml
+*.cover
+
+# IDEs
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
 .DS_Store
+._*
+Thumbs.db
+
+# Home Assistant
+.homeassistant/
+*.log
+
+# Devcontainer
+.devcontainer/.env
+node_modules/.cache/

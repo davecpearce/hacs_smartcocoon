@@ -1,8 +1,10 @@
 """The SmartCocoon integration."""
+
 from __future__ import annotations
 
 import logging
 
+from aiohttp import ClientSession
 from pysmartcocoon.errors import UnauthorizedError
 from pysmartcocoon.manager import SmartCocoonManager
 
@@ -23,14 +25,18 @@ class SmartCocoonController:
     """SmartCocoon main class."""
 
     def __init__(
-        self, username, password, enable_preset_modes: bool, hass: HomeAssistant
+        self,
+        username: str,
+        password: str,
+        enable_preset_modes: bool,
+        hass: HomeAssistant,
     ) -> None:
         """Initialize."""
         self._username = username
         self._password = password
-        self._scmanager: SmartCocoonManager = None
+        self._scmanager: SmartCocoonManager | None = None
         self._hass: HomeAssistant = hass
-        self._session = None
+        self._session: ClientSession | None = None
 
         if enable_preset_modes:
             self._enable_preset_modes = True
@@ -38,12 +44,12 @@ class SmartCocoonController:
             self._enable_preset_modes = False
 
     @property
-    def enable_preset_modes(self):
+    def enable_preset_modes(self) -> bool:
         """Return the Enable Preset Mode flag."""
         return self._enable_preset_modes
 
     @property
-    def scmanager(self):
+    def scmanager(self) -> SmartCocoonManager | None:
         """Return the SmartCocoonManager object."""
         return self._scmanager
 
@@ -110,7 +116,7 @@ async def async_update_options(hass: HomeAssistant, config_entry: ConfigEntry) -
 async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
     """Unload a config entry."""
 
-    unload_ok = await hass.config_entries.async_unload_platforms(
+    unload_ok: bool = await hass.config_entries.async_unload_platforms(
         config_entry, PLATFORMS
     )
 

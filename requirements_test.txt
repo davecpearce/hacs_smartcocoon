@@ -9,3 +9,8 @@ black==25.9.0
 pylint>=4.0.1,<5
 pre-commit==4.3.0
 reorder-python-imports==3.14.0
+# Security scanning tools
+semgrep>=1.45.0
+pip-audit>=2.6.0
+# Type checking
+mypy>=1.8.0

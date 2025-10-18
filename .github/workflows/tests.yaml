@@ -1,5 +1,5 @@
 ---
-name: Linting
+name: CI/CD Pipeline
 
 on:
   push:
@@ -11,7 +11,7 @@ on:
     - cron: "0 0 * * *"
 
 env:
-  DEFAULT_PYTHON: "3.13.2"
+  DEFAULT_PYTHON: "3.13"
 
 jobs:
   pre-commit:
@@ -20,10 +20,10 @@ jobs:
     steps:
       - name: Check out the repository
         uses: actions/checkout@v5.0.0
-      - name: Set up Python ${{ env.DEFAULT_PYTHON }}
+      - name: Set up Python 3.13
         uses: actions/setup-python@v6.0.0
         with:
-          python-version: ${{ env.DEFAULT_PYTHON }}
+          python-version: "3.13"
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -35,14 +35,17 @@ jobs:
 
   test:
     runs-on: "ubuntu-latest"
-    name: Test
+    name: Test Python ${{ matrix.python-version }}
+    strategy:
+      matrix:
+        python-version: ["3.13"]
     steps:
       - name: Check out the repository
         uses: actions/checkout@v5.0.0
-      - name: Set up Python ${{ env.DEFAULT_PYTHON }}
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v6.0.0
         with:
-          python-version: ${{ env.DEFAULT_PYTHON }}
+          python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -56,8 +59,46 @@ jobs:
         with:
           file: ./coverage.xml
           flags: unittests
-          name: codecov-umbrella
+          name: codecov-python-${{ matrix.python-version }}
           fail_ci_if_error: false
+
+  security:
+    runs-on: "ubuntu-latest"
+    name: Security Scan
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v5.0.0
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v6.0.0
+        with:
+          python-version: "3.13"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements_test.txt
+          pip install -e .
+      - name: Run safety vulnerability scan
+        run: |
+          echo "🔍 Running safety vulnerability scan..."
+          # Note: safety now requires authentication for scan command
+          # For CI, we'll use pip-audit which provides similar functionality
+          echo "Skipping safety scan (requires authentication)"
+      - name: Run pip-audit dependency audit
+        run: |
+          echo "🔍 Running pip-audit dependency audit..."
+          pip-audit --requirement requirements.txt --requirement requirements_test.txt --desc --format=json
+      - name: Run semgrep security analysis
+        run: |
+          echo "🔍 Running semgrep security analysis..."
+          semgrep --config=auto --error --json --output=semgrep-results.json .
+      - name: Upload security scan results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: security-scan-results
+          path: |
+            semgrep-results.json
+          retention-days: 30
 
   hacs:
     runs-on: "ubuntu-latest"

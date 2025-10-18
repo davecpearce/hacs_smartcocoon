@@ -8,13 +8,24 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from pysmartcocoon.errors import UnauthorizedError
 import pytest
 
-from custom_components.smartcocoon import SmartCocoonController, async_update_options
+from custom_components.smartcocoon import (
+    SmartCocoonController,
+    async_setup_entry,
+    async_unload_entry,
+    async_update_options,
+)
 from custom_components.smartcocoon.config_flow import (
     CannotConnect,
+    ConfigFlow,
     InvalidAuth,
+    OptionsFlowHandler,
     validate_input,
 )
-from custom_components.smartcocoon.const import DOMAIN, SC_PRESET_MODES
+from custom_components.smartcocoon.const import (
+    CONF_ENABLE_PRESET_MODES,
+    DOMAIN,
+    SC_PRESET_MODES,
+)
 from custom_components.smartcocoon.fan import (
     SmartCocoonFan,
     async_setup_entry as fan_async_setup_entry,
@@ -85,6 +96,179 @@ async def test_validate_input_exception(hass: HomeAssistant) -> None:
             await validate_input(hass, MOCK_USER_INPUT)
 
 
+async def test_config_flow_user_step_no_input(hass: HomeAssistant) -> None:
+    """Test config flow user step with no input."""
+    flow = ConfigFlow()
+    flow.hass = hass
+
+    result = await flow.async_step_user(user_input=None)
+
+    assert result["type"] == "form"
+    assert result["step_id"] == "user"
+
+
+async def test_config_flow_user_step_cannot_connect(hass: HomeAssistant) -> None:
+    """Test config flow user step with cannot connect error."""
+    flow = ConfigFlow()
+    flow.hass = hass
+    flow.context = {}
+
+    with patch(
+        "custom_components.smartcocoon.config_flow.validate_input"
+    ) as mock_validate:
+        mock_validate.side_effect = CannotConnect()
+
+        result = await flow.async_step_user(user_input=MOCK_USER_INPUT)
+
+        assert result["type"] == "form"
+        assert result["step_id"] == "user"
+        assert result["errors"]["base"] == "cannot_connect"
+
+
+async def test_config_flow_user_step_invalid_auth(hass: HomeAssistant) -> None:
+    """Test config flow user step with invalid auth error."""
+    flow = ConfigFlow()
+    flow.hass = hass
+    flow.context = {}
+
+    with patch(
+        "custom_components.smartcocoon.config_flow.validate_input"
+    ) as mock_validate:
+        mock_validate.side_effect = InvalidAuth()
+
+        result = await flow.async_step_user(user_input=MOCK_USER_INPUT)
+
+        assert result["type"] == "form"
+        assert result["step_id"] == "user"
+        assert result["errors"]["base"] == "invalid_auth"
+
+
+async def test_config_flow_user_step_unknown_error(hass: HomeAssistant) -> None:
+    """Test config flow user step with unknown error."""
+    flow = ConfigFlow()
+    flow.hass = hass
+    flow.context = {}
+
+    with patch(
+        "custom_components.smartcocoon.config_flow.validate_input"
+    ) as mock_validate:
+        mock_validate.side_effect = Exception("Unexpected error")
+
+        result = await flow.async_step_user(user_input=MOCK_USER_INPUT)
+
+        assert result["type"] == "form"
+        assert result["step_id"] == "user"
+        assert result["errors"]["base"] == "unknown"
+
+
+async def test_config_flow_user_step_success(hass: HomeAssistant) -> None:
+    """Test config flow user step with successful validation."""
+    flow = ConfigFlow()
+    flow.hass = hass
+    flow.context = {}
+
+    with patch(
+        "custom_components.smartcocoon.config_flow.validate_input"
+    ) as mock_validate:
+        mock_validate.return_value = {"title": "test@example.com"}
+
+        result = await flow.async_step_user(user_input=MOCK_USER_INPUT)
+
+        assert result["type"] == "create_entry"
+        assert result["title"] == "test@example.com"
+        assert result["data"] == MOCK_USER_INPUT
+
+
+async def test_options_flow_handler_init(_hass: HomeAssistant) -> None:
+    """Test OptionsFlowHandler initialization."""
+    config_entry = ConfigEntry(
+        version=1,
+        domain=DOMAIN,
+        title="test@example.com",
+        data=MOCK_USER_INPUT,
+        source="user",
+        options={},
+        unique_id="test@example.com",
+        minor_version=1,
+        discovery_keys=set(),
+        subentries_data=[],
+    )
+
+    flow = OptionsFlowHandler(config_entry)
+    assert flow.config_entry == config_entry
+
+
+async def test_options_flow_step_init_no_input(hass: HomeAssistant) -> None:
+    """Test options flow init step with no input."""
+    config_entry = ConfigEntry(
+        version=1,
+        domain=DOMAIN,
+        title="test@example.com",
+        data=MOCK_USER_INPUT,
+        source="user",
+        options={},
+        unique_id="test@example.com",
+        minor_version=1,
+        discovery_keys=set(),
+        subentries_data=[],
+    )
+
+    flow = OptionsFlowHandler(config_entry)
+    flow.hass = hass
+
+    result = await flow.async_step_init(user_input=None)
+
+    assert result["type"] == "form"
+    assert result["step_id"] == "init"
+
+
+async def test_options_flow_step_init_with_input(hass: HomeAssistant) -> None:
+    """Test options flow init step with user input."""
+    config_entry = ConfigEntry(
+        version=1,
+        domain=DOMAIN,
+        title="test@example.com",
+        data=MOCK_USER_INPUT,
+        source="user",
+        options={},
+        unique_id="test@example.com",
+        minor_version=1,
+        discovery_keys=set(),
+        subentries_data=[],
+    )
+
+    flow = OptionsFlowHandler(config_entry)
+    flow.hass = hass
+
+    user_input = {CONF_ENABLE_PRESET_MODES: True}
+    result = await flow.async_step_init(user_input=user_input)
+
+    assert result["type"] == "create_entry"
+    assert result["data"] == user_input
+
+
+async def test_config_flow_async_get_options_flow(
+    _hass: HomeAssistant,
+) -> None:
+    """Test async_get_options_flow returns OptionsFlowHandler."""
+    config_entry = ConfigEntry(
+        version=1,
+        domain=DOMAIN,
+        title="test@example.com",
+        data=MOCK_USER_INPUT,
+        source="user",
+        options={},
+        unique_id="test@example.com",
+        minor_version=1,
+        discovery_keys=set(),
+        subentries_data=[],
+    )
+
+    options_flow = ConfigFlow.async_get_options_flow(config_entry)
+    assert isinstance(options_flow, OptionsFlowHandler)
+    assert options_flow.config_entry == config_entry
+
+
 async def test_smartcocoon_controller_properties(hass: HomeAssistant) -> None:
     """Test SmartCocoonController properties."""
     controller = SmartCocoonController(
@@ -95,6 +279,21 @@ async def test_smartcocoon_controller_properties(hass: HomeAssistant) -> None:
     )
 
     assert controller.enable_preset_modes is True
+    assert controller.scmanager is None
+
+
+async def test_smartcocoon_controller_preset_modes_disabled(
+    hass: HomeAssistant,
+) -> None:
+    """Test SmartCocoonController with preset modes disabled."""
+    controller = SmartCocoonController(
+        username="test@example.com",
+        password="password",
+        enable_preset_modes=False,
+        hass=hass,
+    )
+
+    assert controller.enable_preset_modes is False
     assert controller.scmanager is None
 
 
@@ -185,13 +384,16 @@ async def test_fan_async_setup_entry(hass: HomeAssistant) -> None:
 
     hass.data[DOMAIN] = {config_entry.entry_id: mock_controller}
 
-    entities = []
+    entities: list[SmartCocoonFan] = []
+
+    def add_entities(fans: list[SmartCocoonFan]) -> None:
+        entities.extend(fans)
 
     with patch("custom_components.smartcocoon.fan.SmartCocoonFan") as mock_fan_class:
         mock_fan = MagicMock()
         mock_fan_class.return_value = mock_fan
 
-        await fan_async_setup_entry(hass, config_entry, entities.append)
+        await fan_async_setup_entry(hass, config_entry, add_entities)
 
         assert len(entities) == 1
         mock_fan_class.assert_called_once()
@@ -276,7 +478,7 @@ async def test_smartcocoon_fan_invalid_preset_mode(hass: HomeAssistant) -> None:
 
 
 async def test_smartcocoon_fan_unsupported_preset_mode(hass: HomeAssistant) -> None:
-    """Test SmartCocoonFan with unsupported preset mode."""
+    """Test SmartCocoonFan with unsupported preset mode that passes validation but is not implemented."""
     controller = MagicMock(spec=SmartCocoonController)
     controller.enable_preset_modes = True
     controller.scmanager = MagicMock()
@@ -293,8 +495,14 @@ async def test_smartcocoon_fan_unsupported_preset_mode(hass: HomeAssistant) -> N
 
     fan = SmartCocoonFan(hass, controller, "fan_1")
 
-    with pytest.raises(ValueError, match="is not a valid preset_mode"):
-        await fan.async_set_preset_mode("unsupported")
+    # Test with a mode that's in SC_PRESET_MODES but not implemented
+    # Since SC_PRESET_MODES only has 'auto' and 'eco', we need to test the else branch
+    # by patching SC_PRESET_MODES temporarily
+    with patch(
+        "custom_components.smartcocoon.fan.SC_PRESET_MODES", ["auto", "eco", "test"]
+    ):
+        with pytest.raises(ValueError, match="Unsupported preset mode"):
+            await fan.async_set_preset_mode("test")
 
 
 async def test_smartcocoon_fan_turn_on_with_preset_mode(hass: HomeAssistant) -> None:
@@ -474,7 +682,7 @@ def test_smartcocoon_fan_basic_properties(hass: HomeAssistant) -> None:
     assert fan.is_on is True
     assert fan.fan_id == "fan_1"
     assert fan.name == "SmartCocoon Fan - Living Room:fan_1"
-    assert fan.percentage == 0.75  # 75/100
+    assert fan.percentage == 75  # 75/100
     assert fan.preset_mode == "auto"
     assert fan.should_poll is False
     assert fan.speed_count == 100
@@ -529,3 +737,134 @@ def test_smartcocoon_fan_preset_modes(hass: HomeAssistant) -> None:
     fan = SmartCocoonFan(hass, controller, "fan_1")
 
     assert fan.preset_modes == SC_PRESET_MODES
+
+
+def test_smartcocoon_fan_init_without_scmanager(hass: HomeAssistant) -> None:
+    """Test SmartCocoonFan initialization when scmanager is None."""
+    controller = MagicMock(spec=SmartCocoonController)
+    controller.enable_preset_modes = True
+    controller.scmanager = None  # Set to None to trigger error
+
+    with pytest.raises(ValueError, match="SmartCocoonManager is not initialized"):
+        SmartCocoonFan(hass, controller, "fan_1")
+
+
+def test_smartcocoon_fan_get_fan_data_without_scmanager(hass: HomeAssistant) -> None:
+    """Test _get_fan_data when scmanager becomes None."""
+    controller = MagicMock(spec=SmartCocoonController)
+    controller.enable_preset_modes = True
+    controller.scmanager = MagicMock()
+    controller.scmanager.fans = {
+        "fan_1": MagicMock(
+            room_name="Living Room",
+            connected=True,
+            fan_on=True,
+            power=75,
+            mode="auto",
+            firmware_version="1.0.0",
+        )
+    }
+
+    fan = SmartCocoonFan(hass, controller, "fan_1")
+
+    # Now set scmanager to None to trigger the error in _get_fan_data
+    fan._scmanager = None  # pylint: disable=protected-access
+
+    with pytest.raises(ValueError, match="SmartCocoonManager is not initialized"):
+        fan._get_fan_data()  # pylint: disable=protected-access
+
+
+async def test_async_setup_entry(hass: HomeAssistant) -> None:
+    """Test async_setup_entry function."""
+
+    config_entry = ConfigEntry(
+        version=1,
+        domain=DOMAIN,
+        title="test@example.com",
+        data=MOCK_USER_INPUT,
+        source="user",
+        options={CONF_ENABLE_PRESET_MODES: True},
+        unique_id="test@example.com",
+        minor_version=1,
+        discovery_keys=set(),
+        subentries_data=[],
+    )
+
+    mock_controller = MagicMock(spec=SmartCocoonController)
+    mock_controller.scmanager = MagicMock()
+    mock_controller.scmanager.fans = {}
+    mock_controller.enable_preset_modes = True
+
+    with (
+        patch.object(
+            SmartCocoonController, "async_start", return_value=True
+        ) as mock_start,
+        patch.object(
+            hass.config_entries, "async_forward_entry_setups", return_value=None
+        ) as mock_forward,
+    ):
+        result = await async_setup_entry(hass, config_entry)
+
+        assert result is True
+        assert DOMAIN in hass.data
+        assert config_entry.entry_id in hass.data[DOMAIN]
+        mock_start.assert_called_once()
+        mock_forward.assert_called_once()
+
+
+async def test_async_unload_entry(hass: HomeAssistant) -> None:
+    """Test async_unload_entry function."""
+
+    config_entry = ConfigEntry(
+        version=1,
+        domain=DOMAIN,
+        title="test@example.com",
+        data=MOCK_USER_INPUT,
+        source="user",
+        options={},
+        unique_id="test@example.com",
+        minor_version=1,
+        discovery_keys=set(),
+        subentries_data=[],
+    )
+
+    # Setup initial data
+    hass.data[DOMAIN] = {config_entry.entry_id: MagicMock()}
+
+    with patch.object(
+        hass.config_entries, "async_unload_platforms", return_value=True
+    ) as mock_unload:
+        result = await async_unload_entry(hass, config_entry)
+
+        assert result is True
+        assert config_entry.entry_id not in hass.data[DOMAIN]
+        mock_unload.assert_called_once()
+
+
+async def test_async_unload_entry_failure(hass: HomeAssistant) -> None:
+    """Test async_unload_entry function when unload fails."""
+
+    config_entry = ConfigEntry(
+        version=1,
+        domain=DOMAIN,
+        title="test@example.com",
+        data=MOCK_USER_INPUT,
+        source="user",
+        options={},
+        unique_id="test@example.com",
+        minor_version=1,
+        discovery_keys=set(),
+        subentries_data=[],
+    )
+
+    # Setup initial data
+    hass.data[DOMAIN] = {config_entry.entry_id: MagicMock()}
+
+    with patch.object(
+        hass.config_entries, "async_unload_platforms", return_value=False
+    ) as mock_unload:
+        result = await async_unload_entry(hass, config_entry)
+
+        assert result is False
+        assert config_entry.entry_id in hass.data[DOMAIN]  # Should still be there
+        mock_unload.assert_called_once()
