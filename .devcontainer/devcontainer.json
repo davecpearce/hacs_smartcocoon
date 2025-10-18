@@ -8,6 +8,7 @@
     "-v",
     "${env:HOME}${env:USERPROFILE}/.ssh:/tmp/.ssh" // This is added so you can push from inside the container
   ],
+  "postCreateCommand": "/usr/local/bin/setup-component.sh",
   "customizations": {
     "vscode": {
       "extensions": [
@@ -23,7 +24,7 @@
         "files.eol": "\n",
         "editor.tabSize": 4,
         "terminal.integrated.defaultProfile.linux": "bash",
-        "python.pythonPath": "/usr/local/python/bin/python",
+        "python.pythonPath": "/usr/local/bin/python",
         "python.analysis.autoSearchPaths": false,
         "editor.formatOnPaste": false,
         "editor.formatOnSave": true,
@@ -33,7 +34,17 @@
         "[python]": {
           "editor.defaultFormatter": "ms-python.black-formatter",
           "editor.formatOnSave": true
-        }
+        },
+        "python.analysis.extraPaths": [
+          "/opt/hass",
+          "/workspaces/hacs_smartcocoon/custom_components"
+        ],
+        "python.testing.pytestEnabled": true,
+        "python.testing.pytestArgs": [
+          "tests"
+        ],
+        "python.testing.unittestEnabled": false,
+        "python.testing.nosetestsEnabled": false
       }
     }
   }
