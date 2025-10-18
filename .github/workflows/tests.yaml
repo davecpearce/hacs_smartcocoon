@@ -93,6 +93,44 @@ jobs:
             echo "SUCCESS: Installation succeeded for Python ${{ matrix.python-version }}"
           fi
 
+  security:
+    runs-on: "ubuntu-latest"
+    name: Security Scan
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v5.0.0
+      - name: Set up Python 3.13.3
+        uses: actions/setup-python@v6.0.0
+        with:
+          python-version: "3.13.3"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements_test.txt
+          pip install -e .
+      - name: Run safety vulnerability scan
+        run: |
+          echo "🔍 Running safety vulnerability scan..."
+          # Note: safety now requires authentication for scan command
+          # For CI, we'll use pip-audit which provides similar functionality
+          echo "Skipping safety scan (requires authentication)"
+      - name: Run pip-audit dependency audit
+        run: |
+          echo "🔍 Running pip-audit dependency audit..."
+          pip-audit --requirement requirements.txt --requirement requirements_test.txt --desc --format=json
+      - name: Run semgrep security analysis
+        run: |
+          echo "🔍 Running semgrep security analysis..."
+          semgrep --config=auto --error --json --output=semgrep-results.json .
+      - name: Upload security scan results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: security-scan-results
+          path: |
+            semgrep-results.json
+          retention-days: 30
+
   hacs:
     runs-on: "ubuntu-latest"
     name: HACS

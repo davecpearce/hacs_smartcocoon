@@ -43,3 +43,12 @@ repos:
     rev: v2.6.1
     hooks:
       - id: prettier
+  # Security scanning hooks
+  - repo: local
+    hooks:
+      - id: semgrep
+        name: semgrep
+        entry: semgrep
+        language: system
+        args: [--config=auto, --error]
+        types: [python]
