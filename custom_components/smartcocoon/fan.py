@@ -73,9 +73,9 @@ class SmartCocoonFan(FanEntity):
         )
 
         # The fan can be updated direcly by the SmartCocoon app, the pysmartcooon api handles this
-        self._scmanager.fans[self._fan_id]._async_update_fan_callback = (
-            self.async_update_fan_callback
-        )
+        self._scmanager.fans[
+            self._fan_id
+        ]._async_update_fan_callback = self.async_update_fan_callback
 
         _LOGGER.debug("Initialized fan_id: %s", self._fan_id)
 
