@@ -19,6 +19,25 @@ classifiers = [
 ]
 requires-python = ">=3.13.2"
 
+[tool.black]
+line-length = 88
+target-version = ['py39']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+# Note: Use 'pre-commit run black --all-files' to match CI formatting
+
 [tool.pylint.BASIC]
 class-const-naming-style = "any"
 good-names = [

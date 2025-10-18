@@ -48,7 +48,7 @@ async def async_setup_entry(
     _LOGGER.debug("Completed async_setup_entry")
 
 
-class SmartCocoonFan(FanEntity):
+class SmartCocoonFan(FanEntity):  # type: ignore[misc]
     """A SmartCocoon fan entity."""
 
     def __init__(
