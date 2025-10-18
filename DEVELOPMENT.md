@@ -9,11 +9,13 @@ This project uses pre-commit hooks to ensure code quality and consistency. The h
 To prevent version drift between local development and CI:
 
 1. **Always run pre-commit locally** before committing:
+
    ```bash
    pre-commit run --all-files
    ```
 
 2. **Update pre-commit hooks regularly**:
+
    ```bash
    ./scripts/update-precommit.sh
    ```
@@ -35,11 +37,13 @@ To prevent version drift between local development and CI:
 ## Testing
 
 Run the full CI locally:
+
 ```bash
 ./scripts/run-ci-local.sh
 ```
 
 Run just the tests:
+
 ```bash
 ./scripts/run-ci-summary.sh
 ```
