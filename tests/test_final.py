@@ -107,6 +107,78 @@ async def test_config_flow_user_step_no_input(hass: HomeAssistant) -> None:
     assert result["step_id"] == "user"
 
 
+async def test_config_flow_user_step_cannot_connect(hass: HomeAssistant) -> None:
+    """Test config flow user step with cannot connect error."""
+    flow = ConfigFlow()
+    flow.hass = hass
+    flow.context = {}
+
+    with patch(
+        "custom_components.smartcocoon.config_flow.validate_input"
+    ) as mock_validate:
+        mock_validate.side_effect = CannotConnect()
+
+        result = await flow.async_step_user(user_input=MOCK_USER_INPUT)
+
+        assert result["type"] == "form"
+        assert result["step_id"] == "user"
+        assert result["errors"]["base"] == "cannot_connect"
+
+
+async def test_config_flow_user_step_invalid_auth(hass: HomeAssistant) -> None:
+    """Test config flow user step with invalid auth error."""
+    flow = ConfigFlow()
+    flow.hass = hass
+    flow.context = {}
+
+    with patch(
+        "custom_components.smartcocoon.config_flow.validate_input"
+    ) as mock_validate:
+        mock_validate.side_effect = InvalidAuth()
+
+        result = await flow.async_step_user(user_input=MOCK_USER_INPUT)
+
+        assert result["type"] == "form"
+        assert result["step_id"] == "user"
+        assert result["errors"]["base"] == "invalid_auth"
+
+
+async def test_config_flow_user_step_unknown_error(hass: HomeAssistant) -> None:
+    """Test config flow user step with unknown error."""
+    flow = ConfigFlow()
+    flow.hass = hass
+    flow.context = {}
+
+    with patch(
+        "custom_components.smartcocoon.config_flow.validate_input"
+    ) as mock_validate:
+        mock_validate.side_effect = Exception("Unexpected error")
+
+        result = await flow.async_step_user(user_input=MOCK_USER_INPUT)
+
+        assert result["type"] == "form"
+        assert result["step_id"] == "user"
+        assert result["errors"]["base"] == "unknown"
+
+
+async def test_config_flow_user_step_success(hass: HomeAssistant) -> None:
+    """Test config flow user step with successful validation."""
+    flow = ConfigFlow()
+    flow.hass = hass
+    flow.context = {}
+
+    with patch(
+        "custom_components.smartcocoon.config_flow.validate_input"
+    ) as mock_validate:
+        mock_validate.return_value = {"title": "test@example.com"}
+
+        result = await flow.async_step_user(user_input=MOCK_USER_INPUT)
+
+        assert result["type"] == "create_entry"
+        assert result["title"] == "test@example.com"
+        assert result["data"] == MOCK_USER_INPUT
+
+
 async def test_options_flow_handler_init(hass: HomeAssistant) -> None:
     """Test OptionsFlowHandler initialization."""
     config_entry = ConfigEntry(
