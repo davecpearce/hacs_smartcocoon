@@ -19,10 +19,19 @@ classifiers = [
 ]
 requires-python = ">=3.13.2"
 
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["custom_components*"]
+exclude = ["node_modules*", "tests*", "scripts*"]
+
 [tool.black]
 line-length = 88
 target-version = ['py39']
 include = '\.pyi?$'
+# Note: Use 'python -m black --safe' to match pre-commit formatting
 extend-exclude = '''
 /(
   # directories

@@ -15,12 +15,10 @@ The devcontainer provides a complete Home Assistant development environment with
 ### Getting Started
 
 1. **Prerequisites**:
-
    - VS Code with the "Dev Containers" extension
    - Docker Desktop running
 
 2. **Open in Devcontainer**:
-
    - Open this folder in VS Code
    - VS Code will prompt to reopen in container, or use `Ctrl+Shift+P` → "Dev Containers: Reopen in Container"
    - Wait for the container to build and set up the environment (first time takes 3-5 minutes)
