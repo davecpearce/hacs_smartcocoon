@@ -193,6 +193,7 @@ class SmartCocoonFan(FanEntity):  # type: ignore[misc]
 
     async def async_set_percentage(self, percentage: int) -> None:
         """Set the speed of the fan, as a percentage."""
+        assert self._scmanager is not None  # Checked in constructor
         await self._scmanager.async_set_fan_speed(self._fan_id, percentage)
         # self._power = percentage * 100
         self.async_write_ha_state()
@@ -204,6 +205,7 @@ class SmartCocoonFan(FanEntity):  # type: ignore[misc]
                 f"{preset_mode} is not a valid preset_mode: {SC_PRESET_MODES}"
             )
 
+        assert self._scmanager is not None  # Checked in constructor
         if preset_mode == SC_PRESET_MODE_AUTO:
             await self._scmanager.async_set_fan_auto(self._fan_id)
         elif preset_mode == SC_PRESET_MODE_ECO:
@@ -215,6 +217,7 @@ class SmartCocoonFan(FanEntity):  # type: ignore[misc]
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn off the entity."""
+        assert self._scmanager is not None  # Checked in constructor
         await self._scmanager.async_fan_turn_off(self._fan_id)
         self.async_write_ha_state()
 
@@ -232,5 +235,6 @@ class SmartCocoonFan(FanEntity):  # type: ignore[misc]
         if percentage is not None:
             await self.async_set_percentage(percentage)
 
+        assert self._scmanager is not None  # Checked in constructor
         await self._scmanager.async_fan_turn_on(self._fan_id)
         self.async_write_ha_state()
