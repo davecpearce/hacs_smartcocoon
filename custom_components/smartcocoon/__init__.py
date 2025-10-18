@@ -1,4 +1,5 @@
 """The SmartCocoon integration."""
+
 from __future__ import annotations
 
 import logging
@@ -115,7 +116,7 @@ async def async_update_options(hass: HomeAssistant, config_entry: ConfigEntry) -
 async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
     """Unload a config entry."""
 
-    unload_ok = await hass.config_entries.async_unload_platforms(
+    unload_ok: bool = await hass.config_entries.async_unload_platforms(
         config_entry, PLATFORMS
     )
 

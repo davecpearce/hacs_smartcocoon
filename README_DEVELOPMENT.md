@@ -6,7 +6,7 @@ This project uses **devcontainer** for development, providing a complete Home As
 
 The devcontainer provides a complete Home Assistant development environment with:
 
-- Python 3.13.2
+- Python 3.13.2 (Home Assistant minimum requirement)
 - Home Assistant core installed
 - All dependencies pre-installed
 - VS Code extensions configured
@@ -23,7 +23,7 @@ The devcontainer provides a complete Home Assistant development environment with
 
    - Open this folder in VS Code
    - VS Code will prompt to reopen in container, or use `Ctrl+Shift+P` → "Dev Containers: Reopen in Container"
-   - Wait for the container to build and set up the environment (first time takes a few minutes)
+   - Wait for the container to build and set up the environment (first time takes 3-5 minutes)
 
 3. **Start Developing**: Everything is ready to go!
 

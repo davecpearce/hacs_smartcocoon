@@ -1,4 +1,5 @@
 """Config flow for SmartCocoon integration."""
+
 from __future__ import annotations
 
 import logging
@@ -41,13 +42,14 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
     return {"title": data[CONF_USERNAME]}
 
 
-class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+class ConfigFlow(config_entries.ConfigFlow):  # type: ignore[misc]
     """Handle a config flow for SmartCocoon."""
 
     VERSION = 1
+    DOMAIN = DOMAIN
 
     @staticmethod
-    @callback
+    @callback  # type: ignore[misc]
     def async_get_options_flow(
         config_entry: config_entries.ConfigEntry,
     ) -> config_entries.OptionsFlow:
@@ -83,7 +85,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
 
 
-class OptionsFlowHandler(config_entries.OptionsFlow):
+class OptionsFlowHandler(config_entries.OptionsFlow):  # type: ignore[misc]
     """Handle a option flow for ISY/IoX."""
 
     def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
@@ -111,9 +113,9 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         return self.async_show_form(step_id="init", data_schema=options_schema)
 
 
-class CannotConnect(HomeAssistantError):
+class CannotConnect(HomeAssistantError):  # type: ignore[misc]
     """Error to indicate we cannot connect."""
 
 
-class InvalidAuth(HomeAssistantError):
+class InvalidAuth(HomeAssistantError):  # type: ignore[misc]
     """Error to indicate there is invalid auth."""

@@ -179,7 +179,7 @@ async def test_config_flow_user_step_success(hass: HomeAssistant) -> None:
         assert result["data"] == MOCK_USER_INPUT
 
 
-async def test_options_flow_handler_init(hass: HomeAssistant) -> None:
+async def test_options_flow_handler_init(_hass: HomeAssistant) -> None:
     """Test OptionsFlowHandler initialization."""
     config_entry = ConfigEntry(
         version=1,
@@ -247,7 +247,9 @@ async def test_options_flow_step_init_with_input(hass: HomeAssistant) -> None:
     assert result["data"] == user_input
 
 
-async def test_config_flow_async_get_options_flow(hass: HomeAssistant) -> None:
+async def test_config_flow_async_get_options_flow(
+    _hass: HomeAssistant,
+) -> None:
     """Test async_get_options_flow returns OptionsFlowHandler."""
     config_entry = ConfigEntry(
         version=1,

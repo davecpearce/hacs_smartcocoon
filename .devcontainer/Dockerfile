@@ -1,33 +1,37 @@
-FROM mcr.microsoft.com/devcontainers/python:3.13.2
+FROM python:3.13.2-slim
 
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+# Set environment variables
+ENV PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
 
-RUN apt update \
-    && sudo apt install -y libpcap-dev vim curl jq \
-    && mkdir -p /opt
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libffi-dev \
+    libssl-dev \
+    libjpeg-dev \
+    zlib1g-dev \
+    libpcap-dev \
+    git \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
+# Clone and install Home Assistant core
 WORKDIR /opt
-
 RUN git clone --depth=1 -b dev https://github.com/home-assistant/core.git hass \
-    && python3 -m pip --disable-pip-version-check install --upgrade ./hass
+    && cd hass \
+    && python3 -m pip install --upgrade pip \
+    && python3 -m pip install -e . \
+    && ./script/setup
 
+# Install project dependencies
 WORKDIR /workspaces/hacs_smartcocoon
-COPY requirements.txt ./
-COPY requirements_test.txt ./
+COPY requirements*.txt ./
 RUN python3 -m pip install -r requirements_test.txt
 
-# Setup the Home Assistant environment
-WORKDIR /opt/hass
-RUN ./script/setup
-
-# Create symlink for the custom component (this will be done after container starts)
-WORKDIR /workspaces/hacs_smartcocoon
-
-# Add a post-create script to set up the symlink
+# Create symlink script
 RUN echo '#!/bin/bash\n\
-if [ ! -L "/opt/hass/homeassistant/components/smartcocoon" ]; then\n\
-    ln -s /workspaces/hacs_smartcocoon/custom_components/smartcocoon /opt/hass/homeassistant/components/smartcocoon\n\
-    echo "Created symlink for smartcocoon component"\n\
-fi' > /usr/local/bin/setup-component.sh && chmod +x /usr/local/bin/setup-component.sh
-
-ENV SHELL /bin/bash
+ln -sf /workspaces/hacs_smartcocoon/custom_components/smartcocoon /opt/hass/homeassistant/components/smartcocoon\n\
+echo "Created symlink for smartcocoon component"' > /usr/local/bin/setup-component.sh \
+    && chmod +x /usr/local/bin/setup-component.sh
