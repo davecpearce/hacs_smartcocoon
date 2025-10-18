@@ -193,20 +193,15 @@ class SmartCocoonFan(FanEntity):  # type: ignore[misc]
 
     async def async_set_percentage(self, percentage: int) -> None:
         """Set the speed of the fan, as a percentage."""
-        if self._scmanager is None:
-            raise ValueError("SmartCocoonManager is not initialized")
         await self._scmanager.async_set_fan_speed(self._fan_id, percentage)
         # self._power = percentage * 100
         self.async_write_ha_state()
 
     async def async_set_preset_mode(self, preset_mode: str) -> None:
         """Set new preset mode."""
-        if self._scmanager is None:
-            raise ValueError("SmartCocoonManager is not initialized")
-
         if preset_mode not in SC_PRESET_MODES:
             raise ValueError(
-                "{preset_mode} is not a valid preset_mode: {SC_PRESET_MODES}"
+                f"{preset_mode} is not a valid preset_mode: {SC_PRESET_MODES}"
             )
 
         if preset_mode == SC_PRESET_MODE_AUTO:
@@ -220,8 +215,6 @@ class SmartCocoonFan(FanEntity):  # type: ignore[misc]
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn off the entity."""
-        if self._scmanager is None:
-            raise ValueError("SmartCocoonManager is not initialized")
         await self._scmanager.async_fan_turn_off(self._fan_id)
         self.async_write_ha_state()
 
@@ -232,9 +225,6 @@ class SmartCocoonFan(FanEntity):  # type: ignore[misc]
         **kwargs: Any,
     ) -> None:
         """Turn on the entity."""
-        if self._scmanager is None:
-            raise ValueError("SmartCocoonManager is not initialized")
-
         if preset_mode:
             await self.async_set_preset_mode(preset_mode)
             return
