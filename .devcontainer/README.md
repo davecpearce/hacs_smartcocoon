@@ -13,11 +13,13 @@ This devcontainer provides a complete development environment for the SmartCocoo
 To customize Git user information:
 
 1. **Copy the example file:**
+
    ```bash
    cp .devcontainer/env.example .devcontainer/.env
    ```
 
 2. **Edit `.devcontainer/.env`** with your information:
+
    ```bash
    GIT_USER_NAME=Your Name
    GIT_USER_EMAIL=your.email@example.com
@@ -53,11 +55,13 @@ pre-commit run --all-files
 The devcontainer supports multiple authentication methods:
 
 1. **GitHub CLI** (recommended):
+
    ```bash
    gh auth login
    ```
 
 2. **Personal Access Token**:
+
    ```bash
    export GITHUB_TOKEN=your_token_here
    git push origin branch-name
