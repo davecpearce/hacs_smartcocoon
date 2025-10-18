@@ -27,3 +27,4 @@ Thumbs.db
 
 # Devcontainer
 .devcontainer/.env
+node_modules/.cache/
