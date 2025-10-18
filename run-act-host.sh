@@ -51,5 +51,3 @@ echo "💡 Tips:"
 echo "   - Use 'act -W .github/workflows/tests.yaml -l' to list available jobs"
 echo "   - Use 'act -W .github/workflows/tests.yaml -j test --dry-run' to see what would run"
 echo "   - Use 'act --secret-file .env' to use secrets from .env file"
-
-

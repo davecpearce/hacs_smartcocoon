@@ -5,11 +5,13 @@ This project supports running GitHub Actions locally using [nektos/act](https://
 ## Quick Start
 
 ### Option 1: From devcontainer (after rebuild)
+
 ```bash
 ./run-ci-local.sh
 ```
 
 ### Option 2: From host machine
+
 ```bash
 ./run-act-host.sh
 ```
@@ -17,19 +19,23 @@ This project supports running GitHub Actions locally using [nektos/act](https://
 ## Setup Options
 
 ### 1. 🔄 Rebuild devcontainer with Docker support (Recommended)
+
 The devcontainer has been configured to mount the Docker socket. To enable act:
 
 1. Rebuild the devcontainer: `Ctrl+Shift+P` → `Dev Containers: Rebuild Container`
 2. Run: `./run-ci-local.sh`
 
 ### 2. 🖥️ Run from host machine
+
 If you prefer to run act from your host machine:
 
 1. Install act on your host: https://github.com/nektos/act#installation
 2. Run: `./run-act-host.sh`
 
 ### 3. 🧪 Use pre-commit for local testing
+
 For quick local testing without Docker:
+
 ```bash
 pre-commit run --all-files
 ```
@@ -42,6 +48,7 @@ pre-commit run --all-files
 ## Configuration
 
 The `.actrc` file contains default configuration:
+
 - Uses `catthehacker/ubuntu:act-latest` runner image
 - Binds current directory to `/workspaces/hacs_smartcocoon`
 - Uses secrets from `.devcontainer/.env` if available
