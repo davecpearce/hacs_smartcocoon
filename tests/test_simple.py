@@ -135,7 +135,7 @@ def test_fan_entity_basic_properties() -> None:
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power=75,  # API returns 0-100 scale, same as HA
+            power_percentage=75,  # pysmartcocoon power_percentage is 0-100 scale
             mode="auto",
             firmware_version="1.0.0",
         )
