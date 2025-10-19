@@ -135,7 +135,7 @@ def test_fan_entity_basic_properties() -> None:
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power_percentage=75,  # pysmartcocoon power_percentage is 0-100 scale
+            speed_pct=75,  # pysmartcocoon speed_pct is 0-100 scale
             mode="auto",
             firmware_version="1.0.0",
         )

@@ -409,7 +409,7 @@ async def test_smartcocoon_fan_async_methods(hass: HomeAssistant) -> None:
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power_percentage=75,  # pysmartcocoon power_percentage is 0-100 scale
+            speed_pct=75,  # pysmartcocoon speed_pct is 0-100 scale
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -470,7 +470,7 @@ async def test_smartcocoon_fan_invalid_preset_mode(hass: HomeAssistant) -> None:
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power_percentage=75,  # pysmartcocoon power_percentage is 0-100 scale
+            speed_pct=75,  # pysmartcocoon speed_pct is 0-100 scale
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -492,7 +492,7 @@ async def test_smartcocoon_fan_unsupported_preset_mode(hass: HomeAssistant) -> N
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power_percentage=75,  # pysmartcocoon power_percentage is 0-100 scale
+            speed_pct=75,  # pysmartcocoon speed_pct is 0-100 scale
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -520,7 +520,7 @@ async def test_smartcocoon_fan_turn_on_with_preset_mode(hass: HomeAssistant) -> 
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power_percentage=75,  # pysmartcocoon power_percentage is 0-100 scale
+            speed_pct=75,  # pysmartcocoon speed_pct is 0-100 scale
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -547,7 +547,7 @@ async def test_smartcocoon_fan_turn_on_with_percentage(hass: HomeAssistant) -> N
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power_percentage=75,  # pysmartcocoon power_percentage is 0-100 scale
+            speed_pct=75,  # pysmartcocoon speed_pct is 0-100 scale
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -583,7 +583,7 @@ def test_smartcocoon_fan_without_preset_modes(hass: HomeAssistant) -> None:
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power_percentage=75,  # pysmartcocoon power_percentage is 0-100 scale
+            speed_pct=75,  # pysmartcocoon speed_pct is 0-100 scale
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -605,7 +605,7 @@ def test_smartcocoon_fan_device_info(hass: HomeAssistant) -> None:
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power_percentage=75,  # pysmartcocoon power_percentage is 0-100 scale
+            speed_pct=75,  # pysmartcocoon speed_pct is 0-100 scale
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -632,7 +632,7 @@ def test_smartcocoon_fan_extra_state_attributes(hass: HomeAssistant) -> None:
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power_percentage=75,  # pysmartcocoon power_percentage is 0-100 scale
+            speed_pct=75,  # pysmartcocoon speed_pct is 0-100 scale
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -655,7 +655,7 @@ async def test_smartcocoon_fan_update_callback(hass: HomeAssistant) -> None:
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power_percentage=75,  # pysmartcocoon power_percentage is 0-100 scale
+            speed_pct=75,  # pysmartcocoon speed_pct is 0-100 scale
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -678,7 +678,7 @@ def test_smartcocoon_fan_basic_properties(hass: HomeAssistant) -> None:
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power_percentage=75,  # pysmartcocoon power_percentage is 0-100 scale
+            speed_pct=75,  # pysmartcocoon speed_pct is 0-100 scale
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -710,7 +710,7 @@ def test_smartcocoon_fan_supported_features(hass: HomeAssistant) -> None:
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power_percentage=75,  # pysmartcocoon power_percentage is 0-100 scale
+            speed_pct=75,  # pysmartcocoon speed_pct is 0-100 scale
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -738,7 +738,7 @@ def test_smartcocoon_fan_preset_modes(hass: HomeAssistant) -> None:
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power_percentage=75,  # pysmartcocoon power_percentage is 0-100 scale
+            speed_pct=75,  # pysmartcocoon speed_pct is 0-100 scale
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -769,7 +769,7 @@ def test_smartcocoon_fan_get_fan_data_without_scmanager(hass: HomeAssistant) -> 
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power_percentage=75,  # pysmartcocoon power_percentage is 0-100 scale
+            speed_pct=75,  # pysmartcocoon speed_pct is 0-100 scale
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -903,7 +903,7 @@ async def test_smartcocoon_fan_error_handling_invalid_preset_mode_format(
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power_percentage=75,  # pysmartcocoon power_percentage is 0-100 scale
+            speed_pct=75,  # pysmartcocoon speed_pct is 0-100 scale
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -928,7 +928,7 @@ async def test_smartcocoon_fan_error_handling_preset_mode_fstring_fixed(
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power_percentage=75,  # pysmartcocoon power_percentage is 0-100 scale
+            speed_pct=75,  # pysmartcocoon speed_pct is 0-100 scale
             mode="auto",
             firmware_version="1.0.0",
         )
