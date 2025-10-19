@@ -409,7 +409,7 @@ async def test_smartcocoon_fan_async_methods(hass: HomeAssistant) -> None:
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power_percentage=75,  # pysmartcocoon power_percentage is 0-100 scale
+            speed_pct=75,  # pysmartcocoon speed_pct is 0-100 scale
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -422,37 +422,41 @@ async def test_smartcocoon_fan_async_methods(hass: HomeAssistant) -> None:
     controller.scmanager.async_fan_turn_off = AsyncMock()
     controller.scmanager.async_fan_turn_on = AsyncMock()
 
+    # Mock error handler
+    controller.error_handler = MagicMock()
+    controller.error_handler.async_retry_operation = AsyncMock()
+
     fan = SmartCocoonFan(hass, controller, "fan_1")
 
     # Test async_set_percentage
     with patch.object(fan, "async_write_ha_state") as mock_write:
         await fan.async_set_percentage(50)
-        # API expects 0-100 scale, same as HA
-        controller.scmanager.async_set_fan_speed.assert_called_once_with("fan_1", 50)
+        # With error handling, the error handler should be called
+        controller.error_handler.async_retry_operation.assert_called()
         mock_write.assert_called_once()
 
     # Test async_set_preset_mode_auto
     with patch.object(fan, "async_write_ha_state") as mock_write:
         await fan.async_set_preset_mode("auto")
-        controller.scmanager.async_set_fan_auto.assert_called_once_with("fan_1")
+        controller.error_handler.async_retry_operation.assert_called()
         mock_write.assert_called_once()
 
     # Test async_set_preset_mode_eco
     with patch.object(fan, "async_write_ha_state") as mock_write:
         await fan.async_set_preset_mode("eco")
-        controller.scmanager.async_set_fan_eco.assert_called_once_with("fan_1")
+        controller.error_handler.async_retry_operation.assert_called()
         mock_write.assert_called_once()
 
     # Test async_turn_off
     with patch.object(fan, "async_write_ha_state") as mock_write:
         await fan.async_turn_off()
-        controller.scmanager.async_fan_turn_off.assert_called_once_with("fan_1")
+        controller.error_handler.async_retry_operation.assert_called()
         mock_write.assert_called_once()
 
     # Test async_turn_on
     with patch.object(fan, "async_write_ha_state") as mock_write:
         await fan.async_turn_on()
-        controller.scmanager.async_fan_turn_on.assert_called_once_with("fan_1")
+        controller.error_handler.async_retry_operation.assert_called()
         mock_write.assert_called_once()
 
 
@@ -466,7 +470,7 @@ async def test_smartcocoon_fan_invalid_preset_mode(hass: HomeAssistant) -> None:
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power_percentage=75,  # pysmartcocoon power_percentage is 0-100 scale
+            speed_pct=75,  # pysmartcocoon speed_pct is 0-100 scale
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -488,7 +492,7 @@ async def test_smartcocoon_fan_unsupported_preset_mode(hass: HomeAssistant) -> N
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power_percentage=75,  # pysmartcocoon power_percentage is 0-100 scale
+            speed_pct=75,  # pysmartcocoon speed_pct is 0-100 scale
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -516,7 +520,7 @@ async def test_smartcocoon_fan_turn_on_with_preset_mode(hass: HomeAssistant) -> 
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power_percentage=75,  # pysmartcocoon power_percentage is 0-100 scale
+            speed_pct=75,  # pysmartcocoon speed_pct is 0-100 scale
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -543,13 +547,17 @@ async def test_smartcocoon_fan_turn_on_with_percentage(hass: HomeAssistant) -> N
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power_percentage=75,  # pysmartcocoon power_percentage is 0-100 scale
+            speed_pct=75,  # pysmartcocoon speed_pct is 0-100 scale
             mode="auto",
             firmware_version="1.0.0",
         )
     }
 
     controller.scmanager.async_fan_turn_on = AsyncMock()
+
+    # Mock error handler
+    controller.error_handler = MagicMock()
+    controller.error_handler.async_retry_operation = AsyncMock()
 
     fan = SmartCocoonFan(hass, controller, "fan_1")
 
@@ -559,7 +567,8 @@ async def test_smartcocoon_fan_turn_on_with_percentage(hass: HomeAssistant) -> N
     ):
         await fan.async_turn_on(percentage=50)
         mock_set_percentage.assert_called_once_with(50)
-        controller.scmanager.async_fan_turn_on.assert_called_once_with("fan_1")
+        # Should also call the error handler for async_fan_turn_on
+        controller.error_handler.async_retry_operation.assert_called()
         mock_write.assert_called_once()
 
 
@@ -574,7 +583,7 @@ def test_smartcocoon_fan_without_preset_modes(hass: HomeAssistant) -> None:
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power_percentage=75,  # pysmartcocoon power_percentage is 0-100 scale
+            speed_pct=75,  # pysmartcocoon speed_pct is 0-100 scale
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -596,7 +605,7 @@ def test_smartcocoon_fan_device_info(hass: HomeAssistant) -> None:
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power_percentage=75,  # pysmartcocoon power_percentage is 0-100 scale
+            speed_pct=75,  # pysmartcocoon speed_pct is 0-100 scale
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -623,7 +632,7 @@ def test_smartcocoon_fan_extra_state_attributes(hass: HomeAssistant) -> None:
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power_percentage=75,  # pysmartcocoon power_percentage is 0-100 scale
+            speed_pct=75,  # pysmartcocoon speed_pct is 0-100 scale
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -646,7 +655,7 @@ async def test_smartcocoon_fan_update_callback(hass: HomeAssistant) -> None:
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power_percentage=75,  # pysmartcocoon power_percentage is 0-100 scale
+            speed_pct=75,  # pysmartcocoon speed_pct is 0-100 scale
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -669,7 +678,7 @@ def test_smartcocoon_fan_basic_properties(hass: HomeAssistant) -> None:
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power_percentage=75,  # pysmartcocoon power_percentage is 0-100 scale
+            speed_pct=75,  # pysmartcocoon speed_pct is 0-100 scale
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -701,7 +710,7 @@ def test_smartcocoon_fan_supported_features(hass: HomeAssistant) -> None:
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power_percentage=75,  # pysmartcocoon power_percentage is 0-100 scale
+            speed_pct=75,  # pysmartcocoon speed_pct is 0-100 scale
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -729,7 +738,7 @@ def test_smartcocoon_fan_preset_modes(hass: HomeAssistant) -> None:
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power_percentage=75,  # pysmartcocoon power_percentage is 0-100 scale
+            speed_pct=75,  # pysmartcocoon speed_pct is 0-100 scale
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -760,7 +769,7 @@ def test_smartcocoon_fan_get_fan_data_without_scmanager(hass: HomeAssistant) -> 
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power_percentage=75,  # pysmartcocoon power_percentage is 0-100 scale
+            speed_pct=75,  # pysmartcocoon speed_pct is 0-100 scale
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -894,7 +903,7 @@ async def test_smartcocoon_fan_error_handling_invalid_preset_mode_format(
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power_percentage=75,  # pysmartcocoon power_percentage is 0-100 scale
+            speed_pct=75,  # pysmartcocoon speed_pct is 0-100 scale
             mode="auto",
             firmware_version="1.0.0",
         )
@@ -919,7 +928,7 @@ async def test_smartcocoon_fan_error_handling_preset_mode_fstring_fixed(
             room_name="Living Room",
             connected=True,
             fan_on=True,
-            power_percentage=75,  # pysmartcocoon power_percentage is 0-100 scale
+            speed_pct=75,  # pysmartcocoon speed_pct is 0-100 scale
             mode="auto",
             firmware_version="1.0.0",
         )

@@ -15,6 +15,7 @@ from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .const import CONF_ENABLE_PRESET_MODES, DEFAULT_ENABLE_PRESET_MODES, DOMAIN
+from .error_handler import RetryConfig, SmartCocoonErrorHandler
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -43,6 +44,17 @@ class SmartCocoonController:
         else:
             self._enable_preset_modes = False
 
+        # Initialize error handler with retry configuration
+        self._error_handler = SmartCocoonErrorHandler(
+            RetryConfig(
+                max_attempts=3,
+                base_delay=1.0,
+                max_delay=30.0,
+                exponential_base=2.0,
+                jitter=True,
+            )
+        )
+
     @property
     def enable_preset_modes(self) -> bool:
         """Return the Enable Preset Mode flag."""
@@ -61,12 +73,16 @@ class SmartCocoonController:
         self._session = async_get_clientsession(self._hass)
         self._scmanager = SmartCocoonManager(self._session)
 
-        try:
-            await self._scmanager.async_start_services(
+        # Use error handler for retry logic
+        assert self._scmanager is not None  # Checked in constructor
+        scmanager = self._scmanager  # Store reference to avoid mypy issues
+        await self._error_handler.async_retry_operation(
+            operation=lambda: scmanager.async_start_services(
                 username=self._username, password=self._password
-            )
-        except (UnauthorizedError,) as exc:
-            raise ConfigEntryAuthFailed() from exc
+            ),
+            operation_name="SmartCocoon service startup",
+            context={"username": self._username},
+        )
 
         _LOGGER.debug("SmartCocoon services started successfully")
 
@@ -76,6 +92,11 @@ class SmartCocoonController:
         _LOGGER.debug("scmanager.fans: %s", self._scmanager.fans)
 
         return True
+
+    @property
+    def error_handler(self) -> SmartCocoonErrorHandler:
+        """Return the error handler instance."""
+        return self._error_handler
 
 
 async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
