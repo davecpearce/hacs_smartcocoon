@@ -60,6 +60,7 @@ class SmartCocoonFan(FanEntity):  # type: ignore[misc]
         """Initialize the SmartCocoon entity."""
 
         self._fan_id = fan_id
+        self._smartcocoon = smartcocoon
         self._scmanager = smartcocoon.scmanager
         self._enable_preset_modes = smartcocoon.enable_preset_modes
 
@@ -142,14 +143,16 @@ class SmartCocoonFan(FanEntity):  # type: ignore[misc]
     def percentage(self) -> int | None:
         """Return the current speed as a percentage (0-100)."""
         fan_data = self._get_fan_data()
-        percentage = fan_data.power_percentage
+        power = fan_data.power_percentage
         _LOGGER.debug(
-            "Fan %s: Power percentage from pysmartcocoon: %s (type: %s)",
+            "Fan %s: Raw power value from pysmartcocoon: %s (type: %s)",
             self._fan_id,
-            percentage,
-            type(percentage),
+            power,
+            type(power),
         )
-        return int(percentage)
+        percentage = int(power)
+        _LOGGER.debug("Fan %s: Converted to percentage: %s", self._fan_id, percentage)
+        return percentage
 
     @property
     def preset_mode(self) -> str | None:
@@ -199,25 +202,48 @@ class SmartCocoonFan(FanEntity):  # type: ignore[misc]
 
     async def async_set_percentage(self, percentage: int) -> None:
         """Set the speed of the fan, as a percentage."""
+        _LOGGER.debug(
+            "Fan %s: Setting percentage to %s (type: %s)",
+            self._fan_id,
+            percentage,
+            type(percentage),
+        )
         assert self._scmanager is not None  # Checked in constructor
-        # Convert HA percentage (0-100) to SmartCocoon API scale (0-10000)
-        # SmartCocoon API expects values in range 0-10000, not 0-100
-        api_speed = percentage
-        await self._scmanager.async_set_fan_speed(self._fan_id, api_speed)
+        scmanager = self._scmanager  # Store reference to avoid mypy issues
+        await self._smartcocoon.error_handler.async_retry_operation(
+            operation=lambda: scmanager.async_set_fan_speed(self._fan_id, percentage),
+            operation_name=f"set fan speed to {percentage}%",
+            context={"fan_id": self._fan_id, "percentage": percentage},
+        )
+        _LOGGER.debug(
+            "Fan %s: Successfully set percentage to %s", self._fan_id, percentage
+        )
         self.async_write_ha_state()
 
     async def async_set_preset_mode(self, preset_mode: str) -> None:
         """Set new preset mode."""
+        _LOGGER.debug("Fan %s: Setting preset mode to %s", self._fan_id, preset_mode)
         if preset_mode not in SC_PRESET_MODES:
             raise ValueError(
                 f"{preset_mode} is not a valid preset_mode: {SC_PRESET_MODES}"
             )
 
         assert self._scmanager is not None  # Checked in constructor
+        scmanager = self._scmanager  # Store reference to avoid mypy issues
         if preset_mode == SC_PRESET_MODE_AUTO:
-            await self._scmanager.async_set_fan_auto(self._fan_id)
+            await self._smartcocoon.error_handler.async_retry_operation(
+                operation=lambda: scmanager.async_set_fan_auto(self._fan_id),
+                operation_name="set fan to auto mode",
+                context={"fan_id": self._fan_id, "preset_mode": preset_mode},
+            )
+            _LOGGER.debug("Fan %s: Successfully set to auto mode", self._fan_id)
         elif preset_mode == SC_PRESET_MODE_ECO:
-            await self._scmanager.async_set_fan_eco(self._fan_id)
+            await self._smartcocoon.error_handler.async_retry_operation(
+                operation=lambda: scmanager.async_set_fan_eco(self._fan_id),
+                operation_name="set fan to eco mode",
+                context={"fan_id": self._fan_id, "preset_mode": preset_mode},
+            )
+            _LOGGER.debug("Fan %s: Successfully set to eco mode", self._fan_id)
         else:
             raise ValueError(f"Unsupported preset mode {preset_mode}")
 
@@ -225,8 +251,15 @@ class SmartCocoonFan(FanEntity):  # type: ignore[misc]
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn off the entity."""
+        _LOGGER.debug("Fan %s: Turning off", self._fan_id)
         assert self._scmanager is not None  # Checked in constructor
-        await self._scmanager.async_fan_turn_off(self._fan_id)
+        scmanager = self._scmanager  # Store reference to avoid mypy issues
+        await self._smartcocoon.error_handler.async_retry_operation(
+            operation=lambda: scmanager.async_fan_turn_off(self._fan_id),
+            operation_name="turn off fan",
+            context={"fan_id": self._fan_id},
+        )
+        _LOGGER.debug("Fan %s: Successfully turned off", self._fan_id)
         self.async_write_ha_state()
 
     async def async_turn_on(
@@ -236,6 +269,12 @@ class SmartCocoonFan(FanEntity):  # type: ignore[misc]
         **kwargs: Any,
     ) -> None:
         """Turn on the entity."""
+        _LOGGER.debug(
+            "Fan %s: Turning on (percentage=%s, preset_mode=%s)",
+            self._fan_id,
+            percentage,
+            preset_mode,
+        )
         if preset_mode:
             await self.async_set_preset_mode(preset_mode)
             return
@@ -244,5 +283,11 @@ class SmartCocoonFan(FanEntity):  # type: ignore[misc]
             await self.async_set_percentage(percentage)
 
         assert self._scmanager is not None  # Checked in constructor
-        await self._scmanager.async_fan_turn_on(self._fan_id)
+        scmanager = self._scmanager  # Store reference to avoid mypy issues
+        await self._smartcocoon.error_handler.async_retry_operation(
+            operation=lambda: scmanager.async_fan_turn_on(self._fan_id),
+            operation_name="turn on fan",
+            context={"fan_id": self._fan_id},
+        )
+        _LOGGER.debug("Fan %s: Successfully turned on", self._fan_id)
         self.async_write_ha_state()

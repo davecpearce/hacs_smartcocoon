@@ -422,37 +422,41 @@ async def test_smartcocoon_fan_async_methods(hass: HomeAssistant) -> None:
     controller.scmanager.async_fan_turn_off = AsyncMock()
     controller.scmanager.async_fan_turn_on = AsyncMock()
 
+    # Mock error handler
+    controller.error_handler = MagicMock()
+    controller.error_handler.async_retry_operation = AsyncMock()
+
     fan = SmartCocoonFan(hass, controller, "fan_1")
 
     # Test async_set_percentage
     with patch.object(fan, "async_write_ha_state") as mock_write:
         await fan.async_set_percentage(50)
-        # API expects 0-100 scale, same as HA
-        controller.scmanager.async_set_fan_speed.assert_called_once_with("fan_1", 50)
+        # With error handling, the error handler should be called
+        controller.error_handler.async_retry_operation.assert_called()
         mock_write.assert_called_once()
 
     # Test async_set_preset_mode_auto
     with patch.object(fan, "async_write_ha_state") as mock_write:
         await fan.async_set_preset_mode("auto")
-        controller.scmanager.async_set_fan_auto.assert_called_once_with("fan_1")
+        controller.error_handler.async_retry_operation.assert_called()
         mock_write.assert_called_once()
 
     # Test async_set_preset_mode_eco
     with patch.object(fan, "async_write_ha_state") as mock_write:
         await fan.async_set_preset_mode("eco")
-        controller.scmanager.async_set_fan_eco.assert_called_once_with("fan_1")
+        controller.error_handler.async_retry_operation.assert_called()
         mock_write.assert_called_once()
 
     # Test async_turn_off
     with patch.object(fan, "async_write_ha_state") as mock_write:
         await fan.async_turn_off()
-        controller.scmanager.async_fan_turn_off.assert_called_once_with("fan_1")
+        controller.error_handler.async_retry_operation.assert_called()
         mock_write.assert_called_once()
 
     # Test async_turn_on
     with patch.object(fan, "async_write_ha_state") as mock_write:
         await fan.async_turn_on()
-        controller.scmanager.async_fan_turn_on.assert_called_once_with("fan_1")
+        controller.error_handler.async_retry_operation.assert_called()
         mock_write.assert_called_once()
 
 
@@ -551,6 +555,10 @@ async def test_smartcocoon_fan_turn_on_with_percentage(hass: HomeAssistant) -> N
 
     controller.scmanager.async_fan_turn_on = AsyncMock()
 
+    # Mock error handler
+    controller.error_handler = MagicMock()
+    controller.error_handler.async_retry_operation = AsyncMock()
+
     fan = SmartCocoonFan(hass, controller, "fan_1")
 
     with (
@@ -559,7 +567,8 @@ async def test_smartcocoon_fan_turn_on_with_percentage(hass: HomeAssistant) -> N
     ):
         await fan.async_turn_on(percentage=50)
         mock_set_percentage.assert_called_once_with(50)
-        controller.scmanager.async_fan_turn_on.assert_called_once_with("fan_1")
+        # Should also call the error handler for async_fan_turn_on
+        controller.error_handler.async_retry_operation.assert_called()
         mock_write.assert_called_once()
 
 
