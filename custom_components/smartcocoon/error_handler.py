@@ -80,7 +80,7 @@ class SmartCocoonErrorHandler:
                     exc,
                 )
                 await asyncio.sleep(delay)
-            except Exception as exc:
+            except Exception as exc:  # pylint: disable=broad-exception-caught
                 if self._retry_config.retry_generic_exceptions:
                     if attempt == self._retry_config.max_attempts - 1:
                         _LOGGER.error(
@@ -91,7 +91,7 @@ class SmartCocoonErrorHandler:
                             exc,
                         )
                         raise exc
-                    
+
                     delay = self._calculate_delay(attempt)
                     _LOGGER.warning(
                         "Attempt %d/%d for %s failed with unexpected error. Retrying in %.2f seconds. Context: %s. Error: %s",
