@@ -25,6 +25,8 @@ class RetryConfig:
     max_delay: float = 30.0  # seconds
     exponential_base: float = 2.0
     jitter: bool = True
+    # Retry generic exceptions (use with caution)
+    retry_generic_exceptions: bool = False
 
 
 class SmartCocoonErrorHandler:
@@ -79,14 +81,37 @@ class SmartCocoonErrorHandler:
                 )
                 await asyncio.sleep(delay)
             except Exception as exc:
-                _LOGGER.exception(
-                    "An unexpected error occurred during %s (attempt %d/%d). Context: %s",
-                    operation_name,
-                    attempt + 1,
-                    self._retry_config.max_attempts,
-                    context,
-                )
-                raise exc
+                if self._retry_config.retry_generic_exceptions:
+                    if attempt == self._retry_config.max_attempts - 1:
+                        _LOGGER.error(
+                            "Failed to complete %s after %d attempts. Context: %s. Error: %s",
+                            operation_name,
+                            self._retry_config.max_attempts,
+                            context,
+                            exc,
+                        )
+                        raise exc
+                    
+                    delay = self._calculate_delay(attempt)
+                    _LOGGER.warning(
+                        "Attempt %d/%d for %s failed with unexpected error. Retrying in %.2f seconds. Context: %s. Error: %s",
+                        attempt + 1,
+                        self._retry_config.max_attempts,
+                        operation_name,
+                        delay,
+                        context,
+                        exc,
+                    )
+                    await asyncio.sleep(delay)
+                else:
+                    _LOGGER.exception(
+                        "An unexpected error occurred during %s (attempt %d/%d). Context: %s",
+                        operation_name,
+                        attempt + 1,
+                        self._retry_config.max_attempts,
+                        context,
+                    )
+                    raise exc
         raise RuntimeError(
             "Should not reach here: retry logic exhausted without raising an exception."
         )
