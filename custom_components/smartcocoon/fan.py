@@ -143,14 +143,14 @@ class SmartCocoonFan(FanEntity):  # type: ignore[misc]
     def percentage(self) -> int | None:
         """Return the current speed as a percentage (0-100)."""
         fan_data = self._get_fan_data()
-        power = fan_data.power_percentage
+        speed_pct = fan_data.speed_pct
         _LOGGER.debug(
-            "Fan %s: Raw power value from pysmartcocoon: %s (type: %s)",
+            "Fan %s: Speed percentage from pysmartcocoon: %s (type: %s)",
             self._fan_id,
-            power,
-            type(power),
+            speed_pct,
+            type(speed_pct),
         )
-        percentage = int(power)
+        percentage = int(speed_pct)
         _LOGGER.debug("Fan %s: Converted to percentage: %s", self._fan_id, percentage)
         return percentage
 
