@@ -11,7 +11,21 @@ def test_fan_extra_attributes_typeddict() -> None:
     assert issubclass(FanExtraAttributes, dict)  # TypedDict is a subclass of dict
 
     # Test that it has the expected keys
-    expected_keys = {"room_name"}
+    expected_keys = {
+        "room_name",
+        "fan_id",
+        "firmware_version",
+        "connected",
+        "fan_on",
+        "mode",
+        "last_connected",
+        "last_disconnected",
+        "predicted_room_temperature",
+        "is_room_estimating",
+        "thermostat_vendor",
+        "room_id",
+        "identifier",
+    }
     assert set(FanExtraAttributes.__annotations__.keys()) == expected_keys
 
     # Test that room_name is optional (total=False)

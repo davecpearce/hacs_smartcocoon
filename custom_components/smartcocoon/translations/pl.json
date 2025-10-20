@@ -1,0 +1,38 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "Urządzenie jest już skonfigurowane"
+    },
+    "error": {
+      "cannot_connect": "Błąd połączenia",
+      "invalid_auth": "Nieprawidłowa autoryzacja",
+      "unknown": "Nieoczekiwany błąd"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "username": "Nazwa użytkownika",
+          "password": "Hasło",
+          "enable_preset_mode": "Włącz tryby wstępnie ustawione"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "enable_preset_modes": "Włącz tryby wstępnie ustawione",
+          "max_offline_duration": "Maksymalny czas offline",
+          "recovery_attempt_interval": "Interwał próby odzyskania",
+          "max_recovery_attempts_per_hour": "Maksymalne próby odzyskania na godzinę",
+          "recovery_reset_interval": "Interwał resetowania odzyskiwania",
+          "connection_check_interval": "Interwał sprawdzania połączenia"
+        },
+        "description": "Ustaw opcje dla SmartCocoon:\n • Tryby wstępnie ustawione (auto, eco) nie tłumaczą się dobrze w Apple Home. Jeśli wolisz używać tych trybów, włącz je tutaj.\n • Maksymalny czas offline: Jak długo próbować ponownie połączyć wentylator przed zatrzymaniem prób odzyskania (1-168 godzin). Domyślnie: 24 godziny.\n • Interwał próby odzyskania: Jak często próbować odzyskać rozłączone wentylatory (1-60 minut). Domyślnie: 5 minut.\n • Maksymalne próby odzyskania na godzinę: Maksymalne próby odzyskania na godzinę przed resetem (1-20 prób). Domyślnie: 5 prób.\n • Interwał resetowania odzyskiwania: Jak często resetować licznik prób odzyskania (15-240 minut). Domyślnie: 60 minut.\n • Interwał sprawdzania połączenia: Jak często sprawdzać status chmury dla rozłączonych wentylatorów (1-24 godziny). Domyślnie: 1 godzina.",
+        "title": "Opcje SmartCocoon"
+      }
+    }
+  }
+}
+

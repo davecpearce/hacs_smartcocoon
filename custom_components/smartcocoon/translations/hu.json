@@ -1,0 +1,37 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "Az eszköz már konfigurálva van"
+    },
+    "error": {
+      "cannot_connect": "A kapcsolat sikertelen",
+      "invalid_auth": "Érvénytelen hitelesítés",
+      "unknown": "Váratlan hiba"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "username": "Felhasználónév",
+          "password": "Jelszó",
+          "enable_preset_mode": "Előre beállított módok engedélyezése"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "enable_preset_modes": "Előre beállított módok engedélyezése",
+          "max_offline_duration": "Maximális offline időtartam",
+          "recovery_attempt_interval": "Helyreállítási kísérlet intervallum",
+          "max_recovery_attempts_per_hour": "Maximális helyreállítási kísérletek óránként",
+          "recovery_reset_interval": "Helyreállítási reset intervallum",
+          "connection_check_interval": "Kapcsolat ellenőrzési intervallum"
+        },
+        "description": "SmartCocoon beállítások:\n • Az előre beállított módok (auto, eco) nem fordítódnak jól az Apple Home-ban. Ha ezeket a módokat szeretné használni, engedélyezze őket itt.\n • Maximális offline időtartam: Mennyi ideig próbáljon újra csatlakozni egy ventilátorhoz a helyreállítási kísérletek leállítása előtt (1-168 óra). Alapértelmezett: 24 óra.\n • Helyreállítási kísérlet intervallum: Milyen gyakran próbáljon helyreállítást a leválasztott ventilátorokhoz (1-60 perc). Alapértelmezett: 5 perc.\n • Maximális helyreállítási kísérletek óránként: Maximális helyreállítási kísérletek óránként a reset előtt (1-20 kísérlet). Alapértelmezett: 5 kísérlet.\n • Helyreállítási reset intervallum: Milyen gyakran állítsa vissza a helyreállítási kísérletek számlálóját (15-240 perc). Alapértelmezett: 60 perc.\n • Kapcsolat ellenőrzési intervallum: Milyen gyakran ellenőrizze a felhő állapotát a leválasztott ventilátorokhoz (1-24 óra). Alapértelmezett: 1 óra.",
+        "title": "SmartCocoon beállítások"
+      }
+    }
+  }
+}

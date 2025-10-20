@@ -1,0 +1,37 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "El dispositiu ja està configurat"
+    },
+    "error": {
+      "cannot_connect": "Error de connexió",
+      "invalid_auth": "Autenticació invàlida",
+      "unknown": "Error inesperat"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "username": "Nom d'usuari",
+          "password": "Contrasenya",
+          "enable_preset_mode": "Habilitar modes predefinits"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "enable_preset_modes": "Habilitar modes predefinits",
+          "max_offline_duration": "Durada màxima fora de línia",
+          "recovery_attempt_interval": "Interval d'intent de recuperació",
+          "max_recovery_attempts_per_hour": "Intents de recuperació màxims per hora",
+          "recovery_reset_interval": "Interval de reinicialització de recuperació",
+          "connection_check_interval": "Interval de verificació de connexió"
+        },
+        "description": "Establir les opcions per SmartCocoon:\n • Els modes predefinits (auto, eco) no es tradueixen bé a Apple Home. Si preferiu utilitzar aquests modes, habiliteu-los aquí.\n • Durada màxima fora de línia: Quant de temps intentar tornar a connectar un ventilador abans d'aturar els intents de recuperació (1-168 hores). Per defecte: 24 hores.\n • Interval d'intent de recuperació: Amb quina freqüència intentar recuperació per ventiladors desconnectats (1-60 minuts). Per defecte: 5 minuts.\n • Intents de recuperació màxims per hora: Intents de recuperació màxims per hora abans del reinici (1-20 intents). Per defecte: 5 intents.\n • Interval de reinicialització de recuperació: Amb quina freqüència reinicialitzar el comptador d'intents de recuperació (15-240 minuts). Per defecte: 60 minuts.\n • Interval de verificació de connexió: Amb quina freqüència verificar l'estat del núvol per ventiladors desconnectats (1-24 hores). Per defecte: 1 hora.",
+        "title": "Opcions SmartCocoon"
+      }
+    }
+  }
+}

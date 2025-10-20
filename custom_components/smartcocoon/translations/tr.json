@@ -1,0 +1,38 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "Cihaz zaten yapılandırılmış"
+    },
+    "error": {
+      "cannot_connect": "Bağlantı başarısız",
+      "invalid_auth": "Geçersiz kimlik doğrulama",
+      "unknown": "Beklenmeyen hata"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "username": "Kullanıcı adı",
+          "password": "Şifre",
+          "enable_preset_mode": "Önceden ayarlanmış modları etkinleştir"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "enable_preset_modes": "Önceden ayarlanmış modları etkinleştir",
+          "max_offline_duration": "Maksimum çevrimdışı süre",
+          "recovery_attempt_interval": "Kurtarma denemesi aralığı",
+          "max_recovery_attempts_per_hour": "Saatte maksimum kurtarma denemesi",
+          "recovery_reset_interval": "Kurtarma sıfırlama aralığı",
+          "connection_check_interval": "Bağlantı kontrol aralığı"
+        },
+        "description": "SmartCocoon için seçenekleri ayarla:\n • Önceden ayarlanmış modlar (auto, eco) Apple Home'da iyi çevrilmiyor. Bu modları kullanmayı tercih ediyorsanız, burada etkinleştirin.\n • Maksimum çevrimdışı süre: Kurtarma denemelerini durdurmadan önce bir fanı yeniden bağlamaya ne kadar süre çalışılacağı (1-168 saat). Varsayılan: 24 saat.\n • Kurtarma denemesi aralığı: Bağlantısı kesilen fanlar için kurtarma denemesinin ne sıklıkla yapılacağı (1-60 dakika). Varsayılan: 5 dakika.\n • Saatte maksimum kurtarma denemesi: Sıfırlamadan önce saatte maksimum kurtarma denemesi (1-20 deneme). Varsayılan: 5 deneme.\n • Kurtarma sıfırlama aralığı: Kurtarma denemesi sayacının ne sıklıkla sıfırlanacağı (15-240 dakika). Varsayılan: 60 dakika.\n • Bağlantı kontrol aralığı: Bağlantısı kesilen fanlar için bulut durumunun ne sıklıkla kontrol edileceği (1-24 saat). Varsayılan: 1 saat.",
+        "title": "SmartCocoon Seçenekleri"
+      }
+    }
+  }
+}
+

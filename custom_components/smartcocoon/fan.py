@@ -83,6 +83,8 @@ class SmartCocoonFan(FanEntity):  # type: ignore[misc]
         self._attr_extra_state_attributes: FanExtraAttributes = {
             "room_name": self._get_fan_data().room_name
         }
+        # Initialize availability tracking
+        self._last_available: bool | None = None
 
     async def async_added_to_hass(self) -> None:
         """Run when entity is about to be added to Home Assistant."""
@@ -165,8 +167,6 @@ class SmartCocoonFan(FanEntity):  # type: ignore[misc]
                 attrs["is_room_estimating"] = extracted["is_room_estimating"]
             if "thermostat_vendor" in extracted:
                 attrs["thermostat_vendor"] = extracted["thermostat_vendor"]
-            if "power" in extracted:
-                attrs["power"] = extracted["power"]
             if "room_id" in extracted:
                 attrs["room_id"] = extracted["room_id"]
             if "identifier" in extracted:
@@ -342,6 +342,30 @@ class SmartCocoonFan(FanEntity):  # type: ignore[misc]
     def async_write_ha_state(self) -> None:
         """Ensure attributes are refreshed and log on each state write."""
         try:
+            # Check if availability changed
+            was_available = getattr(self, '_last_available', None)
+            is_available = self.available
+
+            # If availability changed from True to False, trigger recovery
+            if was_available is True and is_available is False:
+                _LOGGER.info(
+                    "Fan %s became unavailable - triggering recovery check",
+                    self._fan_id,
+                )
+                # Trigger recovery check asynchronously
+                if (
+                    hasattr(self._smartcocoon, 'connection_monitor')
+                    and self._smartcocoon.connection_monitor
+                ):
+                    self.hass.async_create_task(
+                        self._smartcocoon.connection_monitor.check_fan_unavailable(
+                            self._fan_id
+                        )
+                    )
+
+            # Store current availability for next check
+            self._last_available = is_available
+
             self._attr_extra_state_attributes = self._build_extra_attrs()
             _LOGGER.debug(
                 "Fan %s: write_ha_state attrs: %s",

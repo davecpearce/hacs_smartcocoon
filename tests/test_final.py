@@ -376,10 +376,7 @@ async def test_smartcocoon_fan_async_methods(hass: HomeAssistant) -> None:
     # Test async_set_percentage
     with patch.object(fan, "async_write_ha_state") as mock_write:
         await fan.async_set_percentage(50)
-<<<<<<< Updated upstream
-=======
         # With error handling, the error handler should be called
->>>>>>> Stashed changes
         controller.error_handler.async_retry_operation.assert_called()
         mock_write.assert_called_once()
 
@@ -503,7 +500,7 @@ async def test_smartcocoon_fan_turn_on_with_percentage(hass: HomeAssistant) -> N
     }
 
     controller.scmanager.async_fan_turn_on = AsyncMock()
-    
+
     # Mock error handler
     controller.error_handler = MagicMock()
     controller.error_handler.async_retry_operation = AsyncMock()

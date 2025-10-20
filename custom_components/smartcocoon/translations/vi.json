@@ -1,0 +1,37 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "Thiết bị đã được cấu hình"
+    },
+    "error": {
+      "cannot_connect": "Kết nối thất bại",
+      "invalid_auth": "Xác thực không hợp lệ",
+      "unknown": "Lỗi không mong muốn"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "username": "Tên người dùng",
+          "password": "Mật khẩu",
+          "enable_preset_mode": "Bật chế độ cài sẵn"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "enable_preset_modes": "Bật chế độ cài sẵn",
+          "max_offline_duration": "Thời gian offline tối đa",
+          "recovery_attempt_interval": "Khoảng thời gian thử khôi phục",
+          "max_recovery_attempts_per_hour": "Số lần thử khôi phục tối đa mỗi giờ",
+          "recovery_reset_interval": "Khoảng thời gian đặt lại khôi phục",
+          "connection_check_interval": "Khoảng thời gian kiểm tra kết nối"
+        },
+        "description": "Đặt tùy chọn cho SmartCocoon:\n • Các chế độ cài sẵn (auto, eco) không dịch tốt trong Apple Home. Nếu bạn muốn sử dụng các chế độ này, hãy bật chúng ở đây.\n • Thời gian offline tối đa: Bao lâu để thử kết nối lại quạt trước khi dừng các lần thử khôi phục (1-168 giờ). Mặc định: 24 giờ.\n • Khoảng thời gian thử khôi phục: Tần suất thử khôi phục cho các quạt bị ngắt kết nối (1-60 phút). Mặc định: 5 phút.\n • Số lần thử khôi phục tối đa mỗi giờ: Số lần thử khôi phục tối đa mỗi giờ trước khi đặt lại (1-20 lần). Mặc định: 5 lần.\n • Khoảng thời gian đặt lại khôi phục: Tần suất đặt lại bộ đếm lần thử khôi phục (15-240 phút). Mặc định: 60 phút.\n • Khoảng thời gian kiểm tra kết nối: Tần suất kiểm tra trạng thái đám mây cho các quạt bị ngắt kết nối (1-24 giờ). Mặc định: 1 giờ.",
+        "title": "Tùy chọn SmartCocoon"
+      }
+    }
+  }
+}

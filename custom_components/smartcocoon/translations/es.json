@@ -1,0 +1,38 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "El dispositivo ya está configurado"
+    },
+    "error": {
+      "cannot_connect": "Error de conexión",
+      "invalid_auth": "Autenticación inválida",
+      "unknown": "Error inesperado"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "username": "Nombre de usuario",
+          "password": "Contraseña",
+          "enable_preset_mode": "Habilitar modos preestablecidos"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "enable_preset_modes": "Habilitar modos preestablecidos",
+          "max_offline_duration": "Duración máxima sin conexión",
+          "recovery_attempt_interval": "Intervalo de intento de recuperación",
+          "max_recovery_attempts_per_hour": "Intentos de recuperación máximos por hora",
+          "recovery_reset_interval": "Intervalo de reinicio de recuperación",
+          "connection_check_interval": "Intervalo de verificación de conexión"
+        },
+        "description": "Establecer las opciones para SmartCocoon:\n • Los modos preestablecidos (auto, eco) no se traducen bien en Apple Home. Si prefieres usar estos modos, actívalos aquí.\n • Duración máxima sin conexión: Cuánto tiempo intentar reconectar un ventilador antes de detener los intentos de recuperación (1-168 horas). Por defecto: 24 horas.\n • Intervalo de intento de recuperación: Con qué frecuencia intentar la recuperación para ventiladores desconectados (1-60 minutos). Por defecto: 5 minutos.\n • Intentos de recuperación máximos por hora: Intentos de recuperación máximos por hora antes del reinicio (1-20 intentos). Por defecto: 5 intentos.\n • Intervalo de reinicio de recuperación: Con qué frecuencia reiniciar el contador de intentos de recuperación (15-240 minutos). Por defecto: 60 minutos.\n • Intervalo de verificación de conexión: Con qué frecuencia verificar el estado de la nube para ventiladores desconectados (1-24 horas). Por defecto: 1 hora.",
+        "title": "Opciones de SmartCocoon"
+      }
+    }
+  }
+}
+

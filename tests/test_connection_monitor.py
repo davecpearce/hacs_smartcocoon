@@ -1,4 +1,5 @@
 """Test connection monitor functionality."""
+# ruff: noqa: SLF001
 
 # pylint: disable=protected-access,unused-argument
 
@@ -7,7 +8,10 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from custom_components.smartcocoon.connection_monitor import ConnectionMonitor
+from custom_components.smartcocoon.connection_monitor import (
+    ConnectionMonitor,
+    ConnectionMonitorConfig,
+)
 from custom_components.smartcocoon.error_handler import (
     RetryConfig,
     SmartCocoonErrorHandler,
@@ -53,12 +57,19 @@ class TestConnectionMonitor:
     @pytest.fixture
     def connection_monitor(self, mock_hass, mock_scmanager, error_handler):
         """Create a ConnectionMonitor instance."""
+        config = ConnectionMonitorConfig(
+            max_offline_duration=3600,  # 1 hour for testing
+            recovery_attempt_interval=300,  # 5 minutes for testing
+            max_recovery_attempts_per_hour=5,  # 5 attempts for testing
+            recovery_reset_interval=3600,  # 60 minutes for testing
+            connection_check_interval=3600,  # 1 hour for testing
+        )
+
         return ConnectionMonitor(
             hass=mock_hass,
             scmanager=mock_scmanager,
             error_handler=error_handler,
-            check_interval=1,  # 1 minute for testing
-            max_offline_duration=1,  # 1 hour for testing
+            config=config,
         )
 
     @pytest.mark.asyncio
@@ -68,17 +79,19 @@ class TestConnectionMonitor:
         connection_monitor._scmanager.fans = {"fan1": MagicMock()}
 
         with patch(
-            "custom_components.smartcocoon.connection_monitor.async_track_time_interval"
-        ) as mock_track:
-            mock_track.return_value = MagicMock()
+            "custom_components.smartcocoon.connection_monitor.async_call_later"
+        ) as mock_call_later:
+            mock_call_later.return_value = MagicMock()
 
             await connection_monitor.start_monitoring()
 
-            # Verify that async_track_time_interval was called
-            mock_track.assert_called_once()
+            # Verify that async_call_later was called twice
+            # (grace period + periodic check)
+            assert mock_call_later.call_count == 2
 
-            # Verify the timer is stored
-            assert connection_monitor._unsubscribe_timer is not None
+            # Verify the callbacks are stored
+            assert connection_monitor._grace_period_callback is not None
+            assert connection_monitor._periodic_check_callback is not None
 
     @pytest.mark.asyncio
     async def test_stop_monitoring(self, connection_monitor, mock_hass):
@@ -87,10 +100,10 @@ class TestConnectionMonitor:
         connection_monitor._scmanager.fans = {"fan1": MagicMock()}
 
         with patch(
-            "custom_components.smartcocoon.connection_monitor.async_track_time_interval"
-        ) as mock_track:
+            "custom_components.smartcocoon.connection_monitor.async_call_later"
+        ) as mock_call_later:
             mock_timer = MagicMock()
-            mock_track.return_value = mock_timer
+            mock_call_later.return_value = mock_timer
 
             # Start monitoring first
             await connection_monitor.start_monitoring()
@@ -98,9 +111,11 @@ class TestConnectionMonitor:
             # Stop monitoring
             await connection_monitor.stop_monitoring()
 
-            # Verify the timer was called
-            mock_timer.assert_called_once()
-            assert connection_monitor._unsubscribe_timer is None
+            # Verify the timer was called (multiple times due to multiple callbacks)
+            assert mock_timer.call_count >= 2
+            # Verify the callbacks are cleared
+            assert connection_monitor._grace_period_callback is None
+            assert connection_monitor._periodic_check_callback is None
 
     @pytest.mark.asyncio
     async def test_check_connections(self, connection_monitor, mock_scmanager):
@@ -136,8 +151,8 @@ class TestConnectionMonitor:
             "last_connected": None,
             "last_disconnected": datetime.now() - timedelta(seconds=120),
             "recovery_attempts": 0,
-            "last_recovery_attempt": None,
             "first_recovery_attempt": None,
+            "last_recovery_attempt": None,
         }
 
         # Attempt recovery
@@ -164,8 +179,8 @@ class TestConnectionMonitor:
             "last_connected": None,
             "last_disconnected": datetime.now() - timedelta(seconds=120),
             "recovery_attempts": 0,
-            "last_recovery_attempt": None,
             "first_recovery_attempt": None,
+            "last_recovery_attempt": None,
         }
 
         # Mock successful recovery
@@ -191,6 +206,7 @@ class TestConnectionMonitor:
             "last_connected": None,
             "last_disconnected": datetime.now() - timedelta(seconds=120),
             "recovery_attempts": 1,
+            "first_recovery_attempt": None,
             "last_recovery_attempt": datetime.now()
             - timedelta(seconds=30),  # Recent attempt
         }
@@ -214,9 +230,9 @@ class TestConnectionMonitor:
             "last_connected": None,
             "last_disconnected": datetime.now() - timedelta(seconds=120),
             "recovery_attempts": 5,  # Max attempts
+            "first_recovery_attempt": None,
             "last_recovery_attempt": datetime.now()
             - timedelta(seconds=600),  # Old attempt
-            "first_recovery_attempt": None,
         }
 
         # Attempt recovery (should be blocked by max attempts)
@@ -236,9 +252,11 @@ class TestConnectionMonitor:
         # Initialize device state with long offline duration
         connection_monitor._device_states["fan1"] = {
             "last_connected": None,
-            "last_disconnected": datetime.now() - timedelta(hours=2),  # 2 hours offline
+            "last_disconnected": datetime.now()
+            - timedelta(hours=25),  # 25 hours offline
             "recovery_attempts": 1,
-            "last_recovery_attempt": datetime.now() - timedelta(hours=2),
+            "first_recovery_attempt": None,
+            "last_recovery_attempt": datetime.now() - timedelta(hours=25),
         }
 
         # Attempt recovery (should be blocked by max offline duration)
@@ -257,6 +275,7 @@ class TestConnectionMonitor:
                 "last_connected": datetime.now(),
                 "last_disconnected": None,
                 "recovery_attempts": 0,
+                "first_recovery_attempt": None,
                 "last_recovery_attempt": None,
             }
         }

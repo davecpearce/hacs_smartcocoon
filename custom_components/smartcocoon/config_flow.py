@@ -111,9 +111,6 @@ class OptionsFlowHandler(config_entries.OptionsFlow):  # type: ignore[misc]
         enable_preset_modes = options.get(
             CONF_ENABLE_PRESET_MODES, DEFAULT_ENABLE_PRESET_MODES
         )
-        connection_check_interval = options.get(
-            CONF_CONNECTION_CHECK_INTERVAL, DEFAULT_CONNECTION_CHECK_INTERVAL
-        )
         max_offline_duration = options.get(
             CONF_MAX_OFFLINE_DURATION, DEFAULT_MAX_OFFLINE_DURATION
         )
@@ -126,24 +123,15 @@ class OptionsFlowHandler(config_entries.OptionsFlow):  # type: ignore[misc]
         recovery_reset_interval = options.get(
             CONF_RECOVERY_RESET_INTERVAL, DEFAULT_RECOVERY_RESET_INTERVAL
         )
+        connection_check_interval = options.get(
+            CONF_CONNECTION_CHECK_INTERVAL, DEFAULT_CONNECTION_CHECK_INTERVAL
+        )
 
         options_schema = vol.Schema(
             {
                 vol.Required(
                     CONF_ENABLE_PRESET_MODES, default=enable_preset_modes
                 ): bool,
-                vol.Optional(
-                    CONF_CONNECTION_CHECK_INTERVAL,
-                    default=connection_check_interval,
-                ): selector.NumberSelector(
-                    selector.NumberSelectorConfig(
-                        min=1,
-                        max=60,
-                        step=1,
-                        unit_of_measurement="minutes",
-                        mode="box",
-                    )
-                ),
                 vol.Optional(
                     CONF_MAX_OFFLINE_DURATION,
                     default=max_offline_duration,
@@ -189,6 +177,18 @@ class OptionsFlowHandler(config_entries.OptionsFlow):  # type: ignore[misc]
                         max=240,
                         step=15,
                         unit_of_measurement="minutes",
+                        mode="box",
+                    )
+                ),
+                vol.Optional(
+                    CONF_CONNECTION_CHECK_INTERVAL,
+                    default=connection_check_interval,
+                ): selector.NumberSelector(
+                    selector.NumberSelectorConfig(
+                        min=1,
+                        max=24,
+                        step=1,
+                        unit_of_measurement="hours",
                         mode="box",
                     )
                 ),

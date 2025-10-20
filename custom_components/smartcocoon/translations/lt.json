@@ -1,0 +1,37 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "Įrenginys jau sukonfigūruotas"
+    },
+    "error": {
+      "cannot_connect": "Ryšys nepavyko",
+      "invalid_auth": "Neteisingas autentifikavimas",
+      "unknown": "Netikėta klaida"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "username": "Vartotojo vardas",
+          "password": "Slaptažodis",
+          "enable_preset_mode": "Įjungti iš anksto nustatytus režimus"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "enable_preset_modes": "Įjungti iš anksto nustatytus režimus",
+          "max_offline_duration": "Maksimalus offline trukmė",
+          "recovery_attempt_interval": "Atkūrimo bandymo intervalas",
+          "max_recovery_attempts_per_hour": "Maksimalūs atkūrimo bandymai per valandą",
+          "recovery_reset_interval": "Atkūrimo iš naujo nustatymo intervalas",
+          "connection_check_interval": "Ryšio tikrinimo intervalas"
+        },
+        "description": "Nustatyti SmartCocoon parinktis:\n • Iš anksto nustatyti režimai (auto, eco) negerai verčiami Apple Home. Jei norite naudoti šiuos režimus, įjunkite juos čia.\n • Maksimalus offline trukmė: Kiek ilgai bandyti vėl prijungti ventiliatorių prieš sustabdant atkūrimo bandymus (1-168 valandos). Pagal nutylėjimą: 24 valandos.\n • Atkūrimo bandymo intervalas: Kaip dažnai bandyti atkurti atjungtus ventiliatorius (1-60 minučių). Pagal nutylėjimą: 5 minutės.\n • Maksimalūs atkūrimo bandymai per valandą: Maksimalūs atkūrimo bandymai per valandą prieš iš naujo nustatymą (1-20 bandymų). Pagal nutylėjimą: 5 bandymai.\n • Atkūrimo iš naujo nustatymo intervalas: Kaip dažnai iš naujo nustatyti atkūrimo bandymų skaitiklį (15-240 minučių). Pagal nutylėjimą: 60 minučių.\n • Ryšio tikrinimo intervalas: Kaip dažnai tikrinti debesies būseną atjungtiems ventiliatoriams (1-24 valandos). Pagal nutylėjimą: 1 valanda.",
+        "title": "SmartCocoon parinktys"
+      }
+    }
+  }
+}

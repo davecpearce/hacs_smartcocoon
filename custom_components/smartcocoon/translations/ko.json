@@ -1,0 +1,37 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "장치가 이미 구성됨"
+    },
+    "error": {
+      "cannot_connect": "연결 실패",
+      "invalid_auth": "잘못된 인증",
+      "unknown": "예상치 못한 오류"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "username": "사용자 이름",
+          "password": "비밀번호",
+          "enable_preset_mode": "사전 설정 모드 활성화"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "enable_preset_modes": "사전 설정 모드 활성화",
+          "max_offline_duration": "최대 오프라인 지속 시간",
+          "recovery_attempt_interval": "복구 시도 간격",
+          "max_recovery_attempts_per_hour": "시간당 최대 복구 시도 횟수",
+          "recovery_reset_interval": "복구 재설정 간격",
+          "connection_check_interval": "연결 확인 간격"
+        },
+        "description": "SmartCocoon 옵션 설정:\n • 사전 설정 모드(auto, eco)는 Apple Home에서 잘 번역되지 않습니다. 이러한 모드를 사용하려면 여기에서 활성화하세요.\n • 최대 오프라인 지속 시간: 복구 시도를 중단하기 전에 팬을 다시 연결하려고 시도하는 시간(1-168시간). 기본값: 24시간.\n • 복구 시도 간격: 연결이 끊어진 팬에 대한 복구를 시도하는 빈도(1-60분). 기본값: 5분.\n • 시간당 최대 복구 시도 횟수: 재설정 전 시간당 최대 복구 시도 횟수(1-20회). 기본값: 5회.\n • 복구 재설정 간격: 복구 시도 카운터를 재설정하는 빈도(15-240분). 기본값: 60분.\n • 연결 확인 간격: 연결이 끊어진 팬의 클라우드 상태를 확인하는 빈도(1-24시간). 기본값: 1시간.",
+        "title": "SmartCocoon 옵션"
+      }
+    }
+  }
+}

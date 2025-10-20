@@ -1,0 +1,38 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "デバイスは既に設定されています"
+    },
+    "error": {
+      "cannot_connect": "接続に失敗しました",
+      "invalid_auth": "認証が無効です",
+      "unknown": "予期しないエラー"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "username": "ユーザー名",
+          "password": "パスワード",
+          "enable_preset_mode": "プリセットモードを有効にする"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "enable_preset_modes": "プリセットモードを有効にする",
+          "max_offline_duration": "最大オフライン時間",
+          "recovery_attempt_interval": "回復試行間隔",
+          "max_recovery_attempts_per_hour": "1時間あたりの最大回復試行回数",
+          "recovery_reset_interval": "回復リセット間隔",
+          "connection_check_interval": "接続チェック間隔"
+        },
+        "description": "SmartCocoonのオプションを設定:\n • プリセットモード（auto、eco）はApple Homeではうまく翻訳されません。これらのモードを使用したい場合は、ここで有効にしてください。\n • 最大オフライン時間: 回復試行を停止する前にファンを再接続しようとする時間（1-168時間）。デフォルト: 24時間。\n • 回復試行間隔: 切断されたファンの回復を試行する頻度（1-60分）。デフォルト: 5分。\n • 1時間あたりの最大回復試行回数: リセット前の1時間あたりの最大回復試行回数（1-20回）。デフォルト: 5回。\n • 回復リセット間隔: 回復試行カウンターをリセットする頻度（15-240分）。デフォルト: 60分。\n • 接続チェック間隔: 切断されたファンのクラウドステータスをチェックする頻度（1-24時間）。デフォルト: 1時間。",
+        "title": "SmartCocoonオプション"
+      }
+    }
+  }
+}
+

@@ -1,16 +1,36 @@
 """Connection monitoring and recovery for SmartCocoon devices."""
 
-from datetime import datetime, timedelta
+from datetime import datetime
 import logging
 from typing import Any
 
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.event import async_track_time_interval
+from homeassistant.helpers.event import async_call_later
 
 from .error_handler import SmartCocoonErrorHandler
 
 _LOGGER = logging.getLogger(__name__)
+
+
+class ConnectionMonitorConfig:
+    """Configuration for ConnectionMonitor."""
+
+    def __init__(self, **kwargs: int) -> None:
+        """Initialize config with keyword arguments."""
+        self.max_offline_duration = kwargs.get("max_offline_duration", 3600)  # 1 hour
+        self.recovery_attempt_interval = kwargs.get(
+            "recovery_attempt_interval", 300
+        )  # 5 minutes
+        self.max_recovery_attempts_per_hour = kwargs.get(
+            "max_recovery_attempts_per_hour", 5
+        )  # 5 attempts
+        self.recovery_reset_interval = kwargs.get(
+            "recovery_reset_interval", 3600
+        )  # 60 minutes
+        self.connection_check_interval = kwargs.get(
+            "connection_check_interval", 3600
+        )  # 1 hour
 
 
 class ConnectionMonitor:
@@ -21,48 +41,90 @@ class ConnectionMonitor:
         hass: HomeAssistant,
         scmanager: Any,
         error_handler: SmartCocoonErrorHandler,
-        check_interval: int = 300,  # 5 minutes
-        max_offline_duration: int = 3600,  # 1 hour
-        recovery_attempt_interval: int = 300,  # 5 minutes
-        max_recovery_attempts_per_hour: int = 5,  # 5 attempts
-        recovery_reset_interval: int = 3600,  # 60 minutes
+        config: ConnectionMonitorConfig,
     ) -> None:
         """Initialize the connection monitor."""
         self._hass = hass
         self._scmanager = scmanager
         self._error_handler = error_handler
-        self._check_interval = check_interval
-        self._max_offline_duration = max_offline_duration
-        self._recovery_attempt_interval = recovery_attempt_interval
-        self._max_recovery_attempts_per_hour = max_recovery_attempts_per_hour
-        self._recovery_reset_interval = recovery_reset_interval
+        self._max_offline_duration = config.max_offline_duration
+        self._recovery_attempt_interval = config.recovery_attempt_interval
+        self._max_recovery_attempts_per_hour = config.max_recovery_attempts_per_hour
+        self._recovery_reset_interval = config.recovery_reset_interval
+        self._connection_check_interval = config.connection_check_interval
 
         # Track device states
         self._device_states: dict[str, dict[str, Any]] = {}
         self._last_check: datetime | None = None
         self._unsubscribe_timer: Any = None
         self._startup_time: datetime = datetime.now()
+        self._grace_period_callback: Any = None
+        self._recovery_callbacks: dict[str, Any] = {}
+        self._periodic_check_callback: Any = None
 
     async def start_monitoring(self) -> None:
         """Start monitoring device connections."""
         _LOGGER.info("Starting SmartCocoon connection monitoring")
 
-        # Initial check
+        # Initial check to establish baseline
         await self._check_connections()
 
-        # Set up periodic checks
-        self._unsubscribe_timer = async_track_time_interval(
-            self._hass,
-            self._check_connections,
-            timedelta(seconds=self._check_interval),
+        # Schedule a check after the grace period to handle fans that were down
+        # at startup
+        self._grace_period_callback = async_call_later(
+            self._hass, 35, self._post_grace_period_check
         )
+
+        # Schedule periodic connection checks to detect disconnections
+        self._schedule_periodic_check()
 
     async def stop_monitoring(self) -> None:
         """Stop monitoring device connections."""
-        if self._unsubscribe_timer:
-            self._unsubscribe_timer()
-            self._unsubscribe_timer = None
+        # Cancel grace period callback if it exists
+        if self._grace_period_callback:
+            self._grace_period_callback()
+            self._grace_period_callback = None
+
+        # Cancel periodic check callback if it exists
+        if self._periodic_check_callback:
+            self._periodic_check_callback()
+            self._periodic_check_callback = None
+
+        # Cancel all recovery callbacks
+        for callback in self._recovery_callbacks.values():
+            if callback:
+                callback()
+        self._recovery_callbacks.clear()
+
         _LOGGER.info("Stopped SmartCocoon connection monitoring")
+
+    async def _post_grace_period_check(self, now: datetime) -> None:
+        """Check connections after the startup grace period has expired."""
+        _LOGGER.debug(
+            "Post-grace period check - evaluating disconnected fans for recovery"
+        )
+        await self._check_connections(now)
+
+    def _schedule_periodic_check(self) -> None:
+        """Schedule the next periodic connection check."""
+        if self._periodic_check_callback:
+            self._periodic_check_callback()
+            self._periodic_check_callback = None
+
+        self._periodic_check_callback = async_call_later(
+            self._hass, self._connection_check_interval, self._periodic_connection_check
+        )
+        _LOGGER.debug(
+            "Scheduled next connection check in %d hours",
+            self._connection_check_interval // 3600,
+        )
+
+    async def _periodic_connection_check(self, now: datetime) -> None:
+        """Periodic connection check to detect disconnections."""
+        _LOGGER.debug("Performing periodic connection check")
+        await self._check_connections(now)
+        # Schedule the next check
+        self._schedule_periodic_check()
 
     async def _check_connections(self, now: datetime | None = None) -> None:
         """Check all device connections and attempt recovery."""
@@ -79,7 +141,7 @@ class ConnectionMonitor:
         self._last_check = now or datetime.now()
 
         # High-level visibility of which fans will be evaluated
-        _LOGGER.info(
+        _LOGGER.debug(
             "Evaluating connection status for fans: %s",
             ", ".join(str(fid) for fid in self._scmanager.fans.keys()),
         )
@@ -177,59 +239,72 @@ class ConnectionMonitor:
         # Fallback to just the fan ID
         return f"Fan {fan_id}"
 
+    def _is_matching_fan_entity(self, entity_entry: Any, fan_id: str) -> bool:
+        """Check if entity entry matches the fan_id."""
+        if not (
+            entity_entry.platform == "smartcocoon" and entity_entry.domain == "fan"
+        ):
+            return False
+
+        # Extract fan_id from unique_id (format: smartcocoon_fan_<fan_id>)
+        unique_id_parts = str(entity_entry.unique_id).rsplit("_", maxsplit=1)
+        return (
+            len(unique_id_parts) == 2
+            and unique_id_parts[-1].lower() == str(fan_id).lower()
+        )
+
+    async def _update_fan_entity_callback(self, fan_id: str) -> bool:
+        """Update fan entity callback if found. Returns True if matched."""
+        fan_component = self._hass.data.get("fan")
+        if not fan_component or not hasattr(fan_component, "entities"):
+            return False
+
+        for fan_entity in fan_component.entities:
+            if (
+                hasattr(fan_entity, "_fan_id")
+                and getattr(fan_entity, "_fan_id", None) == fan_id
+            ):
+                _LOGGER.debug(
+                    "Calling async_update_fan_callback for fan %s",
+                    fan_id,
+                )
+                # Use the callback to ensure full refresh
+                if hasattr(fan_entity, "async_update_fan_callback"):
+                    await fan_entity.async_update_fan_callback()
+                elif hasattr(fan_entity, "async_write_ha_state"):
+                    fan_entity.async_write_ha_state()
+                return True
+        return False
+
     async def _notify_fan_entity(self, fan_id: str) -> None:
         """Notify the fan entity to update its state."""
         try:
             # Find and notify the fan entity directly
             entity_registry = er.async_get(self._hass)
 
-            # Find the fan entity
+            # Find the fan entity by exact fan_id match
             for entity_id, entity_entry in entity_registry.entities.items():
-                if (
-                    entity_entry.platform == "smartcocoon"
-                    and entity_entry.domain == "fan"
-                ):
-                    unique_id_str = str(entity_entry.unique_id).lower()
-                    if str(fan_id).lower() not in unique_id_str:
-                        continue
+                if not self._is_matching_fan_entity(entity_entry, fan_id):
+                    continue
 
-                    _LOGGER.debug(
-                        "Notifying fan entity %s of connection status change", entity_id
-                    )
+                _LOGGER.debug(
+                    "Notifying fan entity %s of connection status change", entity_id
+                )
 
-                    # Get the entity from the state machine
-                    entity = self._hass.states.get(entity_id)
-                    if entity:
-                        # Find the actual entity object and call its update callback
-                        # This will trigger the entity to re-evaluate its available
-                        # property
-                        matched = False
-                        for platform in self._hass.data.get("fan", {}).values():
-                            if hasattr(platform, "entities"):
-                                for fan_entity in platform.entities:
-                                    if (
-                                        hasattr(fan_entity, "_fan_id")
-                                        and getattr(fan_entity, "_fan_id", None)
-                                        == fan_id
-                                        and hasattr(fan_entity, "async_write_ha_state")
-                                    ):
-                                        _LOGGER.debug(
-                                            "Calling async_write_ha_state for fan %s",
-                                            fan_id,
-                                        )
-                                        fan_entity.async_write_ha_state()
-                                        matched = True
-                                        break
-                            if matched:
-                                return
-                    _LOGGER.debug(
-                        (
-                            "No in-memory fan entity object matched _fan_id=%s for "
-                            "entity %s"
-                        ),
-                        fan_id,
-                        entity_id,
-                    )
+                # Get the entity from the state machine
+                entity = self._hass.states.get(entity_id)
+                if entity and await self._update_fan_entity_callback(fan_id):
+                    return
+
+                _LOGGER.debug(
+                    (
+                        "No in-memory fan entity object matched _fan_id=%s for "
+                        "entity %s"
+                    ),
+                    fan_id,
+                    entity_id,
+                )
+
             _LOGGER.debug(
                 (
                     "No entity_registry entry matched fan_id=%s; availability may not "
@@ -267,7 +342,7 @@ class ConnectionMonitor:
         # (convert hours to seconds)
         if device_state["last_disconnected"]:
             offline_duration = current_time - device_state["last_disconnected"]
-            if offline_duration.total_seconds() > (self._max_offline_duration * 3600):
+            if offline_duration.total_seconds() > self._max_offline_duration:
                 friendly_name = self._get_fan_friendly_name(fan_id)
                 _LOGGER.warning(
                     "%s has been offline for %s - stopping recovery attempts",
@@ -351,6 +426,8 @@ class ConnectionMonitor:
                     fan_id,
                     device_state["recovery_attempts"],
                 )
+                # Schedule next recovery attempt
+                await self._schedule_next_recovery(fan_id, fan, device_state)
 
         except (AttributeError, KeyError, TypeError, ValueError) as exc:
             _LOGGER.warning(
@@ -359,6 +436,45 @@ class ConnectionMonitor:
                 device_state["recovery_attempts"],
                 exc,
             )
+            # Schedule next recovery attempt even if this one failed
+            await self._schedule_next_recovery(fan_id, fan, device_state)
+
+    async def _schedule_next_recovery(
+        self, fan_id: str, fan: Any, device_state: dict[str, Any]
+    ) -> None:
+        """Schedule the next recovery attempt for a fan."""
+        # Cancel any existing callback for this fan
+        if self._recovery_callbacks.get(fan_id):
+            self._recovery_callbacks[fan_id]()
+            self._recovery_callbacks[fan_id] = None
+
+        # Check if we should schedule another attempt
+        if device_state["recovery_attempts"] >= self._max_recovery_attempts_per_hour:
+            friendly_name = self._get_fan_friendly_name(fan_id)
+            _LOGGER.debug(
+                "%s has reached max recovery attempts (%d) - waiting for reset",
+                friendly_name,
+                self._max_recovery_attempts_per_hour,
+            )
+            return
+
+        # Schedule next attempt after the configured interval
+        friendly_name = self._get_fan_friendly_name(fan_id)
+        interval_seconds = self._recovery_attempt_interval
+        _LOGGER.debug(
+            "Scheduling next recovery attempt for %s in %d seconds",
+            friendly_name,
+            interval_seconds,
+        )
+
+        async def next_recovery_attempt(_now: datetime) -> None:
+            """Execute the next recovery attempt."""
+            _LOGGER.debug("Executing scheduled recovery attempt for %s", friendly_name)
+            await self._attempt_device_recovery(fan_id, fan, device_state)
+
+        self._recovery_callbacks[fan_id] = async_call_later(
+            self._hass, interval_seconds, next_recovery_attempt
+        )
 
     def get_device_status(self, fan_id: str) -> dict[str, Any] | None:
         """Get the current status of a specific device."""
@@ -388,4 +504,17 @@ class ConnectionMonitor:
             return
 
         _LOGGER.info("Forcing immediate connection recovery check for fan %s", fan_id)
+        await self._check_device_connection(fan_id, fan)
+
+    async def check_fan_unavailable(self, fan_id: str) -> None:
+        """Check and attempt recovery for a fan that has become unavailable."""
+        if not self._scmanager or fan_id not in self._scmanager.fans:
+            _LOGGER.warning("Fan %s not found for unavailable check", fan_id)
+            return
+
+        fan = self._scmanager.fans[fan_id]
+        friendly_name = self._get_fan_friendly_name(fan_id)
+        _LOGGER.info("%s has become unavailable - checking connection", friendly_name)
+
+        # Force a fresh check of this specific fan
         await self._check_device_connection(fan_id, fan)

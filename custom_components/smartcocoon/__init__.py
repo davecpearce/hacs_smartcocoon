@@ -13,9 +13,9 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
-from .connection_monitor import ConnectionMonitor
+from .connection_monitor import ConnectionMonitor, ConnectionMonitorConfig
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from .const import (
     CONF_CONNECTION_CHECK_INTERVAL,
     CONF_ENABLE_PRESET_MODES,
@@ -47,11 +47,11 @@ class SmartCocoonController:
         password: str,
         enable_preset_modes: bool,
         hass: HomeAssistant,
-        connection_check_interval: int = DEFAULT_CONNECTION_CHECK_INTERVAL,
         max_offline_duration: int = DEFAULT_MAX_OFFLINE_DURATION,
         recovery_attempt_interval: int = DEFAULT_RECOVERY_ATTEMPT_INTERVAL,
         max_recovery_attempts_per_hour: int = DEFAULT_MAX_RECOVERY_ATTEMPTS_PER_HOUR,
         recovery_reset_interval: int = DEFAULT_RECOVERY_RESET_INTERVAL,
+        connection_check_interval: int = DEFAULT_CONNECTION_CHECK_INTERVAL,
     ) -> None:
         """Initialize."""
         self._username = username
@@ -60,11 +60,11 @@ class SmartCocoonController:
         self._hass: HomeAssistant = hass
         self._session: ClientSession | None = None
         self._connection_monitor: ConnectionMonitor | None = None
-        self._connection_check_interval = connection_check_interval
         self._max_offline_duration = max_offline_duration
         self._recovery_attempt_interval = recovery_attempt_interval
         self._max_recovery_attempts_per_hour = max_recovery_attempts_per_hour
         self._recovery_reset_interval = recovery_reset_interval
+        self._connection_check_interval = connection_check_interval
 
         if enable_preset_modes:
             self._enable_preset_modes = True
@@ -119,12 +119,7 @@ class SmartCocoonController:
         _LOGGER.debug("scmanager.fans: %s", self._scmanager.fans)
 
         # Start connection monitoring
-        self._connection_monitor = ConnectionMonitor(
-            hass=self._hass,
-            scmanager=self._scmanager,
-            error_handler=self._error_handler,
-            check_interval=self._connection_check_interval
-            * 60,  # Convert minutes to seconds
+        config = ConnectionMonitorConfig(
             max_offline_duration=self._max_offline_duration
             * 3600,  # Convert hours to seconds
             recovery_attempt_interval=self._recovery_attempt_interval
@@ -132,6 +127,15 @@ class SmartCocoonController:
             max_recovery_attempts_per_hour=self._max_recovery_attempts_per_hour,
             recovery_reset_interval=self._recovery_reset_interval
             * 60,  # Convert minutes to seconds
+            connection_check_interval=self._connection_check_interval
+            * 3600,  # Convert hours to seconds
+        )
+
+        self._connection_monitor = ConnectionMonitor(
+            hass=self._hass,
+            scmanager=self._scmanager,
+            error_handler=self._error_handler,
+            config=config,
         )
         await self._connection_monitor.start_monitoring()
 
@@ -165,9 +169,6 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
     enable_preset_modes = config_options.get(
         CONF_ENABLE_PRESET_MODES, DEFAULT_ENABLE_PRESET_MODES
     )
-    connection_check_interval = config_options.get(
-        CONF_CONNECTION_CHECK_INTERVAL, DEFAULT_CONNECTION_CHECK_INTERVAL
-    )
     max_offline_duration = config_options.get(
         CONF_MAX_OFFLINE_DURATION, DEFAULT_MAX_OFFLINE_DURATION
     )
@@ -180,17 +181,20 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
     recovery_reset_interval = config_options.get(
         CONF_RECOVERY_RESET_INTERVAL, DEFAULT_RECOVERY_RESET_INTERVAL
     )
+    connection_check_interval = config_options.get(
+        CONF_CONNECTION_CHECK_INTERVAL, DEFAULT_CONNECTION_CHECK_INTERVAL
+    )
 
     smartcocoon = SmartCocoonController(
         username=username,
         password=password,
         enable_preset_modes=enable_preset_modes,
         hass=hass,
-        connection_check_interval=connection_check_interval,
         max_offline_duration=max_offline_duration,
         recovery_attempt_interval=recovery_attempt_interval,
         max_recovery_attempts_per_hour=max_recovery_attempts_per_hour,
         recovery_reset_interval=recovery_reset_interval,
+        connection_check_interval=connection_check_interval,
     )
 
     await smartcocoon.async_start()

@@ -1,0 +1,38 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "Gerät ist bereits konfiguriert"
+    },
+    "error": {
+      "cannot_connect": "Verbindung fehlgeschlagen",
+      "invalid_auth": "Ungültige Authentifizierung",
+      "unknown": "Unerwarteter Fehler"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "username": "Benutzername",
+          "password": "Passwort",
+          "enable_preset_mode": "Voreinstellungsmodi aktivieren"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "enable_preset_modes": "Voreinstellungsmodi aktivieren",
+          "max_offline_duration": "Maximale Offline-Dauer",
+          "recovery_attempt_interval": "Wiederherstellungsversuch-Intervall",
+          "max_recovery_attempts_per_hour": "Maximale Wiederherstellungsversuche pro Stunde",
+          "recovery_reset_interval": "Wiederherstellungs-Reset-Intervall",
+          "connection_check_interval": "Verbindungsprüfungs-Intervall"
+        },
+        "description": "Legen Sie die Optionen für SmartCocoon fest:\n • Voreinstellungsmodi (auto, eco) übersetzen sich nicht gut in Apple Home. Wenn Sie diese Modi bevorzugen, aktivieren Sie sie hier.\n • Maximale Offline-Dauer: Wie lange versucht werden soll, einen Ventilator wieder zu verbinden, bevor Wiederherstellungsversuche gestoppt werden (1-168 Stunden). Standard: 24 Stunden.\n • Wiederherstellungsversuch-Intervall: Wie oft Wiederherstellung für getrennte Ventilatoren versucht werden soll (1-60 Minuten). Standard: 5 Minuten.\n • Maximale Wiederherstellungsversuche pro Stunde: Maximale Wiederherstellungsversuche pro Stunde vor Reset (1-20 Versuche). Standard: 5 Versuche.\n • Wiederherstellungs-Reset-Intervall: Wie oft der Wiederherstellungsversuch-Zähler zurückgesetzt werden soll (15-240 Minuten). Standard: 60 Minuten.\n • Verbindungsprüfungs-Intervall: Wie oft der Cloud-Status für getrennte Ventilatoren geprüft werden soll (1-24 Stunden). Standard: 1 Stunde.",
+        "title": "SmartCocoon-Optionen"
+      }
+    }
+  }
+}
+

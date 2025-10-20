@@ -64,15 +64,17 @@ There is a config flow for this integration. After installing the custom compone
 These options make recovery behavior more predictable and user friendly:
 
 - **Enable Preset Modes**: Expose SmartCocoon preset modes (auto/eco). Default: off.
-- **Connection Check Interval (minutes)**: How often to evaluate connections. Default: 60.
 - **Max Offline Duration (hours)**: How long to keep attempting recovery. Default: 24.
 - **Recovery Attempt Interval (minutes)**: Minimum delay between attempts per fan. Default: 5.
 - **Max Recovery Attempts Per Hour**: Rate limit for recovery attempts per fan. Default: 5.
 - **Recovery Reset Interval (minutes)**: When to reset the attempt counter. Default: 60.
+- **Connection Check Interval (hours)**: How often to check cloud status for disconnected fans. Default: 1.
 
 Notes:
 
 - The integration adds a 30-second startup grace period before attempting any recovery to avoid noisy logs and unnecessary calls immediately after HA restarts.
+- Periodic connection checks detect when fans become unavailable and trigger recovery automatically.
+- Recovery attempts continue automatically until successful or max attempts are reached.
 - Logs include the fan's friendly name for clarity.
 
 ### Services

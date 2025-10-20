@@ -1,0 +1,38 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "Apparaat is al geconfigureerd"
+    },
+    "error": {
+      "cannot_connect": "Verbinding mislukt",
+      "invalid_auth": "Ongeldige authenticatie",
+      "unknown": "Onverwachte fout"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "username": "Gebruikersnaam",
+          "password": "Wachtwoord",
+          "enable_preset_mode": "Vooraf ingestelde modi inschakelen"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "enable_preset_modes": "Vooraf ingestelde modi inschakelen",
+          "max_offline_duration": "Maximale offline duur",
+          "recovery_attempt_interval": "Herstelpoging interval",
+          "max_recovery_attempts_per_hour": "Maximale herstelpogingen per uur",
+          "recovery_reset_interval": "Herstel reset interval",
+          "connection_check_interval": "Verbindingscontrole interval"
+        },
+        "description": "Stel de opties in voor SmartCocoon:\n • Vooraf ingestelde modi (auto, eco) vertalen niet goed naar Apple Home. Als je deze modi wilt gebruiken, schakel ze hier in.\n • Maximale offline duur: Hoe lang proberen een ventilator opnieuw te verbinden voordat herstelpogingen worden gestopt (1-168 uur). Standaard: 24 uur.\n • Herstelpoging interval: Hoe vaak proberen herstel voor losgekoppelde ventilatoren (1-60 minuten). Standaard: 5 minuten.\n • Maximale herstelpogingen per uur: Maximale herstelpogingen per uur voor reset (1-20 pogingen). Standaard: 5 pogingen.\n • Herstel reset interval: Hoe vaak de herstelpoging teller resetten (15-240 minuten). Standaard: 60 minuten.\n • Verbindingscontrole interval: Hoe vaak de cloud status controleren voor losgekoppelde ventilatoren (1-24 uur). Standaard: 1 uur.",
+        "title": "SmartCocoon Opties"
+      }
+    }
+  }
+}
+

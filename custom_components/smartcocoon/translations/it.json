@@ -1,0 +1,38 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "Il dispositivo è già configurato"
+    },
+    "error": {
+      "cannot_connect": "Connessione fallita",
+      "invalid_auth": "Autenticazione non valida",
+      "unknown": "Errore imprevisto"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "username": "Nome utente",
+          "password": "Password",
+          "enable_preset_mode": "Abilita modalità preimpostate"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "enable_preset_modes": "Abilita modalità preimpostate",
+          "max_offline_duration": "Durata massima offline",
+          "recovery_attempt_interval": "Intervallo tentativo di recupero",
+          "max_recovery_attempts_per_hour": "Tentativi di recupero massimi per ora",
+          "recovery_reset_interval": "Intervallo reset recupero",
+          "connection_check_interval": "Intervallo controllo connessione"
+        },
+        "description": "Imposta le opzioni per SmartCocoon:\n • Le modalità preimpostate (auto, eco) non si traducono bene in Apple Home. Se preferisci usare queste modalità, abilitali qui.\n • Durata massima offline: Per quanto tempo tentare di riconnettere una ventola prima di fermare i tentativi di recupero (1-168 ore). Predefinito: 24 ore.\n • Intervallo tentativo di recupero: Con quale frequenza tentare il recupero per ventole disconnesse (1-60 minuti). Predefinito: 5 minuti.\n • Tentativi di recupero massimi per ora: Tentativi di recupero massimi per ora prima del reset (1-20 tentativi). Predefinito: 5 tentativi.\n • Intervallo reset recupero: Con quale frequenza resettare il contatore dei tentativi di recupero (15-240 minuti). Predefinito: 60 minuti.\n • Intervallo controllo connessione: Con quale frequenza controllare lo stato cloud per ventole disconnesse (1-24 ore). Predefinito: 1 ora.",
+        "title": "Opzioni SmartCocoon"
+      }
+    }
+  }
+}
+

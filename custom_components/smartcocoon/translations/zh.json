@@ -1,0 +1,38 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "设备已配置"
+    },
+    "error": {
+      "cannot_connect": "连接失败",
+      "invalid_auth": "认证无效",
+      "unknown": "意外错误"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "username": "用户名",
+          "password": "密码",
+          "enable_preset_mode": "启用预设模式"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "enable_preset_modes": "启用预设模式",
+          "max_offline_duration": "最大离线时长",
+          "recovery_attempt_interval": "恢复尝试间隔",
+          "max_recovery_attempts_per_hour": "每小时最大恢复尝试次数",
+          "recovery_reset_interval": "恢复重置间隔",
+          "connection_check_interval": "连接检查间隔"
+        },
+        "description": "设置SmartCocoon选项:\n • 预设模式（auto、eco）在Apple Home中翻译效果不佳。如果您更喜欢使用这些模式，请在此处启用。\n • 最大离线时长: 在停止恢复尝试之前尝试重新连接风扇的时间（1-168小时）。默认: 24小时。\n • 恢复尝试间隔: 为断开连接的风扇尝试恢复的频率（1-60分钟）。默认: 5分钟。\n • 每小时最大恢复尝试次数: 重置前每小时的最大恢复尝试次数（1-20次）。默认: 5次。\n • 恢复重置间隔: 重置恢复尝试计数器的频率（15-240分钟）。默认: 60分钟。\n • 连接检查间隔: 检查断开连接风扇的云状态的频率（1-24小时）。默认: 1小时。",
+        "title": "SmartCocoon选项"
+      }
+    }
+  }
+}
+
