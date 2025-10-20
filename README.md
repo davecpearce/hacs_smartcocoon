@@ -43,6 +43,33 @@ Add the following to the Custom Repository under `Settings` in HACS:
 1. If you do not already have a `custom_components` directory in your Home Assistant config directory, create it.
 1. Copy or move the `smartcocoon` folder from `hacs_smartcocoon/custom_components` you cloned from step 1 to the `custom_components` folder in your Home Assistant `config` folder.
 
+## 🧪 Beta Testing
+
+We're currently testing version 1.2.0-beta with major enhancements:
+
+### **New Features in Beta:**
+- **🌍 34 Language Translations** - Complete global language support
+- **⚙️ Configurable Recovery Options** - Customize connection monitoring and recovery behavior
+- **🔧 Enhanced Fan Attributes** - Additional attributes from pysmartcocoon library
+- **🛠️ Improved Error Handling** - Better connection monitoring and recovery logic
+- **📱 Updated Configuration Flow** - New options for recovery behavior
+
+### **How to Install Beta:**
+
+**HACS Beta Installation:**
+1. Add repository: `davecpearce/hacs_smartcocoon`
+2. Choose `Integration` as Category
+3. **Important**: Change the branch from `main` to `beta/smartcocoon-v1.2.0`
+4. Install the integration
+
+**Manual Beta Installation:**
+```bash
+git clone -b beta/smartcocoon-v1.2.0 https://github.com/davecpearce/hacs_smartcocoon.git
+```
+
+### **Beta Testing Feedback:**
+Please report any issues or feedback via [GitHub Issues](https://github.com/davecpearce/hacs_smartcocoon/issues) with the `beta` label.
+
 ## Track Updates
 
 If installed via HACS, updates are flagged automatically. Otherwise, you will have to manually update as described in the manual installation steps above.
