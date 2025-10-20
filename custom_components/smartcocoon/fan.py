@@ -220,10 +220,6 @@ class SmartCocoonFan(FanEntity):  # type: ignore[misc]
         if isinstance(value, str):
             extracted["thermostat_vendor"] = value
 
-        value = getattr(fan_data, "power", None)
-        if isinstance(value, (int, bool)):
-            extracted["power"] = value
-
         value = getattr(fan_data, "room_id", None)
         if isinstance(value, str):
             extracted["room_id"] = value

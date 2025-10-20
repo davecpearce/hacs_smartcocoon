@@ -19,6 +19,5 @@ class FanExtraAttributes(TypedDict, total=False):
     predicted_room_temperature: float
     is_room_estimating: bool
     thermostat_vendor: str
-    power: int | bool
     room_id: str
     identifier: str
