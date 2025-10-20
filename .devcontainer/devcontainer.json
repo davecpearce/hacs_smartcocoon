@@ -17,7 +17,7 @@
         "ms-python.python",
         "github.vscode-pull-request-github",
         "ryanluker.vscode-coverage-gutters",
-        "ms-python.black-formatter",
+        "charliermarsh.ruff",
         "ms-python.pylint",
         "ms-python.vscode-pylance",
         "ms-vscode-remote.vscode-remote-extensionpack"
@@ -35,7 +35,7 @@
         "files.trimTrailingWhitespace": true,
         "yaml.customTags": ["!secret scalar"],
         "[python]": {
-          "editor.defaultFormatter": "ms-python.black-formatter",
+          "editor.defaultFormatter": "charliermarsh.ruff",
           "editor.formatOnSave": true
         },
         "python.analysis.extraPaths": [

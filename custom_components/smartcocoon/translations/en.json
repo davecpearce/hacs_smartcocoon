@@ -22,9 +22,14 @@
     "step": {
       "init": {
         "data": {
-          "enable_preset_modes": "Enable Preset Modes"
+          "enable_preset_modes": "Enable Preset Modes",
+          "connection_check_interval": "Connection Check Interval",
+          "max_offline_duration": "Max Offline Duration",
+          "recovery_attempt_interval": "Recovery Attempt Interval",
+          "max_recovery_attempts_per_hour": "Max Recovery Attempts Per Hour",
+          "recovery_reset_interval": "Recovery Reset Interval"
         },
-        "description": "Set the options for the SmartCocoon: \n \u2022 Preset modes (auto, eco) do not translate well in Apple Home, if you prefer to use these modes, enable them here.",
+        "description": "Set the options for the SmartCocoon: \n \u2022 Preset modes (auto, eco) do not translate well in Apple Home, if you prefer to use these modes, enable them here.\n \u2022 Connection Check Interval: How often to check if fans are connected (1-60 minutes). Default: 60 minutes.\n \u2022 Max Offline Duration: How long to keep attempting to reconnect a fan before stopping recovery attempts (1-168 hours). Default: 24 hours.\n \u2022 Recovery Attempt Interval: How often to attempt recovery for disconnected fans (1-60 minutes). Default: 5 minutes.\n \u2022 Max Recovery Attempts Per Hour: Maximum recovery attempts per hour before reset (1-20 attempts). Default: 5 attempts.\n \u2022 Recovery Reset Interval: How often to reset the recovery attempt counter (15-240 minutes). Default: 60 minutes.",
         "title": "SmartCocoon Options"
       }
     }

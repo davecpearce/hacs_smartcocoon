@@ -61,7 +61,10 @@ class SmartCocoonErrorHandler:
             except (RequestError, SmartCocoonError, asyncio.TimeoutError) as exc:
                 if attempt == self._retry_config.max_attempts - 1:
                     _LOGGER.error(
-                        "Failed to complete %s after %d attempts. Context: %s. Error: %s",
+                        (
+                            "Failed to complete %s after %d attempts. "
+                            "Context: %s. Error: %s"
+                        ),
                         operation_name,
                         self._retry_config.max_attempts,
                         context,
@@ -71,7 +74,10 @@ class SmartCocoonErrorHandler:
 
                 delay = self._calculate_delay(attempt)
                 _LOGGER.warning(
-                    "Attempt %d/%d for %s failed. Retrying in %.2f seconds. Context: %s. Error: %s",
+                    (
+                        "Attempt %d/%d for %s failed. Retrying in %.2f seconds. "
+                        "Context: %s. Error: %s"
+                    ),
                     attempt + 1,
                     self._retry_config.max_attempts,
                     operation_name,
@@ -84,7 +90,10 @@ class SmartCocoonErrorHandler:
                 if self._retry_config.retry_generic_exceptions:
                     if attempt == self._retry_config.max_attempts - 1:
                         _LOGGER.error(
-                            "Failed to complete %s after %d attempts. Context: %s. Error: %s",
+                            (
+                                "Failed to complete %s after %d attempts. "
+                                "Context: %s. Error: %s"
+                            ),
                             operation_name,
                             self._retry_config.max_attempts,
                             context,
@@ -94,7 +103,10 @@ class SmartCocoonErrorHandler:
 
                     delay = self._calculate_delay(attempt)
                     _LOGGER.warning(
-                        "Attempt %d/%d for %s failed with unexpected error. Retrying in %.2f seconds. Context: %s. Error: %s",
+                        (
+                            "Attempt %d/%d for %s failed with unexpected error. "
+                            "Retrying in %.2f seconds. Context: %s. Error: %s"
+                        ),
                         attempt + 1,
                         self._retry_config.max_attempts,
                         operation_name,
@@ -105,7 +117,10 @@ class SmartCocoonErrorHandler:
                     await asyncio.sleep(delay)
                 else:
                     _LOGGER.exception(
-                        "An unexpected error occurred during %s (attempt %d/%d). Context: %s",
+                        (
+                            "An unexpected error occurred during %s (attempt %d/%d). "
+                            "Context: %s"
+                        ),
                         operation_name,
                         attempt + 1,
                         self._retry_config.max_attempts,

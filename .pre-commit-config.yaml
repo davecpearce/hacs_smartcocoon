@@ -12,13 +12,7 @@ repos:
       - id: check-yaml
       - id: end-of-file-fixer
       - id: trailing-whitespace
-  - repo: https://github.com/psf/black
-    rev: 25.9.0
-    hooks:
-      - id: black
-        args:
-          - --safe
-          - --quiet
+  # Formatting handled by Ruff (ruff-format); Black removed to avoid conflicts
   - repo: https://github.com/pycqa/pylint
     rev: v4.0.1
     hooks:
@@ -35,10 +29,12 @@ repos:
           - --configfile=tests/bandit.yaml
         additional_dependencies:
           - pbr
-  - repo: https://github.com/PyCQA/isort
-    rev: 7.0.0
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.9
     hooks:
-      - id: isort
+      - id: ruff
+        args: ["--fix"]
+      - id: ruff-format
   - repo: https://github.com/pre-commit/mirrors-prettier
     rev: v4.0.0-alpha.8
     hooks:

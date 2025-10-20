@@ -80,10 +80,10 @@ async def test_smartcocoon_controller_init(hass: HomeAssistant) -> None:
     )
 
     # pylint: disable=protected-access
-    assert controller._username == "test@example.com"
-    assert controller._password == "password"
-    assert controller._enable_preset_modes is True
-    assert controller._hass == hass
+    assert controller._username == "test@example.com"  # noqa: SLF001
+    assert controller._password == "password"  # noqa: SLF001
+    assert controller._enable_preset_modes is True  # noqa: SLF001
+    assert controller._hass == hass  # noqa: SLF001
 
 
 async def test_smartcocoon_controller_async_start_mock(hass: HomeAssistant) -> None:
@@ -110,8 +110,8 @@ async def test_smartcocoon_controller_async_start_mock(hass: HomeAssistant) -> N
 
         assert result is True
         # pylint: disable=protected-access
-        assert controller._scmanager == mock_scmanager
-        assert controller._session is not None
+        assert controller._scmanager == mock_scmanager  # noqa: SLF001
+        assert controller._session is not None  # noqa: SLF001
 
 
 def test_constants() -> None:

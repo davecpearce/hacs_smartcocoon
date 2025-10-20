@@ -2,7 +2,17 @@
 
 ATTR_ROOM_NAME = "room_name"
 CONF_ENABLE_PRESET_MODES = "enable_preset_modes"
+CONF_CONNECTION_CHECK_INTERVAL = "connection_check_interval"
+CONF_MAX_OFFLINE_DURATION = "max_offline_duration"
+CONF_RECOVERY_ATTEMPT_INTERVAL = "recovery_attempt_interval"
+CONF_MAX_RECOVERY_ATTEMPTS_PER_HOUR = "max_recovery_attempts_per_hour"
+CONF_RECOVERY_RESET_INTERVAL = "recovery_reset_interval"
 DEFAULT_ENABLE_PRESET_MODES = False
+DEFAULT_CONNECTION_CHECK_INTERVAL = 60  # 60 minutes (1 hour)
+DEFAULT_MAX_OFFLINE_DURATION = 24  # 24 hours
+DEFAULT_RECOVERY_ATTEMPT_INTERVAL = 5  # 5 minutes
+DEFAULT_MAX_RECOVERY_ATTEMPTS_PER_HOUR = 5  # 5 attempts
+DEFAULT_RECOVERY_RESET_INTERVAL = 60  # 60 minutes
 DOMAIN = "smartcocoon"
 SC_PRESET_MODE_AUTO = "auto"
 SC_PRESET_MODE_ECO = "eco"
