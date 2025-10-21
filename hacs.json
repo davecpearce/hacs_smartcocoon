@@ -1,7 +1,5 @@
 {
   "name": "SmartCocoon",
-  "domains": ["smartcocoon"],
-  "iot_class": "cloud_push",
   "render_readme": true,
   "homeassistant": "2025.5.0",
   "hide_default_branch": false
