@@ -1,37 +1,37 @@
 {
-    "config": {
-        "abort": {
-            "already_configured": "Zariadenie je už nakonfigurované"
-        },
-        "error": {
-            "cannot_connect": "Pripojenie zlyhalo",
-            "invalid_auth": "Neplatné overenie",
-            "unknown": "Neočakávaná chyba"
-        },
-        "step": {
-            "user": {
-                "data": {
-                    "username": "Používateľské meno",
-                    "password": "Heslo",
-                    "enable_preset_mode": "Povoliť prednastavené režimy"
-                }
-            }
-        }
+  "config": {
+    "abort": {
+      "already_configured": "Zariadenie je už nakonfigurované"
     },
-    "options": {
-        "step": {
-            "init": {
-                "data": {
-                    "enable_preset_modes": "Povoliť prednastavené režimy",
-                    "max_offline_duration": "Maximálna doba offline",
-                    "recovery_attempt_interval": "Interval pokusu o obnovenie",
-                    "max_recovery_attempts_per_hour": "Maximálne pokusy o obnovenie za hodinu",
-                    "recovery_reset_interval": "Interval resetu obnovenia",
-                    "connection_check_interval": "Interval kontroly pripojenia"
-                },
-                "description": "Nastaviť možnosti pre SmartCocoon:\n • Prednastavené režimy (auto, eco) sa neprekladajú dobre v Apple Home. Ak preferujete používať tieto režimy, povolte ich tu.\n • Maximálna doba offline: Ako dlho sa pokúšať znovu pripojiť ventilátor pred zastavením pokusov o obnovenie (1-168 hodín). Predvolené: 24 hodín.\n • Interval pokusu o obnovenie: Ako často sa pokúšať o obnovenie pre odpojené ventilátory (1-60 minút). Predvolené: 5 minút.\n • Maximálne pokusy o obnovenie za hodinu: Maximálne pokusy o obnovenie za hodinu pred resetom (1-20 pokusov). Predvolené: 5 pokusov.\n • Interval resetu obnovenia: Ako často resetovať počítadlo pokusov o obnovenie (15-240 minút). Predvolené: 60 minút.\n • Interval kontroly pripojenia: Ako často kontrolovať stav cloudu pre odpojené ventilátory (1-24 hodín). Predvolené: 1 hodina.",
-                "title": "Možnosti SmartCocoon"
-            }
+    "error": {
+      "cannot_connect": "Pripojenie zlyhalo",
+      "invalid_auth": "Neplatné overenie",
+      "unknown": "Neočakávaná chyba"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "username": "Používateľské meno",
+          "password": "Heslo",
+          "enable_preset_mode": "Povoliť prednastavené režimy"
         }
+      }
     }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "enable_preset_modes": "Povoliť prednastavené režimy",
+          "max_offline_duration": "Maximálna doba offline",
+          "recovery_attempt_interval": "Interval pokusu o obnovenie",
+          "max_recovery_attempts_per_hour": "Maximálne pokusy o obnovenie za hodinu",
+          "recovery_reset_interval": "Interval resetu obnovenia",
+          "connection_check_interval": "Interval kontroly pripojenia"
+        },
+        "description": "Nastaviť možnosti pre SmartCocoon:\n • Prednastavené režimy (auto, eco) sa neprekladajú dobre v Apple Home. Ak preferujete používať tieto režimy, povolte ich tu.\n • Maximálna doba offline: Ako dlho sa pokúšať znovu pripojiť ventilátor pred zastavením pokusov o obnovenie (1-168 hodín). Predvolené: 24 hodín.\n • Interval pokusu o obnovenie: Ako často sa pokúšať o obnovenie pre odpojené ventilátory (1-60 minút). Predvolené: 5 minút.\n • Maximálne pokusy o obnovenie za hodinu: Maximálne pokusy o obnovenie za hodinu pred resetom (1-20 pokusov). Predvolené: 5 pokusov.\n • Interval resetu obnovenia: Ako často resetovať počítadlo pokusov o obnovenie (15-240 minút). Predvolené: 60 minút.\n • Interval kontroly pripojenia: Ako často kontrolovať stav cloudu pre odpojené ventilátory (1-24 hodín). Predvolené: 1 hodina.",
+        "title": "Možnosti SmartCocoon"
+      }
+    }
+  }
 }

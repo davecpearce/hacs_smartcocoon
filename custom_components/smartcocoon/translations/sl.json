@@ -1,37 +1,37 @@
 {
-    "config": {
-        "abort": {
-            "already_configured": "Naprava je že konfigurirana"
-        },
-        "error": {
-            "cannot_connect": "Povezava ni uspela",
-            "invalid_auth": "Neveljavna overitev",
-            "unknown": "Nepričakovana napaka"
-        },
-        "step": {
-            "user": {
-                "data": {
-                    "username": "Uporabniško ime",
-                    "password": "Geslo",
-                    "enable_preset_mode": "Omogoči vnaprej nastavljene načine"
-                }
-            }
-        }
+  "config": {
+    "abort": {
+      "already_configured": "Naprava je že konfigurirana"
     },
-    "options": {
-        "step": {
-            "init": {
-                "data": {
-                    "enable_preset_modes": "Omogoči vnaprej nastavljene načine",
-                    "max_offline_duration": "Največji čas brez povezave",
-                    "recovery_attempt_interval": "Interval poskusa obnovitve",
-                    "max_recovery_attempts_per_hour": "Največ poskusov obnovitve na uro",
-                    "recovery_reset_interval": "Interval ponastavitve obnovitve",
-                    "connection_check_interval": "Interval preverjanja povezave"
-                },
-                "description": "Nastavite možnosti za SmartCocoon:\n • Vnaprej nastavljeni načini (auto, eco) se ne prevajajo dobro v Apple Home. Če raje uporabljate te načine, jih omogočite tukaj.\n • Največji čas brez povezave: Kako dolgo poskušati ponovno povezati ventilator pred ustavljanjem poskusov obnovitve (1-168 ur). Privzeto: 24 ur.\n • Interval poskusa obnovitve: Kako pogosto poskušati obnovitev za odklopljene ventilatorje (1-60 minut). Privzeto: 5 minut.\n • Največ poskusov obnovitve na uro: Največ poskusov obnovitve na uro pred ponastavitvijo (1-20 poskusov). Privzeto: 5 poskusov.\n • Interval ponastavitve obnovitve: Kako pogosto ponastaviti števec poskusov obnovitve (15-240 minut). Privzeto: 60 minut.\n • Interval preverjanja povezave: Kako pogosto preverjati stanje oblaka za odklopljene ventilatorje (1-24 ur). Privzeto: 1 ura.",
-                "title": "Možnosti SmartCocoon"
-            }
+    "error": {
+      "cannot_connect": "Povezava ni uspela",
+      "invalid_auth": "Neveljavna overitev",
+      "unknown": "Nepričakovana napaka"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "username": "Uporabniško ime",
+          "password": "Geslo",
+          "enable_preset_mode": "Omogoči vnaprej nastavljene načine"
         }
+      }
     }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "enable_preset_modes": "Omogoči vnaprej nastavljene načine",
+          "max_offline_duration": "Največji čas brez povezave",
+          "recovery_attempt_interval": "Interval poskusa obnovitve",
+          "max_recovery_attempts_per_hour": "Največ poskusov obnovitve na uro",
+          "recovery_reset_interval": "Interval ponastavitve obnovitve",
+          "connection_check_interval": "Interval preverjanja povezave"
+        },
+        "description": "Nastavite možnosti za SmartCocoon:\n • Vnaprej nastavljeni načini (auto, eco) se ne prevajajo dobro v Apple Home. Če raje uporabljate te načine, jih omogočite tukaj.\n • Največji čas brez povezave: Kako dolgo poskušati ponovno povezati ventilator pred ustavljanjem poskusov obnovitve (1-168 ur). Privzeto: 24 ur.\n • Interval poskusa obnovitve: Kako pogosto poskušati obnovitev za odklopljene ventilatorje (1-60 minut). Privzeto: 5 minut.\n • Največ poskusov obnovitve na uro: Največ poskusov obnovitve na uro pred ponastavitvijo (1-20 poskusov). Privzeto: 5 poskusov.\n • Interval ponastavitve obnovitve: Kako pogosto ponastaviti števec poskusov obnovitve (15-240 minut). Privzeto: 60 minut.\n • Interval preverjanja povezave: Kako pogosto preverjati stanje oblaka za odklopljene ventilatorje (1-24 ur). Privzeto: 1 ura.",
+        "title": "Možnosti SmartCocoon"
+      }
+    }
+  }
 }

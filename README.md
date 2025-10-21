@@ -48,6 +48,7 @@ Add the following to the Custom Repository under `Settings` in HACS:
 We're currently testing version 1.2.0-beta with major enhancements:
 
 ### **New Features in Beta:**
+
 - **🌍 34 Language Translations** - Complete global language support
 - **⚙️ Configurable Recovery Options** - Customize connection monitoring and recovery behavior
 - **🔧 Enhanced Fan Attributes** - Additional attributes from pysmartcocoon library
@@ -57,17 +58,20 @@ We're currently testing version 1.2.0-beta with major enhancements:
 ### **How to Install Beta:**
 
 **HACS Beta Installation:**
+
 1. Add repository: `davecpearce/hacs_smartcocoon`
 2. Choose `Integration` as Category
 3. **Important**: Change the branch from `main` to `beta/smartcocoon-v1.2.0`
 4. Install the integration
 
 **Manual Beta Installation:**
+
 ```bash
 git clone -b beta/smartcocoon-v1.2.0 https://github.com/davecpearce/hacs_smartcocoon.git
 ```
 
 ### **Beta Testing Feedback:**
+
 Please report any issues or feedback via [GitHub Issues](https://github.com/davecpearce/hacs_smartcocoon/issues) with the `beta` label.
 
 ## Track Updates
