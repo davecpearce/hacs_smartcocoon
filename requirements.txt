@@ -1,2 +1,1 @@
-homeassistant>=2025.5.0
 pysmartcocoon==1.4.0

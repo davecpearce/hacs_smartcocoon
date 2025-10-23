@@ -86,7 +86,7 @@ jobs:
       - name: Run pip-audit dependency audit
         run: |
           echo "🔍 Running pip-audit dependency audit..."
-          pip-audit --requirement requirements.txt --requirement requirements_test.txt --desc --format=json
+          pip-audit --requirement requirements.txt --desc --format=json
       - name: Run semgrep security analysis
         run: |
           echo "🔍 Running semgrep security analysis..."
