@@ -1,0 +1,83 @@
+# Auto-labeling configuration for PRs based on file changes and branch names
+# This file is used by actions/labeler to automatically assign labels to PRs
+
+# Label based on file changes
+python:
+  - '**/*.py'
+  - '**/pyproject.toml'
+  - '**/requirements*.txt'
+  - '**/setup.py'
+  - '**/tox.ini'
+  - '**/.python-version'
+
+dependencies:
+  - '**/requirements*.txt'
+  - '**/pyproject.toml'
+  - '**/poetry.lock'
+  - '**/Pipfile.lock'
+  - '**/package.json'
+  - '**/yarn.lock'
+  - '**/package-lock.json'
+
+github_actions:
+  - '.github/workflows/**'
+  - '.github/actions/**'
+
+ci:
+  - '.github/workflows/**'
+  - '.ci/**'
+  - '**/.github/workflows/**'
+
+testing:
+  - '**/test_*.py'
+  - '**/tests/**'
+  - '**/*_test.py'
+  - '**/conftest.py'
+  - '**/pytest.ini'
+  - '**/tox.ini'
+
+documentation:
+  - '**/*.md'
+  - '**/docs/**'
+  - '**/README*'
+  - '**/CHANGELOG*'
+  - '**/LICENSE*'
+
+build:
+  - '**/Dockerfile*'
+  - '**/docker-compose*.yml'
+  - '**/Makefile'
+  - '**/CMakeLists.txt'
+  - '**/setup.py'
+  - '**/pyproject.toml'
+
+style:
+  - '**/.pre-commit-config.yaml'
+  - '**/.editorconfig'
+  - '**/.eslintrc*'
+  - '**/.prettierrc*'
+  - '**/black.toml'
+  - '**/isort.cfg'
+
+# Label based on branch name patterns
+hotfix:
+  - 'hotfix/**'
+
+feature:
+  - 'feature/**'
+  - 'feat/**'
+
+bugfix:
+  - 'bugfix/**'
+  - 'fix/**'
+
+housekeeping:
+  - 'housekeeping/**'
+  - 'chore/**'
+
+release:
+  - 'release/**'
+  - 'bump/**'
+
+dependabot:
+  - 'dependabot/**'
