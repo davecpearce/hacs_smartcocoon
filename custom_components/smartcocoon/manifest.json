@@ -1,18 +1,12 @@
 {
   "domain": "smartcocoon",
   "name": "SmartCocoon",
-  "codeowners": [
-    "@davecpearce"
-  ],
+  "codeowners": ["@davecpearce"],
   "config_flow": true,
   "documentation": "https://github.com/davecpearce/hacs_smartcocoon/blob/main/README.md",
   "iot_class": "cloud_push",
   "issue_tracker": "https://github.com/davecpearce/hacs_smartcocoon/issues",
-  "loggers": [
-    "smartcocoon"
-  ],
-  "requirements": [
-    "pysmartcocoon==1.4.0"
-  ],
+  "loggers": ["smartcocoon"],
+  "requirements": ["pysmartcocoon==1.4.0"],
   "version": "1.2.0"
 }
