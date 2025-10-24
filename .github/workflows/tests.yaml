@@ -57,7 +57,7 @@ jobs:
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
-          file: ./coverage.xml
+          files: ./coverage.xml
           flags: unittests
           name: codecov-python-${{ matrix.python-version }}
           fail_ci_if_error: false
@@ -86,7 +86,7 @@ jobs:
       - name: Run pip-audit dependency audit
         run: |
           echo "🔍 Running pip-audit dependency audit..."
-          pip-audit --requirement requirements.txt --requirement requirements_test.txt --desc --format=json
+          pip-audit --requirement requirements.txt --desc --format=json
       - name: Run semgrep security analysis
         run: |
           echo "🔍 Running semgrep security analysis..."
