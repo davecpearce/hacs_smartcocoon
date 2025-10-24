@@ -1,1 +1,1 @@
-pysmartcocoon==1.3.1
+pysmartcocoon==1.4.0
