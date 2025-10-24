@@ -33,5 +33,5 @@ jobs:
       - name: Auto-label PR
         uses: actions/labeler@v4
         with:
-          configuration-path: '.github/labeler-config.yml'
+          configuration-path: ".github/labeler-config.yml"
           repo-token: ${{ secrets.GITHUB_TOKEN }}
