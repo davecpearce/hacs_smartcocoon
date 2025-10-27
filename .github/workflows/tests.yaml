@@ -92,7 +92,7 @@ jobs:
           echo "🔍 Running semgrep security analysis..."
           semgrep --config=auto --error --json --output=semgrep-results.json .
       - name: Upload security scan results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: always()
         with:
           name: security-scan-results
