@@ -1,12 +1,12 @@
 -r requirements.txt
 homeassistant>=2025.5.0
-pytest-homeassistant-custom-component==0.13.288
-pytest-asyncio==1.2.0
+pytest-homeassistant-custom-component==0.13.301
+pytest-asyncio==1.3.0
 pytest-cov==7.0.0
 pytest-mock==3.15.1
 pytest-timeout==2.4.0
 pylint>=4.0.1,<5
-pre-commit==4.3.0
+pre-commit==4.5.1
 # Ruff replaces black/isort and handles imports/formatting
 ruff==0.6.9
 ruff-lsp==0.0.57
