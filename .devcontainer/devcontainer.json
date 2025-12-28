@@ -20,7 +20,10 @@
         "charliermarsh.ruff",
         "ms-python.pylint",
         "ms-python.vscode-pylance",
-        "ms-vscode-remote.vscode-remote-extensionpack"
+        "ms-vscode-remote.vscode-remote-extensionpack",
+        "cschleiden.vscode-github-actions",
+        "redhat.vscode-yaml",
+        "ms-vscode.vscode-json"
       ],
       "settings": {
         "files.eol": "\n",
