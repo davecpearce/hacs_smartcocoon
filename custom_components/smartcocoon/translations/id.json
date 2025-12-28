@@ -1,0 +1,37 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "Perangkat sudah dikonfigurasi"
+    },
+    "error": {
+      "cannot_connect": "Koneksi gagal",
+      "invalid_auth": "Autentikasi tidak valid",
+      "unknown": "Kesalahan tak terduga"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "username": "Nama pengguna",
+          "password": "Kata sandi",
+          "enable_preset_mode": "Aktifkan mode preset"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "enable_preset_modes": "Aktifkan mode preset",
+          "max_offline_duration": "Durasi offline maksimal",
+          "recovery_attempt_interval": "Interval upaya pemulihan",
+          "max_recovery_attempts_per_hour": "Upaya pemulihan maksimal per jam",
+          "recovery_reset_interval": "Interval reset pemulihan",
+          "connection_check_interval": "Interval pemeriksaan koneksi"
+        },
+        "description": "Atur opsi untuk SmartCocoon:\n • Mode preset (auto, eco) tidak diterjemahkan dengan baik di Apple Home. Jika Anda lebih suka menggunakan mode ini, aktifkan di sini.\n • Durasi offline maksimal: Berapa lama mencoba menyambungkan kembali kipas sebelum menghentikan upaya pemulihan (1-168 jam). Default: 24 jam.\n • Interval upaya pemulihan: Seberapa sering mencoba pemulihan untuk kipas yang terputus (1-60 menit). Default: 5 menit.\n • Upaya pemulihan maksimal per jam: Upaya pemulihan maksimal per jam sebelum reset (1-20 upaya). Default: 5 upaya.\n • Interval reset pemulihan: Seberapa sering mereset penghitung upaya pemulihan (15-240 menit). Default: 60 menit.\n • Interval pemeriksaan koneksi: Seberapa sering memeriksa status cloud untuk kipas yang terputus (1-24 jam). Default: 1 jam.",
+        "title": "Opsi SmartCocoon"
+      }
+    }
+  }
+}

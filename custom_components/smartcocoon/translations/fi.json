@@ -1,0 +1,37 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "Laite on jo määritetty"
+    },
+    "error": {
+      "cannot_connect": "Yhteys epäonnistui",
+      "invalid_auth": "Virheellinen todennus",
+      "unknown": "Odottamaton virhe"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "username": "Käyttäjätunnus",
+          "password": "Salasana",
+          "enable_preset_mode": "Ota käyttöön esiasetetut tilat"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "enable_preset_modes": "Ota käyttöön esiasetetut tilat",
+          "max_offline_duration": "Maksimi offline-kesto",
+          "recovery_attempt_interval": "Palautusyrityksen väli",
+          "max_recovery_attempts_per_hour": "Maksimi palautusyrityksiä tunnissa",
+          "recovery_reset_interval": "Palautuksen nollausväli",
+          "connection_check_interval": "Yhteyden tarkistusväli"
+        },
+        "description": "Aseta SmartCocoon-asetukset:\n • Esiasetetut tilat (auto, eco) eivät käänny hyvin Apple Homeen. Jos haluat käyttää näitä tiloja, ota ne käyttöön tässä.\n • Maksimi offline-kesto: Kuinka kauan yrittää yhdistää tuuletin uudelleen ennen palautusyritysten lopettamista (1-168 tuntia). Oletus: 24 tuntia.\n • Palautusyrityksen väli: Kuinka usein yrittää palauttaa irrotetut tuulettimet (1-60 minuuttia). Oletus: 5 minuuttia.\n • Maksimi palautusyrityksiä tunnissa: Maksimi palautusyrityksiä tunnissa ennen nollauksen (1-20 yritystä). Oletus: 5 yritystä.\n • Palautuksen nollausväli: Kuinka usein nollata palautusyritysten laskuri (15-240 minuuttia). Oletus: 60 minuuttia.\n • Yhteyden tarkistusväli: Kuinka usein tarkistaa pilven tila irrotetuille tuulettimille (1-24 tuntia). Oletus: 1 tunti.",
+        "title": "SmartCocoon-asetukset"
+      }
+    }
+  }
+}

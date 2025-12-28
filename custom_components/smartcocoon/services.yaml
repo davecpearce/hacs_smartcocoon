@@ -1,3 +1,28 @@
+force_recovery:
+  name: Force recovery
+  description: Force an immediate connection check and recovery attempt.
+  fields:
+    entity_id:
+      name: Fan entity
+      description: Optional. Limit the recovery attempt to a single SmartCocoon fan.
+      required: false
+      selector:
+        entity:
+          domain: fan
+          integration: smartcocoon
+
+get_device_status:
+  name: Get device status
+  description: Log current connection/recovery status for SmartCocoon fans.
+  fields:
+    entity_id:
+      name: Fan entity
+      description: Optional. Get status for a single SmartCocoon fan.
+      required: false
+      selector:
+        entity:
+          domain: fan
+          integration: smartcocoon
 # Describes the format for available fan services
 
 set_eco_mode:

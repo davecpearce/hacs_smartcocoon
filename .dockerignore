@@ -1,0 +1,19 @@
+# Exclude heavy/unnecessary items from Docker build context
+node_modules
+.git
+.gitignore
+.DS_Store
+__pycache__
+*.pyc
+.mypy_cache
+.pytest_cache
+.ruff_cache
+.coverage
+htmlcov
+dist
+build
+.vscode
+.idea
+*.log
+*.swp
+*.swo

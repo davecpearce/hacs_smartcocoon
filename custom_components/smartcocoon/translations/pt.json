@@ -1,0 +1,37 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "Dispositivo já configurado"
+    },
+    "error": {
+      "cannot_connect": "Falha na conexão",
+      "invalid_auth": "Autenticação inválida",
+      "unknown": "Erro inesperado"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "username": "Nome de usuário",
+          "password": "Senha",
+          "enable_preset_mode": "Habilitar modos predefinidos"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "enable_preset_modes": "Habilitar modos predefinidos",
+          "max_offline_duration": "Duração máxima offline",
+          "recovery_attempt_interval": "Intervalo de tentativa de recuperação",
+          "max_recovery_attempts_per_hour": "Tentativas de recuperação máximas por hora",
+          "recovery_reset_interval": "Intervalo de reset de recuperação",
+          "connection_check_interval": "Intervalo de verificação de conexão"
+        },
+        "description": "Definir opções para SmartCocoon:\n • Modos predefinidos (auto, eco) não se traduzem bem no Apple Home. Se você prefere usar esses modos, habilite-os aqui.\n • Duração máxima offline: Quanto tempo tentar reconectar um ventilador antes de parar as tentativas de recuperação (1-168 horas). Padrão: 24 horas.\n • Intervalo de tentativa de recuperação: Com que frequência tentar recuperação para ventiladores desconectados (1-60 minutos). Padrão: 5 minutos.\n • Tentativas de recuperação máximas por hora: Tentativas de recuperação máximas por hora antes do reset (1-20 tentativas). Padrão: 5 tentativas.\n • Intervalo de reset de recuperação: Com que frequência resetar o contador de tentativas de recuperação (15-240 minutos). Padrão: 60 minutos.\n • Intervalo de verificação de conexão: Com que frequência verificar o status da nuvem para ventiladores desconectados (1-24 horas). Padrão: 1 hora.",
+        "title": "Opções SmartCocoon"
+      }
+    }
+  }
+}

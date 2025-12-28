@@ -1,0 +1,37 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "Uređaj je već konfiguriran"
+    },
+    "error": {
+      "cannot_connect": "Veza neuspješna",
+      "invalid_auth": "Neispravna autentifikacija",
+      "unknown": "Neočekivana greška"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "username": "Korisničko ime",
+          "password": "Lozinka",
+          "enable_preset_mode": "Omogući unaprijed postavljene načine"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "enable_preset_modes": "Omogući unaprijed postavljene načine",
+          "max_offline_duration": "Maksimalno trajanje offline",
+          "recovery_attempt_interval": "Interval pokušaja oporavka",
+          "max_recovery_attempts_per_hour": "Maksimalni pokušaji oporavka po satu",
+          "recovery_reset_interval": "Interval resetiranja oporavka",
+          "connection_check_interval": "Interval provjere veze"
+        },
+        "description": "Postavite opcije za SmartCocoon:\n • Unaprijed postavljeni načini (auto, eco) se ne prevode dobro u Apple Home. Ako preferirate koristiti ove načine, omogućite ih ovdje.\n • Maksimalno trajanje offline: Koliko dugo pokušavati ponovno povezati ventilator prije zaustavljanja pokušaja oporavka (1-168 sati). Zadano: 24 sata.\n • Interval pokušaja oporavka: Koliko često pokušavati oporavak za odspojene ventilatore (1-60 minuta). Zadano: 5 minuta.\n • Maksimalni pokušaji oporavka po satu: Maksimalni pokušaji oporavka po satu prije resetiranja (1-20 pokušaja). Zadano: 5 pokušaja.\n • Interval resetiranja oporavka: Koliko često resetirati brojač pokušaja oporavka (15-240 minuta). Zadano: 60 minuta.\n • Interval provjere veze: Koliko često provjeravati status oblaka za odspojene ventilatore (1-24 sata). Zadano: 1 sat.",
+        "title": "SmartCocoon opcije"
+      }
+    }
+  }
+}

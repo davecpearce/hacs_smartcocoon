@@ -1,0 +1,37 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "Enheten är redan konfigurerad"
+    },
+    "error": {
+      "cannot_connect": "Anslutning misslyckades",
+      "invalid_auth": "Ogiltig autentisering",
+      "unknown": "Oväntat fel"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "username": "Användarnamn",
+          "password": "Lösenord",
+          "enable_preset_mode": "Aktivera förinställda lägen"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "enable_preset_modes": "Aktivera förinställda lägen",
+          "max_offline_duration": "Maximal offline-varaktighet",
+          "recovery_attempt_interval": "Återställningsförsök-intervall",
+          "max_recovery_attempts_per_hour": "Maximala återställningsförsök per timme",
+          "recovery_reset_interval": "Återställningsreset-intervall",
+          "connection_check_interval": "Anslutningskontroll-intervall"
+        },
+        "description": "Ställ in alternativ för SmartCocoon:\n • Förinställda lägen (auto, eco) översätts inte bra i Apple Home. Om du föredrar att använda dessa lägen, aktivera dem här.\n • Maximal offline-varaktighet: Hur länge försöka återansluta en fläkt innan återställningsförsök stoppas (1-168 timmar). Standard: 24 timmar.\n • Återställningsförsök-intervall: Hur ofta försöka återställning för frånkopplade fläktar (1-60 minuter). Standard: 5 minuter.\n • Maximala återställningsförsök per timme: Maximala återställningsförsök per timme före reset (1-20 försök). Standard: 5 försök.\n • Återställningsreset-intervall: Hur ofta återställa återställningsförsök-räknaren (15-240 minuter). Standard: 60 minuter.\n • Anslutningskontroll-intervall: Hur ofta kontrollera molnstatus för frånkopplade fläktar (1-24 timmar). Standard: 1 timme.",
+        "title": "SmartCocoon-alternativ"
+      }
+    }
+  }
+}

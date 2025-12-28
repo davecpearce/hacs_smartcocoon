@@ -1,0 +1,37 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "Seade on juba konfigureeritud"
+    },
+    "error": {
+      "cannot_connect": "Ühendus ebaõnnestus",
+      "invalid_auth": "Vigane autentimine",
+      "unknown": "Ootamatu viga"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "username": "Kasutajanimi",
+          "password": "Parool",
+          "enable_preset_mode": "Luba eelseadistatud režiimid"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "enable_preset_modes": "Luba eelseadistatud režiimid",
+          "max_offline_duration": "Maksimaalne offline kestus",
+          "recovery_attempt_interval": "Taastamiskatse intervall",
+          "max_recovery_attempts_per_hour": "Maksimaalsed taastamiskatsed tunnis",
+          "recovery_reset_interval": "Taastamise lähtestamise intervall",
+          "connection_check_interval": "Ühenduse kontrolli intervall"
+        },
+        "description": "Määra SmartCocoon-i valikud:\n • Eelseadistatud režiimid (auto, eco) ei tõlgi hästi Apple Home-is. Kui eelistate neid režiime kasutada, lubage need siin.\n • Maksimaalne offline kestus: Kui kaua proovida ventilaatorit uuesti ühendada enne taastamiskatsete peatamist (1-168 tundi). Vaikimisi: 24 tundi.\n • Taastamiskatse intervall: Kui sageli proovida taastamist ühenduseta ventilaatoritele (1-60 minutit). Vaikimisi: 5 minutit.\n • Maksimaalsed taastamiskatsed tunnis: Maksimaalsed taastamiskatsed tunnis enne lähtestamist (1-20 katset). Vaikimisi: 5 katset.\n • Taastamise lähtestamise intervall: Kui sageli lähtestada taastamiskatsete loendur (15-240 minutit). Vaikimisi: 60 minutit.\n • Ühenduse kontrolli intervall: Kui sageli kontrollida pilve olekut ühenduseta ventilaatoritele (1-24 tundi). Vaikimisi: 1 tund.",
+        "title": "SmartCocoon valikud"
+      }
+    }
+  }
+}

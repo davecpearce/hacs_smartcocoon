@@ -1,0 +1,37 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "Enheden er allerede konfigureret"
+    },
+    "error": {
+      "cannot_connect": "Forbindelse mislykkedes",
+      "invalid_auth": "Ugyldig godkendelse",
+      "unknown": "Uventet fejl"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "username": "Brugernavn",
+          "password": "Adgangskode",
+          "enable_preset_mode": "Aktivér forudindstillede tilstande"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "enable_preset_modes": "Aktivér forudindstillede tilstande",
+          "max_offline_duration": "Maksimal offline-varighed",
+          "recovery_attempt_interval": "Genopretningsforsøg-interval",
+          "max_recovery_attempts_per_hour": "Maksimale genopretningsforsøg per time",
+          "recovery_reset_interval": "Genopretningsreset-interval",
+          "connection_check_interval": "Forbindelseskontrol-interval"
+        },
+        "description": "Indstil muligheder for SmartCocoon:\n • Forudindstillede tilstande (auto, eco) oversættes ikke godt i Apple Home. Hvis du foretrækker at bruge disse tilstande, aktiver dem her.\n • Maksimal offline-varighed: Hvor længe forsøge at genforbinde en ventilator før genopretningsforsøg stoppes (1-168 timer). Standard: 24 timer.\n • Genopretningsforsøg-interval: Hvor ofte forsøge genopretning for afbrudte ventilatorer (1-60 minutter). Standard: 5 minutter.\n • Maksimale genopretningsforsøg per time: Maksimale genopretningsforsøg per time før reset (1-20 forsøg). Standard: 5 forsøg.\n • Genopretningsreset-interval: Hvor ofte nulstille genopretningsforsøg-tælleren (15-240 minutter). Standard: 60 minutter.\n • Forbindelseskontrol-interval: Hvor ofte kontrollere sky-status for afbrudte ventilatorer (1-24 timer). Standard: 1 time.",
+        "title": "SmartCocoon-muligheder"
+      }
+    }
+  }
+}

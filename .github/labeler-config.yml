@@ -3,81 +3,95 @@
 
 # Label based on file changes
 python:
-  - "**/*.py"
-  - "**/pyproject.toml"
-  - "**/requirements*.txt"
-  - "**/setup.py"
-  - "**/tox.ini"
-  - "**/.python-version"
+  - changed-files:
+      - any-glob-to-any-file: "**/*.py"
+      - any-glob-to-any-file: "**/pyproject.toml"
+      - any-glob-to-any-file: "**/requirements*.txt"
+      - any-glob-to-any-file: "**/setup.py"
+      - any-glob-to-any-file: "**/tox.ini"
+      - any-glob-to-any-file: "**/.python-version"
 
 dependencies:
-  - "**/requirements*.txt"
-  - "**/pyproject.toml"
-  - "**/poetry.lock"
-  - "**/Pipfile.lock"
-  - "**/package.json"
-  - "**/yarn.lock"
-  - "**/package-lock.json"
+  - changed-files:
+      - any-glob-to-any-file: "**/requirements*.txt"
+      - any-glob-to-any-file: "**/pyproject.toml"
+      - any-glob-to-any-file: "**/poetry.lock"
+      - any-glob-to-any-file: "**/Pipfile.lock"
+      - any-glob-to-any-file: "**/package.json"
+      - any-glob-to-any-file: "**/yarn.lock"
+      - any-glob-to-any-file: "**/package-lock.json"
 
 github_actions:
-  - ".github/workflows/**"
-  - ".github/actions/**"
+  - changed-files:
+      - any-glob-to-any-file: ".github/workflows/**"
+      - any-glob-to-any-file: ".github/actions/**"
 
 ci:
-  - ".github/workflows/**"
-  - ".ci/**"
-  - "**/.github/workflows/**"
+  - changed-files:
+      - any-glob-to-any-file: ".github/workflows/**"
+      - any-glob-to-any-file: ".ci/**"
+      - any-glob-to-any-file: "**/.github/workflows/**"
 
 testing:
-  - "**/test_*.py"
-  - "**/tests/**"
-  - "**/*_test.py"
-  - "**/conftest.py"
-  - "**/pytest.ini"
-  - "**/tox.ini"
+  - changed-files:
+      - any-glob-to-any-file: "**/test_*.py"
+      - any-glob-to-any-file: "**/tests/**"
+      - any-glob-to-any-file: "**/*_test.py"
+      - any-glob-to-any-file: "**/conftest.py"
+      - any-glob-to-any-file: "**/pytest.ini"
+      - any-glob-to-any-file: "**/tox.ini"
 
 documentation:
-  - "**/*.md"
-  - "**/docs/**"
-  - "**/README*"
-  - "**/CHANGELOG*"
-  - "**/LICENSE*"
+  - changed-files:
+      - any-glob-to-any-file: "**/*.md"
+      - any-glob-to-any-file: "**/docs/**"
+      - any-glob-to-any-file: "**/README*"
+      - any-glob-to-any-file: "**/CHANGELOG*"
+      - any-glob-to-any-file: "**/LICENSE*"
 
 build:
-  - "**/Dockerfile*"
-  - "**/docker-compose*.yml"
-  - "**/Makefile"
-  - "**/CMakeLists.txt"
-  - "**/setup.py"
-  - "**/pyproject.toml"
+  - changed-files:
+      - any-glob-to-any-file: "**/Dockerfile*"
+      - any-glob-to-any-file: "**/docker-compose*.yml"
+      - any-glob-to-any-file: "**/Makefile"
+      - any-glob-to-any-file: "**/CMakeLists.txt"
+      - any-glob-to-any-file: "**/setup.py"
+      - any-glob-to-any-file: "**/pyproject.toml"
 
 style:
-  - "**/.pre-commit-config.yaml"
-  - "**/.editorconfig"
-  - "**/.eslintrc*"
-  - "**/.prettierrc*"
-  - "**/black.toml"
-  - "**/isort.cfg"
+  - changed-files:
+      - any-glob-to-any-file: "**/.pre-commit-config.yaml"
+      - any-glob-to-any-file: "**/.editorconfig"
+      - any-glob-to-any-file: "**/.eslintrc*"
+      - any-glob-to-any-file: "**/.prettierrc*"
+      - any-glob-to-any-file: "**/black.toml"
+      - any-glob-to-any-file: "**/isort.cfg"
 
 # Label based on branch name patterns
 hotfix:
-  - "hotfix/**"
+  - head-branch:
+      - pattern: "hotfix/**"
 
 feature:
-  - "feature/**"
-  - "feat/**"
+  - head-branch:
+      - pattern: "feature/**"
+      - pattern: "feat/**"
 
 bugfix:
-  - "bugfix/**"
-  - "fix/**"
+  - head-branch:
+      - pattern: "bugfix/**"
+      - pattern: "fix/**"
 
 housekeeping:
-  - "housekeeping/**"
-  - "chore/**"
+  - head-branch:
+      - pattern: "housekeeping/**"
+      - pattern: "chore/**"
 
 release:
-  - "release/**"
-  - "bump/**"
+  - head-branch:
+      - pattern: "release/**"
+      - pattern: "bump/**"
 
 dependabot:
-  - "dependabot/**"
+  - head-branch:
+      - pattern: "dependabot/**"

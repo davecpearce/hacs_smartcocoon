@@ -1,0 +1,37 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "Enheten er allerede konfigurert"
+    },
+    "error": {
+      "cannot_connect": "Tilkobling mislyktes",
+      "invalid_auth": "Ugyldig autentisering",
+      "unknown": "Uventet feil"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "username": "Brukernavn",
+          "password": "Passord",
+          "enable_preset_mode": "Aktiver forhåndsinnstilte moduser"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "enable_preset_modes": "Aktiver forhåndsinnstilte moduser",
+          "max_offline_duration": "Maksimal offline-varighet",
+          "recovery_attempt_interval": "Gjenopprettingsforsøk-intervall",
+          "max_recovery_attempts_per_hour": "Maksimale gjenopprettingsforsøk per time",
+          "recovery_reset_interval": "Gjenopprettingsreset-intervall",
+          "connection_check_interval": "Tilkoblingskontroll-intervall"
+        },
+        "description": "Sett alternativer for SmartCocoon:\n • Forhåndsinnstilte moduser (auto, eco) oversettes ikke bra i Apple Home. Hvis du foretrekker å bruke disse modusene, aktiver dem her.\n • Maksimal offline-varighet: Hvor lenge prøve å koble til en vifte på nytt før gjenopprettingsforsøk stoppes (1-168 timer). Standard: 24 timer.\n • Gjenopprettingsforsøk-intervall: Hvor ofte prøve gjenoppretting for frakoblede vifter (1-60 minutter). Standard: 5 minutter.\n • Maksimale gjenopprettingsforsøk per time: Maksimale gjenopprettingsforsøk per time før reset (1-20 forsøk). Standard: 5 forsøk.\n • Gjenopprettingsreset-intervall: Hvor ofte tilbakestille gjenopprettingsforsøk-telleren (15-240 minutter). Standard: 60 minutter.\n • Tilkoblingskontroll-intervall: Hvor ofte kontrollere sky-status for frakoblede vifter (1-24 timer). Standard: 1 time.",
+        "title": "SmartCocoon-alternativer"
+      }
+    }
+  }
+}

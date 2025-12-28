@@ -1,0 +1,37 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "L'appareil est déjà configuré"
+    },
+    "error": {
+      "cannot_connect": "Échec de la connexion",
+      "invalid_auth": "Authentification invalide",
+      "unknown": "Erreur inattendue"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "username": "Nom d'utilisateur",
+          "password": "Mot de passe",
+          "enable_preset_mode": "Activer les modes prédéfinis"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "enable_preset_modes": "Activer les modes prédéfinis",
+          "max_offline_duration": "Durée maximale hors ligne",
+          "recovery_attempt_interval": "Intervalle de tentative de récupération",
+          "max_recovery_attempts_per_hour": "Tentatives de récupération maximales par heure",
+          "recovery_reset_interval": "Intervalle de réinitialisation de récupération",
+          "connection_check_interval": "Intervalle de vérification de connexion"
+        },
+        "description": "Définir les options pour SmartCocoon :\n • Les modes prédéfinis (auto, eco) ne se traduisent pas bien dans Apple Home. Si vous préférez utiliser ces modes, activez-les ici.\n • Durée maximale hors ligne : Combien de temps essayer de reconnecter un ventilateur avant d'arrêter les tentatives de récupération (1-168 heures). Par défaut : 24 heures.\n • Intervalle de tentative de récupération : À quelle fréquence tenter la récupération pour les ventilateurs déconnectés (1-60 minutes). Par défaut : 5 minutes.\n • Tentatives de récupération maximales par heure : Tentatives de récupération maximales par heure avant réinitialisation (1-20 tentatives). Par défaut : 5 tentatives.\n • Intervalle de réinitialisation de récupération : À quelle fréquence réinitialiser le compteur de tentatives de récupération (15-240 minutes). Par défaut : 60 minutes.\n • Intervalle de vérification de connexion : À quelle fréquence vérifier le statut cloud pour les ventilateurs déconnectés (1-24 heures). Par défaut : 1 heure.",
+        "title": "Options SmartCocoon"
+      }
+    }
+  }
+}

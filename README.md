@@ -43,6 +43,16 @@ Add the following to the Custom Repository under `Settings` in HACS:
 1. If you do not already have a `custom_components` directory in your Home Assistant config directory, create it.
 1. Copy or move the `smartcocoon` folder from `hacs_smartcocoon/custom_components` you cloned from step 1 to the `custom_components` folder in your Home Assistant `config` folder.
 
+## 🎉 What's New in v1.3.0
+
+Version 1.3.0 includes major enhancements:
+
+- **🌍 34 Language Translations** - Complete global language support
+- **⚙️ Configurable Recovery Options** - Customize connection monitoring and recovery behavior
+- **🔧 Enhanced Fan Attributes** - Additional attributes from pysmartcocoon library
+- **🛠️ Improved Error Handling** - Better connection monitoring and recovery logic
+- **📱 Updated Configuration Flow** - New options for recovery behavior
+
 ## Track Updates
 
 If installed via HACS, updates are flagged automatically. Otherwise, you will have to manually update as described in the manual installation steps above.
@@ -57,7 +67,45 @@ There is a config flow for this integration. After installing the custom compone
 4. You will be guided through the rest of the setup process via the config flow
    - You will have to provide the same 'username' and 'password' you use when logging into the official SmartCocoon iOS or Android application.
 5. You have the option to select the Area of each detected fan.
-6. After the installation completes, you will see a "Configure" button for the SmartCocoon integration where you have the option to "Enable Preset Modes"
+6. After the installation completes, you will see a "Configure" button for the SmartCocoon integration where you have the option to "Enable Preset Modes" and connection monitoring options.
+
+### Options
+
+These options make recovery behavior more predictable and user friendly:
+
+- **Enable Preset Modes**: Expose SmartCocoon preset modes (auto/eco). Default: off.
+- **Max Offline Duration (hours)**: How long to keep attempting recovery. Default: 24.
+- **Recovery Attempt Interval (minutes)**: Minimum delay between attempts per fan. Default: 5.
+- **Max Recovery Attempts Per Hour**: Rate limit for recovery attempts per fan. Default: 5.
+- **Recovery Reset Interval (minutes)**: When to reset the attempt counter. Default: 60.
+- **Connection Check Interval (hours)**: How often to check cloud status for disconnected fans. Default: 1.
+
+Notes:
+
+- The integration adds a 30-second startup grace period before attempting any recovery to avoid noisy logs and unnecessary calls immediately after HA restarts.
+- Periodic connection checks detect when fans become unavailable and trigger recovery automatically.
+- Recovery attempts continue automatically until successful or max attempts are reached.
+- Logs include the fan's friendly name for clarity.
+
+### Services
+
+Two services are provided. Both work globally or on a single fan using `entity_id`.
+
+- `smartcocoon.force_recovery`
+  - Force an immediate connection check and recovery attempt.
+  - Data (optional): `{ "entity_id": "fan.bedroom" }`
+
+- `smartcocoon.get_device_status`
+  - Dump the current recovery state tracked by the integration.
+  - Data (optional): `{ "entity_id": "fan.office" }`
+
+If `entity_id` is omitted, the service operates on all fans.
+
+### Troubleshooting
+
+- If a fan is unplugged and later plugged back in, the integration will attempt recovery automatically according to the options above.
+- To accelerate testing, temporarily lower the intervals in Options (e.g., 1 minute for checks/attempts) and restart Home Assistant.
+- Use the `smartcocoon.force_recovery` service to trigger an immediate recovery cycle.
 
 <!---->
 
