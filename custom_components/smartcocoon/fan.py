@@ -105,8 +105,36 @@ class SmartCocoonFan(FanEntity):  # type: ignore[misc]
 
     @property
     def available(self) -> bool:
-        """Return True if entity is available."""
-        return self._get_fan_data().connected  # type: ignore[no-any-return]
+        """Return True if entity is available.
+
+        With pysmartcocoon 1.4.2+, the connected flag is properly maintained,
+        so we can trust it directly. We still include error handling as a safeguard.
+        """
+        try:
+            fan_data = self._get_fan_data()
+            connected = getattr(fan_data, "connected", False)
+
+            # With pysmartcocoon 1.4.2+, the connected flag is reliable
+            # We trust it directly but include error handling as a safeguard
+            result = bool(connected)
+
+            _LOGGER.debug(
+                "Fan %s: Availability check - connected=%s, available=%s",
+                self._fan_id,
+                connected,
+                result,
+            )
+
+            return result
+        except (AttributeError, KeyError, TypeError, ValueError) as exc:
+            # If we can't access the fan data or connected attribute,
+            # mark as unavailable as a safety measure
+            _LOGGER.warning(
+                ("Fan %s: Error checking availability - marking as unavailable: %s"),
+                self._fan_id,
+                exc,
+            )
+            return False
 
     @property
     def device_info(self) -> DeviceInfo:

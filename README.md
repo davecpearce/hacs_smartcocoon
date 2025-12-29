@@ -43,6 +43,19 @@ Add the following to the Custom Repository under `Settings` in HACS:
 1. If you do not already have a `custom_components` directory in your Home Assistant config directory, create it.
 1. Copy or move the `smartcocoon` folder from `hacs_smartcocoon/custom_components` you cloned from step 1 to the `custom_components` folder in your Home Assistant `config` folder.
 
+## 🎉 What's New in v1.3.2
+
+**Fixed Fan Availability Detection**
+
+This release fixes the issue where unplugged fans showed as "off" instead of "unavailable":
+
+- **🔌 Fixed Availability Detection** - Unplugged fans now correctly show as "unavailable" instead of "off"
+- **📦 Updated Dependency** - Requires pysmartcocoon 1.4.2+ which properly maintains the `connected` flag
+- **🛡️ Improved Error Handling** - Enhanced error handling in availability checks as a safeguard
+- **📝 Better Logging** - Improved debug logging for availability checks
+
+**Note:** This release requires pysmartcocoon 1.4.2 or later, which includes the fix for the `connected` flag.
+
 ## 🎉 What's New in v1.3.0
 
 Version 1.3.0 includes major enhancements:
