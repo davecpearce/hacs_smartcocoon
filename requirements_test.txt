@@ -8,8 +8,8 @@ pytest-timeout==2.4.0
 pylint>=4.0.1,<5
 pre-commit==4.5.1
 # Ruff replaces black/isort and handles imports/formatting
-ruff==0.6.9
-ruff-lsp==0.0.57
+ruff==0.14.10
+ruff-lsp==0.0.62
 # Security scanning tools
 semgrep>=1.45.0
 pip-audit>=2.6.0
