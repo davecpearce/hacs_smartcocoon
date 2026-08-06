@@ -1,14 +1,23 @@
 ---
 name: CI/CD Pipeline
 
+# Deliberately no `schedule:` trigger here. GitHub disables scheduled
+# workflows after 60 days of repository inactivity, and that is exactly what
+# happened to this file: CI was silently switched off on 2026-05-27 and
+# nobody noticed for ten weeks, because a disabled workflow reports nothing
+# rather than failing. Pull requests merged against checks that were months
+# stale.
+#
+# The nightly run still exists -- nightly.yml holds the schedule and calls
+# this workflow. If that one gets disabled the same way, the loss is a
+# nightly re-scan rather than all pull request validation.
 on:
   push:
     branches:
       - main
       - develop
   pull_request:
-  schedule:
-    - cron: "0 0 * * *"
+  workflow_call:
 
 env:
   DEFAULT_PYTHON: "3.13"
