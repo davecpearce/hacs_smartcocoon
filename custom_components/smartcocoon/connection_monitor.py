@@ -297,10 +297,7 @@ class ConnectionMonitor:
                     return
 
                 _LOGGER.debug(
-                    (
-                        "No in-memory fan entity object matched _fan_id=%s for "
-                        "entity %s"
-                    ),
+                    ("No in-memory fan entity object matched _fan_id=%s for entity %s"),
                     fan_id,
                     entity_id,
                 )
