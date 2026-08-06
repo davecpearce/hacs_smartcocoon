@@ -14,7 +14,7 @@ pytest-timeout==2.4.0
 # hooks run in their own isolated environments in CI, so a version that
 # differs here only means local runs disagreeing with CI over the same code.
 pylint==4.0.6
-pre-commit==4.5.1
+pre-commit==4.6.1
 # Ruff replaces black/isort and handles imports/formatting
 ruff==0.16.1
 ruff-lsp==0.0.62
@@ -25,4 +25,4 @@ ruff-lsp==0.0.62
 # in isolation with pipx, and the pre-commit hook builds its own environment,
 # so both can track latest independently of homeassistant's pins.
 # Type checking
-mypy==1.18.2
+mypy==2.1.0
