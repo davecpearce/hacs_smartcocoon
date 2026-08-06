@@ -15,11 +15,10 @@ updates:
     # Raise pull requests for version updates
     # to github-actions against the `main` branch
     target-branch: "main"
+    # github-actions supports only `default-days`; the semver-* keys are
+    # rejected for this ecosystem.
     cooldown:
       default-days: 5
-      semver-major-days: 30
-      semver-minor-days: 7
-      semver-patch-days: 3
   - package-ecosystem: pip
     directory: "/.github/workflows"
     schedule:
