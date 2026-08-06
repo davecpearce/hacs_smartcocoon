@@ -27,26 +27,6 @@ build-backend = "setuptools.build_meta"
 include = ["custom_components*"]
 exclude = ["node_modules*", "tests*", "scripts*"]
 
-[tool.black]
-line-length = 88
-target-version = ['py39']
-include = '\.pyi?$'
-# Note: Use 'python -m black --safe' to match pre-commit formatting
-extend-exclude = '''
-/(
-  # directories
-  \.eggs
-  | \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | build
-  | dist
-)/
-'''
-# Note: Use 'pre-commit run black --all-files' to match CI formatting
-
 [tool.pylint.BASIC]
 class-const-naming-style = "any"
 good-names = [

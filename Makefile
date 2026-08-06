@@ -14,8 +14,9 @@ test: ## Run tests
 lint: ## Run pre-commit hooks
 	pre-commit run --all-files
 
-format: ## Format code with Black (safe mode)
-	python -m black --safe custom_components/ tests/
+format: ## Format code with Ruff
+	python -m ruff format custom_components/ tests/
+	python -m ruff check --fix custom_components/ tests/
 
 ci-local: ## Run full CI locally
 	./scripts/run-ci-local.sh
