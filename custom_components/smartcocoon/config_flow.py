@@ -63,7 +63,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[misc
     VERSION = 1
 
     @staticmethod
-    @callback  # type: ignore[misc]
+    @callback  # type: ignore[untyped-decorator]
     def async_get_options_flow(
         config_entry: config_entries.ConfigEntry,
     ) -> config_entries.OptionsFlow:

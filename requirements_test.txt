@@ -25,4 +25,4 @@ ruff-lsp==0.0.62
 # in isolation with pipx, and the pre-commit hook builds its own environment,
 # so both can track latest independently of homeassistant's pins.
 # Type checking
-mypy==1.18.2
+mypy==2.1.0
