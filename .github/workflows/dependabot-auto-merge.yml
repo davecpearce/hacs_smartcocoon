@@ -1,0 +1,43 @@
+---
+name: Dependabot auto-merge
+
+# `pull_request_target` is required so the token can act on the PR, but it
+# means this workflow runs in the context of the base repository with write
+# access. It therefore MUST NOT check out or execute any code from the pull
+# request -- it only reads dependabot's metadata and calls the merge API.
+on: pull_request_target
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-merge:
+    runs-on: ubuntu-latest
+    # Belt and braces: the event is restricted to dependabot's own PRs, and
+    # fetch-metadata below fails on anything it did not author.
+    if: github.actor == 'dependabot[bot]'
+    steps:
+      - name: Fetch dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98 # v3.1.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Only patch and minor updates merge unattended. Majors are left open
+      # deliberately: they are where breaking changes live, and CI passing is
+      # not sufficient evidence that an upgrade is safe to ship.
+      - name: Enable auto-merge for patch and minor updates
+        if: |
+          steps.metadata.outputs.update-type == 'version-update:semver-patch' ||
+          steps.metadata.outputs.update-type == 'version-update:semver-minor'
+        run: gh pr merge --auto --merge "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Note major updates left for review
+        if: steps.metadata.outputs.update-type == 'version-update:semver-major'
+        run: |
+          echo "::notice::Major update to \
+          ${{ steps.metadata.outputs.dependency-names }} left open for review."
