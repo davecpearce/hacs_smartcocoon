@@ -79,7 +79,11 @@ jobs:
       - name: Install security tools
         run: |
           pipx install semgrep==1.172.0
-          pipx install pip-audit==2.10.1
+          # pip-audit builds a throwaway venv to resolve requirements.txt, and
+          # uses its own interpreter to do it. pipx would otherwise pick the
+          # runner's system python (3.12), which cannot resolve pysmartcocoon
+          # at all -- it requires >=3.13.2. Point it at the version set up above.
+          pipx install --python "$(which python)" pip-audit==2.10.1
       - name: Run pip-audit dependency audit
         run: |
           echo "🔍 Running pip-audit dependency audit..."
