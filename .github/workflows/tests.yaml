@@ -72,11 +72,14 @@ jobs:
         uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v6.1.0
         with:
           python-version: "3.13"
-      - name: Install dependencies
+      # Installed in isolation rather than into the project environment.
+      # homeassistant pins PyJWT==2.10.1 while current semgrep requires
+      # pyjwt~=2.13.0, so a shared solve is unsatisfiable -- and neither tool
+      # needs the project's dependencies to do its job.
+      - name: Install security tools
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements_test.txt
-          pip install -e .
+          pipx install semgrep==1.172.0
+          pipx install pip-audit==2.10.1
       - name: Run pip-audit dependency audit
         run: |
           echo "🔍 Running pip-audit dependency audit..."
