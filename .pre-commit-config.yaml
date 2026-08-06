@@ -45,8 +45,15 @@ repos:
       - id: semgrep
         name: semgrep
         entry: semgrep
-        language: system
-        args: [--config=auto, --error]
+        # `language: python` builds an isolated environment for semgrep from
+        # additional_dependencies. `language: system` required it on PATH,
+        # which meant installing it alongside homeassistant -- unsatisfiable,
+        # since homeassistant pins PyJWT==2.10.1 and semgrep needs pyjwt~=2.13.
+        language: python
+        additional_dependencies: ["semgrep==1.172.0"]
+        # Named rule packs rather than --config=auto, matching the CI job, so
+        # a registry-side ruleset change cannot fail commits unexpectedly.
+        args: [--config=p/python, --config=p/secrets, --severity=ERROR, --error]
         types: [python]
   # Type checking
   - repo: https://github.com/pre-commit/mirrors-mypy

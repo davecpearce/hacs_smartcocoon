@@ -1,5 +1,12 @@
 ---
 version: 2
+
+# Each ecosystem below sets a `cooldown`, which delays adoption of freshly
+# published versions. A compromised release is usually caught and yanked
+# within days, so waiting is the cheapest protection available -- and it
+# matters more here because patch and minor updates are auto-merged without a
+# human looking at them.
+
 updates:
   - package-ecosystem: github-actions
     directory: "/"
@@ -8,6 +15,11 @@ updates:
     # Raise pull requests for version updates
     # to github-actions against the `main` branch
     target-branch: "main"
+    cooldown:
+      default-days: 5
+      semver-major-days: 30
+      semver-minor-days: 7
+      semver-patch-days: 3
   - package-ecosystem: pip
     directory: "/.github/workflows"
     schedule:
@@ -15,6 +27,11 @@ updates:
     # Raise pull requests for version updates
     # to github-actions against the `main` branch
     target-branch: "main"
+    cooldown:
+      default-days: 5
+      semver-major-days: 30
+      semver-minor-days: 7
+      semver-patch-days: 3
   - package-ecosystem: pip
     directory: "/"
     schedule:
@@ -22,5 +39,10 @@ updates:
     # Raise pull requests for version updates
     # to github-actions against the `main` branch
     target-branch: "main"
+    cooldown:
+      default-days: 5
+      semver-major-days: 30
+      semver-minor-days: 7
+      semver-patch-days: 3
     ignore:
       - dependency-name: "homeassistant"

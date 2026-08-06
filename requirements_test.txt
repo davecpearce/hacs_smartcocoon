@@ -5,13 +5,24 @@ pytest-asyncio==1.3.0
 pytest-cov==7.0.0
 pytest-mock==3.15.1
 pytest-timeout==2.4.0
-pylint>=4.0.1,<5
+# Pinned exactly, like everything else here: an open range means CI silently
+# installs whatever released overnight, so a new tool version can turn main
+# red with no code change. Dependabot proposes the upgrades instead.
+#
+# pylint and mypy are kept equal to the `rev` pinned for them in
+# .pre-commit-config.yaml. Those hooks run in their own isolated environments
+# in CI, so a different version here would only mean local runs disagreeing
+# with CI over the same code.
+pylint==4.0.1
 pre-commit==4.5.1
 # Ruff replaces black/isort and handles imports/formatting
 ruff==0.14.10
 ruff-lsp==0.0.62
-# Security scanning tools
-semgrep>=1.45.0
-pip-audit>=2.6.0
+# Security scanning tools (semgrep, pip-audit) are deliberately NOT listed
+# here. They are standalone CLIs, and installing them alongside homeassistant
+# forces a shared dependency solve that cannot succeed: homeassistant pins
+# PyJWT==2.10.1 while current semgrep requires pyjwt~=2.13.0. CI installs them
+# in isolation with pipx, and the pre-commit hook builds its own environment,
+# so both can track latest independently of homeassistant's pins.
 # Type checking
-mypy>=1.8.0
+mypy==1.18.2

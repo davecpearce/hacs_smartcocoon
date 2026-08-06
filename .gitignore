@@ -28,3 +28,6 @@ Thumbs.db
 # Devcontainer
 .devcontainer/.env
 node_modules/.cache/
+
+# Security scan output (uploaded as a CI artifact, not committed)
+semgrep-results.json
