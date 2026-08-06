@@ -68,30 +68,22 @@ style:
       - any-glob-to-any-file: "**/isort.cfg"
 
 # Label based on branch name patterns
+# actions/labeler v5+ expects head-branch to be a list of regular expressions,
+# not a list of `pattern:` maps, and matches them as regex rather than globs.
 hotfix:
-  - head-branch:
-      - pattern: "hotfix/**"
+  - head-branch: ["^hotfix/"]
 
 feature:
-  - head-branch:
-      - pattern: "feature/**"
-      - pattern: "feat/**"
+  - head-branch: ["^feature/", "^feat/"]
 
 bugfix:
-  - head-branch:
-      - pattern: "bugfix/**"
-      - pattern: "fix/**"
+  - head-branch: ["^bugfix/", "^fix/"]
 
 housekeeping:
-  - head-branch:
-      - pattern: "housekeeping/**"
-      - pattern: "chore/**"
+  - head-branch: ["^housekeeping/", "^chore/"]
 
 release:
-  - head-branch:
-      - pattern: "release/**"
-      - pattern: "bump/**"
+  - head-branch: ["^release/", "^bump/"]
 
 dependabot:
-  - head-branch:
-      - pattern: "dependabot/**"
+  - head-branch: ["^dependabot/"]
