@@ -1,0 +1,30 @@
+---
+name: Nightly
+
+# This file exists to hold the schedule, and nothing else.
+#
+# GitHub disables scheduled workflows after 60 days of repository inactivity.
+# When that trigger lived in tests.yaml, being disabled took the entire
+# pull request pipeline with it -- silently, since a disabled workflow
+# reports no status at all rather than a failure. That went unnoticed from
+# 2026-05-27 for ten weeks.
+#
+# Keeping the schedule isolated here means the blast radius of the same thing
+# happening again is one nightly re-run, not every check on every PR.
+#
+# The nightly run is still worth having: pip-audit resolves against an
+# advisory database that moves, and semgrep against rule packs that move, so
+# it catches code becoming vulnerable without changing.
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  full-ci:
+    name: Full CI
+    uses: ./.github/workflows/tests.yaml
