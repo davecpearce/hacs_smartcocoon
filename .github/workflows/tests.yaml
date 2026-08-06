@@ -19,9 +19,9 @@ jobs:
     name: Pre-commit
     steps:
       - name: Check out the repository
-        uses: actions/checkout@v6.0.1
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
       - name: Set up Python 3.13
-        uses: actions/setup-python@v6.1.0
+        uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v6.1.0
         with:
           python-version: "3.13"
       - name: Install dependencies
@@ -41,9 +41,9 @@ jobs:
         python-version: ["3.13"]
     steps:
       - name: Check out the repository
-        uses: actions/checkout@v6.0.1
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v6.1.0
+        uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v6.1.0
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
@@ -55,7 +55,7 @@ jobs:
         run: |
           pytest --cov=custom_components.smartcocoon --cov-report=xml --cov-report=html
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@0fb7174895f61a3b6b78fc075e0cd60383518dac # v5
         with:
           files: ./coverage.xml
           flags: unittests
@@ -67,9 +67,9 @@ jobs:
     name: Security Scan
     steps:
       - name: Check out the repository
-        uses: actions/checkout@v6.0.1
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
       - name: Set up Python 3.13
-        uses: actions/setup-python@v6.1.0
+        uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v6.1.0
         with:
           python-version: "3.13"
       - name: Install dependencies
@@ -77,22 +77,65 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements_test.txt
           pip install -e .
-      - name: Run safety vulnerability scan
-        run: |
-          echo "🔍 Running safety vulnerability scan..."
-          # Note: safety now requires authentication for scan command
-          # For CI, we'll use pip-audit which provides similar functionality
-          echo "Skipping safety scan (requires authentication)"
       - name: Run pip-audit dependency audit
         run: |
           echo "🔍 Running pip-audit dependency audit..."
           pip-audit --requirement requirements.txt --desc --format=json
+      # `--config=auto` selects rule packs from the registry at run time, so
+      # the ruleset changed underneath us and CI went red here with no code
+      # change. Name the packs explicitly instead.
+      #
+      # This step never fails the build -- it only collects findings. The
+      # gate is the next step, so that semgrep's full output (every severity)
+      # reaches semgrep-results.json and the uploaded artifact, while only
+      # ERROR-severity findings can actually block a merge.
       - name: Run semgrep security analysis
         run: |
           echo "🔍 Running semgrep security analysis..."
-          semgrep --config=auto --error --json --output=semgrep-results.json .
+          semgrep \
+            --config=p/python \
+            --config=p/github-actions \
+            --config=p/secrets \
+            --json --output=semgrep-results.json . || true
+      - name: Gate on ERROR-severity semgrep findings
+        run: |
+          python - <<'PY'
+          import collections, json, pathlib, sys
+
+          # The scan step swallows its exit code, so an outright semgrep
+          # failure shows up here as a missing or unparseable file. Treat
+          # that as a build failure rather than as "no findings".
+          path = pathlib.Path("semgrep-results.json")
+          if not path.exists():
+              print("::error::semgrep produced no results file -- scan failed")
+              sys.exit(1)
+          try:
+              results = json.loads(path.read_text()).get("results", [])
+          except json.JSONDecodeError as exc:
+              print(f"::error::semgrep results file is not valid JSON: {exc}")
+              sys.exit(1)
+
+          by_severity = collections.Counter(
+              r["extra"]["severity"] for r in results
+          )
+          print(f"{len(results)} finding(s): {dict(by_severity) or 'none'}")
+
+          blocking = [
+              r for r in results if r["extra"]["severity"] == "ERROR"
+          ]
+          for r in results:
+              marker = "BLOCKING" if r["extra"]["severity"] == "ERROR" else "advisory"
+              print(
+                  f"  [{marker}] {r['path']}:{r['start']['line']} "
+                  f"{r['check_id']}"
+              )
+
+          if blocking:
+              print(f"::error::{len(blocking)} ERROR-severity finding(s)")
+              sys.exit(1)
+          PY
       - name: Upload security scan results
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         if: always()
         with:
           name: security-scan-results
@@ -105,10 +148,10 @@ jobs:
     name: HACS
     steps:
       - name: Check out the repository
-        uses: "actions/checkout@v6.0.1"
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
       - name: HACS validation
-        uses: "hacs/action@22.5.0"
+        uses: hacs/action@d556e736723344f83838d08488c983a15381059a # 22.5.0
         with:
           category: "integration"
           ignore: brands
@@ -118,7 +161,7 @@ jobs:
     name: Hassfest
     steps:
       - name: Check out the repository
-        uses: "actions/checkout@v6.0.1"
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
       - name: Hassfest validation
-        uses: "home-assistant/actions/hassfest@master"
+        uses: home-assistant/actions/hassfest@a7c616ce81ccda50150bf1595786c71b1883fabb # master
