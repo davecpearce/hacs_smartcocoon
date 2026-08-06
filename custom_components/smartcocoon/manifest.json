@@ -6,7 +6,7 @@
   "documentation": "https://github.com/davecpearce/hacs_smartcocoon/blob/main/README.md",
   "iot_class": "cloud_push",
   "issue_tracker": "https://github.com/davecpearce/hacs_smartcocoon/issues",
-  "loggers": ["smartcocoon"],
-  "requirements": ["pysmartcocoon==1.4.2"],
-  "version": "1.3.2"
+  "loggers": ["pysmartcocoon"],
+  "requirements": ["pysmartcocoon==1.4.3"],
+  "version": "1.3.3"
 }
