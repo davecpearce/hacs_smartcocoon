@@ -119,16 +119,14 @@ class SmartCocoonController:
         _LOGGER.debug("scmanager.fans: %s", self._scmanager.fans)
 
         # Start connection monitoring
+        # Passed in the units the options flow collects; ConnectionMonitorConfig
+        # converts to seconds itself.
         config = ConnectionMonitorConfig(
-            max_offline_duration=self._max_offline_duration
-            * 3600,  # Convert hours to seconds
-            recovery_attempt_interval=self._recovery_attempt_interval
-            * 60,  # Convert minutes to seconds
+            max_offline_hours=self._max_offline_duration,
+            recovery_attempt_minutes=self._recovery_attempt_interval,
             max_recovery_attempts_per_hour=self._max_recovery_attempts_per_hour,
-            recovery_reset_interval=self._recovery_reset_interval
-            * 60,  # Convert minutes to seconds
-            connection_check_interval=self._connection_check_interval
-            * 3600,  # Convert hours to seconds
+            recovery_reset_minutes=self._recovery_reset_interval,
+            connection_check_hours=self._connection_check_interval,
         )
 
         self._connection_monitor = ConnectionMonitor(

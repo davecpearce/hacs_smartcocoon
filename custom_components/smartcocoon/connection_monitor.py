@@ -7,30 +7,53 @@ from typing import Any
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.event import async_call_later
+from homeassistant.util import dt as dt_util
 
+from .const import (
+    DEFAULT_CONNECTION_CHECK_INTERVAL,
+    DEFAULT_MAX_OFFLINE_DURATION,
+    DEFAULT_MAX_RECOVERY_ATTEMPTS_PER_HOUR,
+    DEFAULT_RECOVERY_ATTEMPT_INTERVAL,
+    DEFAULT_RECOVERY_RESET_INTERVAL,
+)
 from .error_handler import SmartCocoonErrorHandler
 
 _LOGGER = logging.getLogger(__name__)
 
+_SECONDS_PER_HOUR = 3600
+_SECONDS_PER_MINUTE = 60
+
 
 class ConnectionMonitorConfig:
-    """Configuration for ConnectionMonitor."""
+    """Configuration for ConnectionMonitor.
 
-    def __init__(self, **kwargs: int) -> None:
-        """Initialize config with keyword arguments."""
-        self.max_offline_duration = kwargs.get("max_offline_duration", 3600)  # 1 hour
-        self.recovery_attempt_interval = kwargs.get(
-            "recovery_attempt_interval", 300
-        )  # 5 minutes
-        self.max_recovery_attempts_per_hour = kwargs.get(
-            "max_recovery_attempts_per_hour", 5
-        )  # 5 attempts
-        self.recovery_reset_interval = kwargs.get(
-            "recovery_reset_interval", 3600
-        )  # 60 minutes
-        self.connection_check_interval = kwargs.get(
-            "connection_check_interval", 3600
-        )  # 1 hour
+    Takes the same units the options flow uses -- hours and minutes -- and
+    converts to seconds once, here. Previously the caller did the arithmetic
+    and this class defaulted to raw seconds, so the two default sets were not
+    comparable by eye: `24` here meant hours, `3600` meant seconds, and the
+    fallbacks did not describe the shipped configuration at all.
+
+    Parameter names carry their units for the same reason.
+    """
+
+    def __init__(
+        self,
+        max_offline_hours: int = DEFAULT_MAX_OFFLINE_DURATION,
+        recovery_attempt_minutes: int = DEFAULT_RECOVERY_ATTEMPT_INTERVAL,
+        max_recovery_attempts_per_hour: int = DEFAULT_MAX_RECOVERY_ATTEMPTS_PER_HOUR,
+        recovery_reset_minutes: int = DEFAULT_RECOVERY_RESET_INTERVAL,
+        connection_check_hours: int = DEFAULT_CONNECTION_CHECK_INTERVAL,
+    ) -> None:
+        """Initialise config, converting to the seconds used internally.
+
+        Named parameters rather than **kwargs: the previous signature
+        silently ignored a mistyped keyword and used the default instead.
+        """
+        self.max_offline_duration = max_offline_hours * _SECONDS_PER_HOUR
+        self.recovery_attempt_interval = recovery_attempt_minutes * _SECONDS_PER_MINUTE
+        self.max_recovery_attempts_per_hour = max_recovery_attempts_per_hour
+        self.recovery_reset_interval = recovery_reset_minutes * _SECONDS_PER_MINUTE
+        self.connection_check_interval = connection_check_hours * _SECONDS_PER_HOUR
 
 
 class ConnectionMonitor:
@@ -57,7 +80,7 @@ class ConnectionMonitor:
         self._device_states: dict[str, dict[str, Any]] = {}
         self._last_check: datetime | None = None
         self._unsubscribe_timer: Any = None
-        self._startup_time: datetime = datetime.now()
+        self._startup_time: datetime = dt_util.utcnow()
         self._grace_period_callback: Any = None
         self._recovery_callbacks: dict[str, Any] = {}
         self._periodic_check_callback: Any = None
@@ -138,7 +161,7 @@ class ConnectionMonitor:
             "Checking SmartCocoon device connections for %d fans",
             len(self._scmanager.fans),
         )
-        self._last_check = now or datetime.now()
+        self._last_check = now or dt_util.utcnow()
 
         # High-level visibility of which fans will be evaluated
         _LOGGER.debug(
@@ -152,7 +175,7 @@ class ConnectionMonitor:
 
     async def _check_device_connection(self, fan_id: str, fan: Any) -> None:
         """Check and potentially recover a specific device connection."""
-        current_time = datetime.now()
+        current_time = dt_util.utcnow()
         is_connected = getattr(fan, "connected", False)
 
         _LOGGER.debug(
@@ -316,7 +339,7 @@ class ConnectionMonitor:
         self, fan_id: str, fan: Any, device_state: dict[str, Any]
     ) -> None:
         """Attempt to recover a disconnected device."""
-        current_time = datetime.now()
+        current_time = dt_util.utcnow()
 
         # Don't attempt recovery too frequently
         if device_state["last_recovery_attempt"]:
