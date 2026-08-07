@@ -3,7 +3,7 @@
 
 # pylint: disable=protected-access,unused-argument
 
-from datetime import datetime, timedelta
+from datetime import timedelta
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -16,6 +16,7 @@ from custom_components.smartcocoon.error_handler import (
     RetryConfig,
     SmartCocoonErrorHandler,
 )
+from homeassistant.util import dt as dt_util
 
 
 class TestConnectionMonitor:
@@ -57,12 +58,17 @@ class TestConnectionMonitor:
     @pytest.fixture
     def connection_monitor(self, mock_hass, mock_scmanager, error_handler):
         """Create a ConnectionMonitor instance."""
+        # The shipped defaults. These previously read as seconds (3600 / 3600),
+        # which made max_offline equal to recovery_reset -- a combination that
+        # cannot occur in production and in which the reset branch of
+        # _attempt_device_recovery is unreachable, so these tests could never
+        # exercise it.
         config = ConnectionMonitorConfig(
-            max_offline_duration=3600,  # 1 hour for testing
-            recovery_attempt_interval=300,  # 5 minutes for testing
-            max_recovery_attempts_per_hour=5,  # 5 attempts for testing
-            recovery_reset_interval=3600,  # 60 minutes for testing
-            connection_check_interval=3600,  # 1 hour for testing
+            max_offline_hours=24,
+            recovery_attempt_minutes=5,
+            max_recovery_attempts_per_hour=5,
+            recovery_reset_minutes=60,
+            connection_check_hours=1,
         )
 
         return ConnectionMonitor(
@@ -149,7 +155,7 @@ class TestConnectionMonitor:
         # Initialize device state
         connection_monitor._device_states["fan1"] = {
             "last_connected": None,
-            "last_disconnected": datetime.now() - timedelta(seconds=120),
+            "last_disconnected": dt_util.utcnow() - timedelta(seconds=120),
             "recovery_attempts": 0,
             "first_recovery_attempt": None,
             "last_recovery_attempt": None,
@@ -177,7 +183,7 @@ class TestConnectionMonitor:
         # Initialize device state
         connection_monitor._device_states["fan1"] = {
             "last_connected": None,
-            "last_disconnected": datetime.now() - timedelta(seconds=120),
+            "last_disconnected": dt_util.utcnow() - timedelta(seconds=120),
             "recovery_attempts": 0,
             "first_recovery_attempt": None,
             "last_recovery_attempt": None,
@@ -204,10 +210,10 @@ class TestConnectionMonitor:
         # Initialize device state with recent recovery attempt
         connection_monitor._device_states["fan1"] = {
             "last_connected": None,
-            "last_disconnected": datetime.now() - timedelta(seconds=120),
+            "last_disconnected": dt_util.utcnow() - timedelta(seconds=120),
             "recovery_attempts": 1,
             "first_recovery_attempt": None,
-            "last_recovery_attempt": datetime.now()
+            "last_recovery_attempt": dt_util.utcnow()
             - timedelta(seconds=30),  # Recent attempt
         }
 
@@ -228,10 +234,10 @@ class TestConnectionMonitor:
         # Initialize device state with max attempts reached
         connection_monitor._device_states["fan1"] = {
             "last_connected": None,
-            "last_disconnected": datetime.now() - timedelta(seconds=120),
+            "last_disconnected": dt_util.utcnow() - timedelta(seconds=120),
             "recovery_attempts": 5,  # Max attempts
             "first_recovery_attempt": None,
-            "last_recovery_attempt": datetime.now()
+            "last_recovery_attempt": dt_util.utcnow()
             - timedelta(seconds=600),  # Old attempt
         }
 
@@ -252,11 +258,11 @@ class TestConnectionMonitor:
         # Initialize device state with long offline duration
         connection_monitor._device_states["fan1"] = {
             "last_connected": None,
-            "last_disconnected": datetime.now()
+            "last_disconnected": dt_util.utcnow()
             - timedelta(hours=25),  # 25 hours offline
             "recovery_attempts": 1,
             "first_recovery_attempt": None,
-            "last_recovery_attempt": datetime.now() - timedelta(hours=25),
+            "last_recovery_attempt": dt_util.utcnow() - timedelta(hours=25),
         }
 
         # Attempt recovery (should be blocked by max offline duration)
@@ -272,7 +278,7 @@ class TestConnectionMonitor:
         # Initialize some device states
         connection_monitor._device_states = {
             "fan1": {
-                "last_connected": datetime.now(),
+                "last_connected": dt_util.utcnow(),
                 "last_disconnected": None,
                 "recovery_attempts": 0,
                 "first_recovery_attempt": None,
