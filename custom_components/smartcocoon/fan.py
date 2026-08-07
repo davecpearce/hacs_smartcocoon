@@ -11,6 +11,7 @@ from pysmartcocoon.manager import SmartCocoonManager
 from homeassistant.components.fan import ENTITY_ID_FORMAT, FanEntity, FanEntityFeature
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity import async_generate_entity_id
 
@@ -404,6 +405,21 @@ class SmartCocoonFan(FanEntity):  # type: ignore[misc]
             pass
         super().async_write_ha_state()
 
+    def _raise_if_rejected(self, accepted: bool, action: str) -> None:
+        """Fail loudly when the fan did not accept a command.
+
+        The library reports whether the cloud API applied a change. Without
+        this the integration wrote the new state and logged success either
+        way, so a rejected command left Home Assistant showing a speed or
+        mode the vent never adopted -- with nothing for the user to act on.
+        """
+        if not accepted:
+            raise HomeAssistantError(
+                f"SmartCocoon did not apply the request to {action} for fan "
+                f"{self._fan_id}. The fan may be offline or the service may "
+                f"have rejected the change."
+            )
+
     async def async_set_percentage(self, percentage: int) -> None:
         """Set the speed of the fan, as a percentage."""
         _LOGGER.debug(
@@ -414,11 +430,12 @@ class SmartCocoonFan(FanEntity):  # type: ignore[misc]
         )
         assert self._scmanager is not None  # Checked in constructor
         scmanager = self._scmanager  # Store reference to avoid mypy issues
-        await self._smartcocoon.error_handler.async_retry_operation(
+        accepted = await self._smartcocoon.error_handler.async_retry_operation(
             operation=lambda: scmanager.async_set_fan_speed(self._fan_id, percentage),
             operation_name=f"set fan speed to {percentage}%",
             context={"fan_id": self._fan_id, "percentage": percentage},
         )
+        self._raise_if_rejected(accepted, f"set speed to {percentage}%")
         _LOGGER.debug(
             "Fan %s: Successfully set percentage to %s", self._fan_id, percentage
         )
@@ -435,18 +452,20 @@ class SmartCocoonFan(FanEntity):  # type: ignore[misc]
         assert self._scmanager is not None  # Checked in constructor
         scmanager = self._scmanager  # Store reference to avoid mypy issues
         if preset_mode == SC_PRESET_MODE_AUTO:
-            await self._smartcocoon.error_handler.async_retry_operation(
+            accepted = await self._smartcocoon.error_handler.async_retry_operation(
                 operation=lambda: scmanager.async_set_fan_auto(self._fan_id),
                 operation_name="set fan to auto mode",
                 context={"fan_id": self._fan_id, "preset_mode": preset_mode},
             )
+            self._raise_if_rejected(accepted, "set auto mode")
             _LOGGER.debug("Fan %s: Successfully set to auto mode", self._fan_id)
         elif preset_mode == SC_PRESET_MODE_ECO:
-            await self._smartcocoon.error_handler.async_retry_operation(
+            accepted = await self._smartcocoon.error_handler.async_retry_operation(
                 operation=lambda: scmanager.async_set_fan_eco(self._fan_id),
                 operation_name="set fan to eco mode",
                 context={"fan_id": self._fan_id, "preset_mode": preset_mode},
             )
+            self._raise_if_rejected(accepted, "set eco mode")
             _LOGGER.debug("Fan %s: Successfully set to eco mode", self._fan_id)
         else:
             raise ValueError(f"Unsupported preset mode {preset_mode}")
@@ -458,11 +477,12 @@ class SmartCocoonFan(FanEntity):  # type: ignore[misc]
         _LOGGER.debug("Fan %s: Turning off", self._fan_id)
         assert self._scmanager is not None  # Checked in constructor
         scmanager = self._scmanager  # Store reference to avoid mypy issues
-        await self._smartcocoon.error_handler.async_retry_operation(
+        accepted = await self._smartcocoon.error_handler.async_retry_operation(
             operation=lambda: scmanager.async_fan_turn_off(self._fan_id),
             operation_name="turn off fan",
             context={"fan_id": self._fan_id},
         )
+        self._raise_if_rejected(accepted, "turn off")
         _LOGGER.debug("Fan %s: Successfully turned off", self._fan_id)
         self.async_write_ha_state()
 
@@ -488,10 +508,11 @@ class SmartCocoonFan(FanEntity):  # type: ignore[misc]
 
         assert self._scmanager is not None  # Checked in constructor
         scmanager = self._scmanager  # Store reference to avoid mypy issues
-        await self._smartcocoon.error_handler.async_retry_operation(
+        accepted = await self._smartcocoon.error_handler.async_retry_operation(
             operation=lambda: scmanager.async_fan_turn_on(self._fan_id),
             operation_name="turn on fan",
             context={"fan_id": self._fan_id},
         )
+        self._raise_if_rejected(accepted, "turn on")
         _LOGGER.debug("Fan %s: Successfully turned on", self._fan_id)
         self.async_write_ha_state()
