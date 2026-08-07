@@ -16,37 +16,49 @@ from homeassistant.exceptions import HomeAssistantError
 FAN_ID = "abc123"
 
 
-def _fan_entity(accepted: bool) -> SmartCocoonFan:
+class _StubFan(SmartCocoonFan):
+    """A fan entity wired to stubs, keeping the real command methods.
+
+    Subclassing rather than patching a constructed entity avoids the full
+    Home Assistant entity setup while leaving the code under test untouched.
+    """
+
+    # The parent __init__ needs a config entry, hass and a live manager, none
+    # of which these tests want.
+    def __init__(self, accepted: bool) -> None:  # pylint: disable=super-init-not-called
+        scmanager = MagicMock()
+        for name in (
+            "async_set_fan_speed",
+            "async_fan_turn_on",
+            "async_fan_turn_off",
+            "async_set_fan_auto",
+            "async_set_fan_eco",
+        ):
+            setattr(scmanager, name, AsyncMock(return_value=accepted))
+
+        controller = MagicMock()
+
+        # The real error handler awaits the operation and returns its result.
+        # A non-async lambda here would hand back an un-awaited coroutine,
+        # which is truthy -- every one of these tests would pass vacuously.
+        async def _run(operation: object, **_: object) -> object:
+            return await operation()  # type: ignore[operator]
+
+        controller.error_handler.async_retry_operation = AsyncMock(side_effect=_run)
+
+        self._fan_id = FAN_ID
+        self._scmanager = scmanager
+        self._smartcocoon = controller
+        self.state_writes = 0
+
+    def async_write_ha_state(self) -> None:
+        """Record state writes instead of touching Home Assistant."""
+        self.state_writes += 1
+
+
+def _fan_entity(accepted: bool) -> _StubFan:
     """Build a fan entity whose commands return `accepted`."""
-    entity = SmartCocoonFan.__new__(SmartCocoonFan)
-
-    scmanager = MagicMock()
-    for name in (
-        "async_set_fan_speed",
-        "async_fan_turn_on",
-        "async_fan_turn_off",
-        "async_set_fan_auto",
-        "async_set_fan_eco",
-    ):
-        setattr(scmanager, name, AsyncMock(return_value=accepted))
-
-    controller = MagicMock()
-
-    # The real error handler awaits the operation and returns its result. A
-    # non-async lambda here would hand back an un-awaited coroutine, which is
-    # truthy and would make every one of these tests pass vacuously.
-    async def _run(operation: object, **_: object) -> object:
-        return await operation()  # type: ignore[operator]
-
-    controller.error_handler.async_retry_operation = AsyncMock(side_effect=_run)
-
-    # Built via __new__ to avoid the full Home Assistant entity setup, so the
-    # collaborators have to be injected directly.
-    entity._fan_id = FAN_ID  # noqa: SLF001
-    entity._scmanager = scmanager  # noqa: SLF001
-    entity._smartcocoon = controller  # noqa: SLF001
-    entity.async_write_ha_state = MagicMock()  # type: ignore[method-assign]
-    return entity
+    return _StubFan(accepted)
 
 
 @pytest.mark.parametrize(  # type: ignore[untyped-decorator]
@@ -79,7 +91,7 @@ async def test_accepted_command_succeeds(method: str, args: tuple[object, ...]) 
 
     await getattr(entity, method)(*args)
 
-    assert entity.async_write_ha_state.call_count > 0  # type: ignore[attr-defined]
+    assert entity.state_writes > 0
 
 
 async def test_rejected_command_does_not_write_state() -> None:
@@ -93,7 +105,7 @@ async def test_rejected_command_does_not_write_state() -> None:
     with pytest.raises(HomeAssistantError):
         await entity.async_set_percentage(50)
 
-    assert entity.async_write_ha_state.call_count == 0  # type: ignore[attr-defined]
+    assert entity.state_writes == 0
 
 
 async def test_error_message_identifies_the_fan_and_action() -> None:
