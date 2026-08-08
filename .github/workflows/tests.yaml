@@ -60,6 +60,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements_test.txt
           pip install -e .
+      # hacs.json is what HACS enforces when a user installs or updates, and
+      # the tested version is whatever pytest-homeassistant-custom-component
+      # pins. If those drift apart the integration advertises support nothing
+      # verifies -- which is how the declared minimum sat at 2025.5.0 while CI
+      # ran 2026.2.3.
+      - name: Check the declared Home Assistant version is the tested one
+        run: python scripts/check_declared_ha_version.py
+
       - name: Run tests with coverage
         run: |
           pytest --cov=custom_components.smartcocoon --cov-report=xml --cov-report=html
