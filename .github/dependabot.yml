@@ -47,9 +47,20 @@ updates:
     # version, so bumping one on its own is unsatisfiable and the pull
     # request can never go green. They move when that package moves.
     # `homeassistant` was already listed here for the same reason.
+    #
+    # pylint, ruff and mypy are each pinned twice: here and as a `rev` in
+    # .pre-commit-config.yaml. pre-commit is what gates CI, so a bump to
+    # requirements_test.txt alone changes local behaviour and leaves CI on the
+    # old version. Dependabot cannot see the second half of the pin, so every
+    # proposal it makes for these is wrong -- and with auto-merge enabled a
+    # minor bump lands unattended. mypy 2.1.0 -> 2.3.0 did exactly that.
+    # Bump these by hand, in both files, in one commit.
     ignore:
       - dependency-name: "homeassistant"
       - dependency-name: "pytest"
       - dependency-name: "pytest-asyncio"
       - dependency-name: "pytest-cov"
       - dependency-name: "pytest-timeout"
+      - dependency-name: "pylint"
+      - dependency-name: "ruff"
+      - dependency-name: "mypy"
