@@ -1,5 +1,10 @@
 -r requirements.txt
-homeassistant>=2025.5.0
+# pytest-homeassistant-custom-component pins homeassistant to an exact version
+# (currently 2026.2.3), so that is what CI actually tests against and what
+# hacs.json declares as the minimum. This floor only documents the intent --
+# the pin above decides. When bumping that, update hacs.json to match, or the
+# integration advertises support for a version nothing verifies.
+homeassistant>=2026.2.3
 pytest-homeassistant-custom-component==0.13.316
 pytest-asyncio==1.3.0
 pytest-cov==7.0.0
