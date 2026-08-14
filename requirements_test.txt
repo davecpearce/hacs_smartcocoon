@@ -19,7 +19,7 @@ pytest-timeout==2.4.0
 # hooks run in their own isolated environments in CI, so a version that
 # differs here only means local runs disagreeing with CI over the same code.
 pylint==4.0.6
-pre-commit==4.6.1
+pre-commit==4.6.2
 # Ruff replaces black/isort and handles imports/formatting
 ruff==0.16.1
 ruff-lsp==0.0.62
