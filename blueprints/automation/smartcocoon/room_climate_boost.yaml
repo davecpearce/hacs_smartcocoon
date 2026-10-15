@@ -1,0 +1,473 @@
+blueprint:
+  name: SmartCocoon Room Climate Boost
+  description: >-
+    Automatic, self-regulating booster-fan control for one room, driven by the
+    thermostat's hvac_action + a room-sensor delta vs. the relevant setpoint.
+    Symmetric: the same tier ladder serves BOTH cooling and heating (a register
+    booster pulls warm supply air into a cold room just as it pulls cool air in
+    summer). Enable each direction independently.
+
+    COMPATIBILITY: works with any `climate` entity that reports `hvac_action`
+    plus setpoints (`temperature` and/or `target_temp_high`/`target_temp_low`)
+    and, for the equalizer, `current_temperature`. The one hard requirement is
+    that the thermostat report `hvac_action` — some integrations only report the
+    mode. Developed and tested against Ecobee.
+
+    "Demand" = how far the room is on the wrong side of the active setpoint:
+    room-minus-cool_setpoint while cooling, heat_setpoint-minus-room while
+    heating (positive = escalate).
+
+      * demand >= boost_threshold:
+          - actively heating/cooling -> boost_speed  (max recovery)
+          - fan-only (blower)        -> circulate_speed  (0 = off)
+      * actively heating/cooling, within threshold, daytime -> assist_speed
+      * blower on, no active demand, home -> EQUALIZE toward the house (see below)
+      * otherwise (idle / within range) -> baseline_speed
+      * force_max boolean ON -> 100% override (bypasses EVERYTHING, incl. manual OFF)
+
+    Set enable_cooling / enable_heating to manage only one direction.
+
+    HVAC-OFF EQUALIZER: when the central blower is circulating with no active
+    heating/cooling demand and you're home, the fan equalizes the room toward the
+    HOUSE's own current temperature (thermostat current_temperature, or a chosen
+    reference sensor), in EITHER direction. Tiers on |room - house|:
+      >= 2.0C -> 100% | >= 1.0C -> 60% | >= 0.5C -> 33% | else baseline.
+    It can only move house-temperature air (can't push past the house temp), and
+    is gated by the away flag + night suppression. Set enable_equalize off to
+    disable per room.
+
+    Speed control is PERCENTAGE-ONLY (the only reliable lever; preset_mode is
+    never used). Speeds are tunable percentage defaults — the SmartCocoon
+    integration exposes 0-100 continuous and the hardware rounds to its nearest
+    physical step. At night, the assist + circulate + equalize tiers collapse to
+    baseline for constant sleep noise (per-room: disable via
+    enable_night_suppression = false, e.g. a home office used late in the
+    evening). Only an active heating/cooling boost may exceed baseline at night.
+    A manually-off fan is respected unless Force manage.
+  domain: automation
+  source_url: https://github.com/davecpearce/hacs_smartcocoon/blob/main/blueprints/automation/smartcocoon/room_climate_boost.yaml
+  homeassistant:
+    min_version: "2026.2.3"
+  input:
+    thermostat:
+      name: Thermostat
+      description: The central climate entity whose hvac_action/setpoints drive the logic. Must report hvac_action.
+      selector:
+        entity:
+          domain: climate
+    room_sensor:
+      name: Room temperature sensor
+      description: Accurate ambient sensor for this room.
+      selector:
+        entity:
+          domain: sensor
+          device_class: temperature
+    booster_fan:
+      name: SmartCocoon fan
+      description: The SmartCocoon fan entity serving this room.
+      selector:
+        entity:
+          domain: fan
+    boost_threshold:
+      name: Boost threshold (°C off setpoint)
+      description: >-
+        Escalate (boost or circulate) when the room is at least this far above
+        the cool setpoint — or, if "Apply boost to heating too" is enabled, this
+        far below the heat setpoint.
+      default: 1.0
+      selector:
+        number:
+          min: 0.2
+          max: 5
+          step: 0.1
+          mode: box
+    release_threshold:
+      name: Release threshold (°C from setpoint)
+      description: >-
+        Sticky release. Once elevated (boost/circulate), hold until the room is
+        within this of setpoint, then step down. Prevents rubber-banding.
+      default: 0.3
+      selector:
+        number:
+          min: 0.1
+          max: 3
+          step: 0.1
+          mode: box
+    baseline_speed:
+      name: Baseline / quiet speed (%)
+      description: Always-on whisper for fan-only/idle/heating. Default 8 = a low, quiet speed.
+      default: 8
+      selector:
+        number:
+          min: 5
+          max: 100
+          step: 1
+          mode: box
+    assist_speed:
+      name: Assist speed (%, daytime only)
+      description: Gentle daytime nudge while actively heating/cooling and within the boost threshold. Suppressed at night.
+      default: 17
+      selector:
+        number:
+          min: 5
+          max: 100
+          step: 1
+          mode: box
+    circulate_speed:
+      name: Fan-only circulate speed (%, 0 = off)
+      description: >-
+        DEFAULT 60 (on). Runs this speed in fan-only mode when the room is
+        >= boost_threshold on the wrong side of the setpoint — pulls
+        house air into a hot (or cold) spot. Set 0 to opt a room OUT.
+        Suppressed at night.
+      default: 60
+      selector:
+        number:
+          min: 0
+          max: 100
+          step: 1
+          mode: box
+    boost_speed:
+      name: Boost speed (%, 0 = off)
+      description: >-
+        Turbo recovery while actively heating/cooling and beyond the threshold.
+        Applies day and night. Set 0 to disable turbo for this room (it falls
+        back to assist/baseline even when far off target).
+      default: 100
+      selector:
+        number:
+          min: 0
+          max: 100
+          step: 1
+          mode: box
+    max_speed:
+      name: Max speed cap (%)
+      description: >-
+        Hard ceiling for this room's NORMAL automatic speed (equalizer / cooling
+        boost / circulate / assist). Default 100 = no cap. Lower it where full
+        speed is too loud (e.g. an office). The MAX override (force_max) still
+        goes to 100% regardless of this cap.
+      default: 100
+      selector:
+        number:
+          min: 8
+          max: 100
+          step: 1
+          mode: box
+    night_max_speed:
+      name: Night max speed cap (%)
+      description: >-
+        Extra ceiling that applies ONLY during the night window
+        (night_start..night_end). Default 100 = no night cap. Set LOW (e.g.
+        baseline 8) to stop a jarring nighttime BOOST from waking a bedroom — at
+        night the fan won't exceed this. Daytime is unaffected; the MAX override
+        still bypasses.
+      default: 100
+      selector:
+        number:
+          min: 8
+          max: 100
+          step: 1
+          mode: box
+    night_start:
+      name: Night start hour (24h)
+      default: 22
+      selector:
+        number:
+          min: 0
+          max: 23
+          step: 1
+          mode: box
+    night_end:
+      name: Night end hour (24h)
+      default: 8
+      selector:
+        number:
+          min: 0
+          max: 23
+          step: 1
+          mode: box
+    enable_night_suppression:
+      name: Enable night suppression
+      description: >-
+        Default ON. During the night window, collapse the assist / circulate /
+        equalize tiers to baseline for CONSTANT sleep noise (only active-cooling
+        boost may exceed baseline). Turn OFF for a non-bedroom (e.g. a home
+        office used late in the evening) so those tiers work 24/7.
+      default: true
+      selector:
+        boolean: {}
+    enable_equalize:
+      name: Enable HVAC-off equalizer
+      description: >-
+        Default ON. When cooling mode is OFF but the blower still circulates and
+        you're home, run the fan to equalize the room toward the HOUSE current
+        temperature: (room-house) >= 2.0C -> 100%, >= 1.0C -> 60%, >= 0.5C ->
+        33%, else baseline. Respects the away flag + night suppression.
+      default: true
+      selector:
+        boolean: {}
+    equalize_reference_sensor:
+      name: Equalizer reference sensor (cool source)
+      description: >-
+        Temperature sensor the HVAC-off equalizer treats as the COOL SOURCE the
+        room equalizes toward (typically a main-floor / central sensor). Leave
+        unset to fall back to the thermostat current_temperature — which can be
+        sensor-averaged and warmer than the real main floor, making the
+        equalizer under-react.
+      default:
+      selector:
+        entity:
+          domain: sensor
+          device_class: temperature
+    away_boolean:
+      name: Away flag (optional input_boolean)
+      description: >-
+        Optional. An input_boolean that is ON when you're AWAY for an extended
+        period. When ON, the HVAC-off equalizer PAUSES (no point equalizing an
+        empty house). OFF = home = equalize. Leave unset to always equalize when
+        AC is off.
+      default:
+      selector:
+        entity:
+          domain: input_boolean
+    enable_cooling:
+      name: Manage during cooling
+      description: >-
+        Default ON. Run the boost / circulate / assist tiers when the thermostat
+        is cooling (or fan-only with the room above the cool setpoint). Turn OFF
+        to leave the fan at baseline during cooling.
+      default: true
+      selector:
+        boolean: {}
+    enable_heating:
+      name: Manage during heating
+      description: >-
+        Default ON. Mirror the cooling tiers for heating: boost / circulate /
+        assist when the thermostat is heating (or fan-only with the room below
+        the heat setpoint) — a register booster pulls warm supply air into a cold
+        room just as it pulls cool air in summer. Turn OFF to leave the fan at
+        baseline during heating.
+      default: true
+      selector:
+        boolean: {}
+    force_manage:
+      name: Force manage (ignore manual fan-off)
+      description: Default OFF. When OFF, a manually-off fan is left alone until turned back on. ON = always manage.
+      default: false
+      selector:
+        boolean: {}
+    force_max_boolean:
+      name: Force-MAX boolean (optional input_boolean)
+      description: >-
+        Optional global override. When this input_boolean is ON, force this fan
+        to 100%, short-circuiting ALL other logic (night suppression, equalizer,
+        cooling tiers) AND overriding even a manually-OFF fan ("MAX = everything
+        on"). Point every room's instance at the same helper for one whole-house
+        blast switch. Responds instantly on both edges (dedicated template
+        triggers), so a dashboard toggle / voice intent / scene blasts to 100 and
+        reclaims control the moment it is turned off.
+      default:
+      selector:
+        entity:
+          domain: input_boolean
+    speed_floor_entity:
+      name: External speed floor (optional input_number)
+      description: >-
+        Optional. An input_number (0-100) whose value is treated as a MINIMUM
+        fan speed: final = max(computed speed, floor). Lets an external
+        automation (e.g. a sunrise pre-cool ramp) proactively raise the fan
+        WITHOUT fighting this blueprint — this stays the sole writer and can
+        still go higher (boost). Leave unset for no floor. NOTE: because it is
+        optional it is NOT a trigger — a change is picked up on the next
+        re-evaluation (within ~10 min).
+      default:
+      selector:
+        entity:
+          domain: input_number
+
+mode: single
+
+variables:
+  thermostat: !input thermostat
+  room_sensor: !input room_sensor
+  booster_fan: !input booster_fan
+  boost_threshold: !input boost_threshold
+  release_threshold: !input release_threshold
+  baseline_speed: !input baseline_speed
+  assist_speed: !input assist_speed
+  circulate_speed: !input circulate_speed
+  boost_speed: !input boost_speed
+  max_speed: !input max_speed
+  night_max_speed: !input night_max_speed
+  night_start: !input night_start
+  night_end: !input night_end
+  enable_night_suppression: !input enable_night_suppression
+  enable_equalize: !input enable_equalize
+  equalize_reference_sensor: !input equalize_reference_sensor
+  away_boolean: !input away_boolean
+  enable_cooling: !input enable_cooling
+  enable_heating: !input enable_heating
+  force_manage: !input force_manage
+  force_max_boolean: !input force_max_boolean
+  speed_floor_entity: !input speed_floor_entity
+  # External minimum-speed floor (0 if none set / unavailable).
+  speed_floor: >-
+    {% if speed_floor_entity not in [none, 'none', ''] %}{{ states(speed_floor_entity) | int(0) }}{% else %}0{% endif %}
+  is_night: >-
+    {{ now().hour >= night_start or now().hour < night_end }}
+  # Night suppression only applies when the per-room toggle is on.
+  suppress_night: >-
+    {{ is_night and enable_night_suppression }}
+  # Home check for the equalizer: away_boolean ON = away = pause. Unset = always home.
+  # NB: emit a real boolean (Jinja true/false render to "True"/"False", which HA
+  # parses back to bool) -- a hardcoded lowercase "true"/"false" stays a truthy
+  # STRING and breaks `{% if %}` / condition logic when the input is unset.
+  home_ok: >-
+    {{ is_state(away_boolean, 'off') if away_boolean not in [none, 'none', ''] else true }}
+  # Global MAX override: when the force_max boolean is ON, blast to 100% over everything.
+  force_max: >-
+    {{ is_state(force_max_boolean, 'on') if force_max_boolean not in [none, 'none', ''] else false }}
+  # Cool setpoint: target_temp_high (heat_cool/auto) else temperature (cool mode).
+  cool_sp: >-
+    {% set hi = state_attr(thermostat, 'target_temp_high') %}
+    {% set s = state_attr(thermostat, 'temperature') %}
+    {% if hi is not none %}{{ hi }}
+    {% elif states(thermostat) == 'cool' and s is not none %}{{ s }}
+    {% else %}{{ none }}{% endif %}
+  # Heat setpoint: target_temp_low (heat_cool/auto) else temperature (heat mode).
+  heat_sp: >-
+    {% set lo = state_attr(thermostat, 'target_temp_low') %}
+    {% set s = state_attr(thermostat, 'temperature') %}
+    {% if lo is not none %}{{ lo }}
+    {% elif states(thermostat) == 'heat' and s is not none %}{{ s }}
+    {% else %}{{ none }}{% endif %}
+  # Cooling-side demand: how far the room is ABOVE the cool setpoint (positive = too hot).
+  cool_demand: >-
+    {% set room = states(room_sensor) | float(none) %}
+    {% set c = cool_sp | float(none) %}
+    {% if room is none or c is none %}{{ none }}{% else %}{{ room - c }}{% endif %}
+  # Heating-side demand: how far the room is BELOW the heat setpoint (positive = too cold).
+  heat_demand: >-
+    {% set room = states(room_sensor) | float(none) %}
+    {% set h = heat_sp | float(none) %}
+    {% if room is none or h is none %}{{ none }}{% else %}{{ h - room }}{% endif %}
+  # Final target speed. Symmetric: the same boost/circulate/assist ladder serves
+  # cooling and heating -- only the setpoint side (and its enable toggle) differ.
+  desired_speed: >-
+    {% set act = state_attr(thermostat, 'hvac_action') %}
+    {% set cooling = act == 'cooling' %}
+    {% set heating = act == 'heating' %}
+    {% set blower_on = act in ['cooling', 'heating', 'fan'] %}
+    {% set pct = state_attr(booster_fan, 'percentage') | int(0) %}
+    {# Pick the active service's demand + enable toggle. When only the blower is
+       running (fan-only), use whichever setpoint the room is on the wrong side of. #}
+    {% if cooling %}
+      {% set demand = cool_demand %}
+      {% set service_ok = enable_cooling %}
+    {% elif heating %}
+      {% set demand = heat_demand %}
+      {% set service_ok = enable_heating %}
+    {% else %}
+      {% set cool_ok = enable_cooling and (cool_sp is not none) and (cool_demand is not none) %}
+      {% set heat_ok = enable_heating and (heat_sp is not none) and (heat_demand is not none) %}
+      {% if cool_ok and (not heat_ok or (cool_demand >= heat_demand)) %}
+        {% set demand = cool_demand %}
+        {% set service_ok = true %}
+      {% elif heat_ok %}
+        {% set demand = heat_demand %}
+        {% set service_ok = true %}
+      {% else %}
+        {% set demand = none %}
+        {% set service_ok = false %}
+      {% endif %}
+    {% endif %}
+    {% set active = cooling or heating %}
+    {% set high_speed = boost_speed if active else circulate_speed %}
+    {% set currently_high = high_speed > 0 and pct >= (high_speed - 4) %}
+    {% set want_high = service_ok and (demand is not none) and blower_on and high_speed > 0
+                       and (demand > release_threshold if currently_high else demand >= boost_threshold) %}
+    {# HVAC-off/idle equalizer: blower circulating with no active service demand ->
+       equalize toward the house temperature in EITHER direction (abs delta). #}
+    {% set ref_sensor = equalize_reference_sensor %}
+    {% set house = (states(ref_sensor) | float(none)) if ref_sensor not in [none, 'none', ''] else (state_attr(thermostat, 'current_temperature') | float(none)) %}
+    {% set room2 = states(room_sensor) | float(none) %}
+    {% set eq_delta = (room2 - house) | abs if (house is not none and room2 is not none) else none %}
+    {% set equalize_active = enable_equalize and blower_on and home_ok
+                             and (not suppress_night) and (eq_delta is not none) %}
+    {% if force_max %}
+      100
+    {% elif want_high and active %}
+      {{ boost_speed }}
+    {% elif want_high and not suppress_night %}
+      {{ circulate_speed }}
+    {% elif service_ok and active and not suppress_night %}
+      {{ assist_speed }}
+    {% elif equalize_active and eq_delta >= 2.0 %}
+      100
+    {% elif equalize_active and eq_delta >= 1.0 %}
+      60
+    {% elif equalize_active and eq_delta >= 0.5 %}
+      33
+    {% else %}
+      {{ baseline_speed }}
+    {% endif %}
+  # Apply the external floor: never below it, but boost can still exceed it.
+  # Cap normal speed at max_speed + an extra night-only cap; the MAX override bypasses both.
+  final_speed: >-
+    {% if force_max %}100{% else %}{% set cap = [ max_speed, (night_max_speed if is_night else 100) ] | min %}{{ [ [ desired_speed | int(0), speed_floor ] | max, cap ] | min }}{% endif %}
+
+# Bind the optional MAX helper for the template triggers below. An OPTIONAL input
+# cannot be a state-trigger entity_id (an unset input fails to load), but it CAN be
+# referenced inside a template: unset -> renders to `none` -> template is always
+# false -> nothing tracked, never fires, blueprint still loads.
+trigger_variables:
+  force_max_entity: !input force_max_boolean
+
+trigger:
+  # Instant whole-house MAX, both edges (unset-safe; see trigger_variables above).
+  # A template trigger only fires on false->true, so we need one per edge: ON gives
+  # immediate 100; OFF immediately reclaims control (else the fan stays pinned at
+  # 100 until the next re-eval, up to the time_pattern interval).
+  - platform: template
+    value_template: >-
+      {{ force_max_entity not in [none, 'none', ''] and is_state(force_max_entity, 'on') }}
+  - platform: template
+    value_template: >-
+      {{ force_max_entity not in [none, 'none', ''] and is_state(force_max_entity, 'off') }}
+  - platform: state
+    entity_id: !input room_sensor
+  - platform: state
+    entity_id: !input thermostat
+    attribute: hvac_action
+  - platform: state
+    entity_id: !input thermostat
+    attribute: temperature
+  - platform: state
+    entity_id: !input thermostat
+    attribute: target_temp_high
+  - platform: state
+    entity_id: !input thermostat
+    attribute: target_temp_low
+  - platform: time_pattern
+    minutes: /10 # safety re-eval + night boundary rollover + speed-floor pickup
+
+# Respect a manual OFF (baseline is always >0, so an off fan is a human signal).
+condition:
+  - condition: template
+    value_template: "{{ force_manage or force_max or not is_state(booster_fan, 'off') }}"
+
+action:
+  # Re-command only when current speed is more than one fan-step (>4%) off desired.
+  - choose:
+      - conditions:
+          - condition: template
+            value_template: >-
+              {{ ((state_attr(booster_fan, 'percentage') | int(-1)) - final_speed) | abs > 4 }}
+        sequence:
+          - service: fan.set_percentage
+            target:
+              entity_id: !input booster_fan
+            data:
+              percentage: "{{ final_speed }}"
+    default: []
