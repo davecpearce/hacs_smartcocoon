@@ -122,6 +122,22 @@ If `entity_id` is omitted, the service operates on all fans.
 
 <!---->
 
+## Automations & Blueprints
+
+Out of the box the integration gives you a `fan.*` entity per fan. The
+[**Automations & Blueprints cookbook**](docs/AUTOMATIONS.md) turns that into useful
+control — from one-line recipes (boost a hot or cold room, quiet overnight, all vents off
+when away) up to a full self-regulating **Room Climate Boost** blueprint that drives a
+room's booster fan off your thermostat's `hvac_action` and a room temperature sensor,
+symmetrically for **cooling and heating**.
+
+Import the blueprint (works with any `climate` entity that reports `hvac_action`;
+developed and tested against Ecobee):
+
+[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fdavecpearce%2Fhacs_smartcocoon%2Fblob%2Fmain%2Fblueprints%2Fautomation%2Fsmartcocoon%2Froom_climate_boost.yaml)
+
+See [`docs/AUTOMATIONS.md`](docs/AUTOMATIONS.md) for the full walkthrough.
+
 ## Contributions are welcome!
 
 If you want to contribute to this please read the [Contribution guidelines](CONTRIBUTING.md)
