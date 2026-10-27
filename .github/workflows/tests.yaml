@@ -174,11 +174,17 @@ jobs:
       - name: Check out the repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
+      # No `ignore:` here deliberately. This previously carried
+      # `ignore: brands`, which silenced the brand-assets check -- almost
+      # certainly added in 2021 while the home-assistant/brands PR was still
+      # open, and never removed once it merged. The brand has been registered
+      # at custom_integrations/smartcocoon since 2021-10-11, so the check has
+      # had nothing to suppress for five years while reporting nothing either
+      # way. Running it means a lapse would actually surface.
       - name: HACS validation
         uses: hacs/action@d556e736723344f83838d08488c983a15381059a # 22.5.0
         with:
           category: "integration"
-          ignore: brands
 
   hassfest:
     runs-on: "ubuntu-latest"
