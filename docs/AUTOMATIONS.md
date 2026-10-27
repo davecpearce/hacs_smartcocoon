@@ -406,3 +406,10 @@ use_blueprint:
 - **Night caps.** With night suppression on, the assist/circulate/equalize tiers collapse
   to baseline overnight; only an active heating/cooling boost may exceed baseline. Set
   `night_max_speed` low to prevent a nighttime boost from waking a bedroom.
+- **The blueprint is community-contributed and opt-in.** It was written and hardware-tested
+  by [@fermulator](https://github.com/fermulator), and it sits alongside the integration
+  rather than inside it — importing it is a separate, deliberate step, and nothing in the
+  integration changes if you don't. Automation logic is inherently specific to a home's
+  HVAC, sensors and habits, so treat it as a strong starting point to tune rather than a
+  guaranteed fit. If it misbehaves, please say which thermostat integration you use and
+  what `hvac_action` reports — that is almost always where the difference is.
