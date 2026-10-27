@@ -10,6 +10,13 @@ repos:
     hooks:
       - id: check-added-large-files
       - id: check-yaml
+        # Blueprints use Home Assistant custom tags (!input); check those with
+        # --unsafe below (syntax-only) while keeping strict parsing everywhere else.
+        exclude: ^blueprints/.*\.ya?ml$
+      - id: check-yaml
+        name: check-yaml (blueprints, allow HA custom tags)
+        args: [--unsafe]
+        files: ^blueprints/.*\.ya?ml$
       - id: end-of-file-fixer
       - id: trailing-whitespace
   # Formatting handled by Ruff (ruff-format); Black removed to avoid conflicts
