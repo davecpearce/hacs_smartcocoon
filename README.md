@@ -33,9 +33,12 @@ This Integration can be installed in two ways:
 
 **HACS Installation**
 
-Add the following to the Custom Repository under `Settings` in HACS:
+In HACS, open the **⋮** menu (top right) → **Custom repositories**, then add:
 
-`davecpearce/hacs_smartcocoon` and choose `Integration` as the Category
+- Repository: `davecpearce/hacs_smartcocoon`
+- Type: `Integration`
+
+Then search for **SmartCocoon** in HACS and download it.
 
 **Manual Installation**
 
@@ -43,28 +46,10 @@ Add the following to the Custom Repository under `Settings` in HACS:
 1. If you do not already have a `custom_components` directory in your Home Assistant config directory, create it.
 1. Copy or move the `smartcocoon` folder from `hacs_smartcocoon/custom_components` you cloned from step 1 to the `custom_components` folder in your Home Assistant `config` folder.
 
-## 🎉 What's New in v1.3.2
+## Release notes
 
-**Fixed Fan Availability Detection**
-
-This release fixes the issue where unplugged fans showed as "off" instead of "unavailable":
-
-- **🔌 Fixed Availability Detection** - Unplugged fans now correctly show as "unavailable" instead of "off"
-- **📦 Updated Dependency** - Requires pysmartcocoon 1.4.2+ which properly maintains the `connected` flag
-- **🛡️ Improved Error Handling** - Enhanced error handling in availability checks as a safeguard
-- **📝 Better Logging** - Improved debug logging for availability checks
-
-**Note:** This release requires pysmartcocoon 1.4.2 or later, which includes the fix for the `connected` flag.
-
-## 🎉 What's New in v1.3.0
-
-Version 1.3.0 includes major enhancements:
-
-- **🌍 34 Language Translations** - Complete global language support
-- **⚙️ Configurable Recovery Options** - Customize connection monitoring and recovery behavior
-- **🔧 Enhanced Fan Attributes** - Additional attributes from pysmartcocoon library
-- **🛠️ Improved Error Handling** - Better connection monitoring and recovery logic
-- **📱 Updated Configuration Flow** - New options for recovery behavior
+See the [releases page](https://github.com/davecpearce/hacs_smartcocoon/releases) for
+what changed in each version.
 
 ## Track Updates
 
