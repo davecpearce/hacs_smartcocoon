@@ -623,3 +623,60 @@ async def test_max_hook_unset_loads_and_is_quiet(
     hass.states.async_set("input_boolean.unrelated", "on")
     await hass.async_block_till_done()
     assert len(calls) == 0
+
+
+# --------------------------------------------------------------------------- #
+# Force-OFF (silence) hook: instant 0% with explicit user opt-out.
+# Same unset-safe pattern as MAX but for silence: separate from the scenario
+# matrix since they fire on the helper toggle, not a room change.
+# --------------------------------------------------------------------------- #
+_OFF_HELPER = "input_boolean.off"
+
+
+async def test_instant_off_edge(
+    hass: HomeAssistant, calls: list[ServiceCall]
+) -> None:
+    """Turning the OFF helper ON commands 0 immediately (no room change)."""
+    await _setup(hass, {"force_off_boolean": _OFF_HELPER})
+    hass.states.async_set(_OFF_HELPER, "off")
+    _prime_idle(hass, fan_pct=8)
+    await hass.async_block_till_done()
+    calls.clear()
+
+    hass.states.async_set(_OFF_HELPER, "on")  # only change
+    await hass.async_block_till_done()
+    assert _last_pct(calls) == 0
+
+
+async def test_instant_off_resume_edge(
+    hass: HomeAssistant, calls: list[ServiceCall]
+) -> None:
+    """Turning OFF helper OFF immediately resumes automation (not stuck at 0)."""
+    await _setup(hass, {"force_off_boolean": _OFF_HELPER})
+    hass.states.async_set(_OFF_HELPER, "on")
+    _prime_idle(hass, fan_pct=0)
+    await hass.async_block_till_done()
+    calls.clear()
+
+    hass.states.async_set(_OFF_HELPER, "off")  # only change
+    await hass.async_block_till_done()
+    assert _last_pct(calls) == 8  # baseline (from _prime_idle: idle, room below setpoint)
+
+
+async def test_off_hook_unset_loads_and_is_quiet(
+    hass: HomeAssistant, calls: list[ServiceCall]
+) -> None:
+    """With force_off_boolean unset, the blueprint loads and never spuriously fires."""
+    await _setup(hass)  # no force_off_boolean
+    automations = hass.states.async_entity_ids("automation")
+    assert automations, "blueprint failed to load when force_off_boolean is unset"
+    state = hass.states.get(automations[0])
+    assert state is not None
+    assert state.state == "on"
+
+    _prime_idle(hass, fan_pct=8)
+    await hass.async_block_till_done()
+    calls.clear()
+    hass.states.async_set("input_boolean.unrelated", "on")
+    await hass.async_block_till_done()
+    assert len(calls) == 0
