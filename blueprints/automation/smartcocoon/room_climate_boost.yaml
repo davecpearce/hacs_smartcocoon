@@ -455,7 +455,9 @@ trigger:
 # Respect a manual OFF (baseline is always >0, so an off fan is a human signal).
 condition:
   - condition: template
-    value_template: "{{ force_manage or force_max or not is_state(booster_fan, 'off') }}"
+    value_template: >-
+      {{ (force_manage or force_max or not is_state(booster_fan, 'off'))
+      and states(booster_fan) not in ['unavailable', 'unknown'] }}
 
 action:
   # Re-command only when current speed is more than one fan-step (>4%) off desired.
@@ -463,7 +465,8 @@ action:
       - conditions:
           - condition: template
             value_template: >-
-              {{ ((state_attr(booster_fan, 'percentage') | int(-1)) - final_speed) | abs > 4 }}
+              {{ states(booster_fan) not in ['unavailable', 'unknown']
+              and ((state_attr(booster_fan, 'percentage') | int(-1)) - final_speed) | abs > 4 }}
         sequence:
           - service: fan.set_percentage
             target:
