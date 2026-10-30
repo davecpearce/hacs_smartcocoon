@@ -24,6 +24,7 @@ blueprint:
       * blower on, no active demand, home -> EQUALIZE toward the house (see below)
       * otherwise (idle / within range) -> baseline_speed
       * force_max boolean ON -> 100% override (bypasses EVERYTHING, incl. manual OFF)
+      * force_off boolean ON -> 0% silence (explicit OPT-OUT of automation; YOU must turn it back OFF)
 
     Set enable_cooling / enable_heating to manage only one direction.
 
@@ -271,6 +272,22 @@ blueprint:
       selector:
         entity:
           domain: input_boolean
+    force_off_boolean:
+      name: Force-OFF (silence) boolean (optional input_boolean)
+      description: >-
+        Optional global silence switch. When this input_boolean is ON, force this
+        fan to 0% (OFF), short-circuiting ALL automation logic and overriding all
+        other controls. This is an EXPLICIT OPT-OUT of the blueprint: while ON,
+        the automation does nothing and the fan stays silent regardless of room
+        temp, thermostat state, or demand. YOU are responsible for turning this
+        OFF when you want automation to resume — it will NOT auto-resume on any
+        trigger. Responds instantly on both edges (dedicated template triggers).
+        Point every room's instance at the same helper for one whole-house silence
+        switch (the opposite of force_max).
+      default:
+      selector:
+        entity:
+          domain: input_boolean
     speed_floor_entity:
       name: External speed floor (optional input_number)
       description: >-
@@ -310,6 +327,7 @@ variables:
   enable_heating: !input enable_heating
   force_manage: !input force_manage
   force_max_boolean: !input force_max_boolean
+  force_off_boolean: !input force_off_boolean
   speed_floor_entity: !input speed_floor_entity
   # External minimum-speed floor (0 if none set / unavailable).
   speed_floor: >-
@@ -328,6 +346,9 @@ variables:
   # Global MAX override: when the force_max boolean is ON, blast to 100% over everything.
   force_max: >-
     {{ is_state(force_max_boolean, 'on') if force_max_boolean not in [none, 'none', ''] else false }}
+  # Global silence/OFF override: when the force_off boolean is ON, force to 0% and opt out of automation.
+  force_off: >-
+    {{ is_state(force_off_boolean, 'on') if force_off_boolean not in [none, 'none', ''] else false }}
   # Cool setpoint: target_temp_high (heat_cool/auto) else temperature (cool mode).
   cool_sp: >-
     {% set hi = state_attr(thermostat, 'target_temp_high') %}
@@ -415,7 +436,7 @@ variables:
   # Apply the external floor: never below it, but boost can still exceed it.
   # Cap normal speed at max_speed + an extra night-only cap; the MAX override bypasses both.
   final_speed: >-
-    {% if force_max %}100{% else %}{% set cap = [ max_speed, (night_max_speed if is_night else 100) ] | min %}{{ [ [ desired_speed | int(0), speed_floor ] | max, cap ] | min }}{% endif %}
+    {% if force_off %}0{% elif force_max %}100{% else %}{% set cap = [ max_speed, (night_max_speed if is_night else 100) ] | min %}{{ [ [ desired_speed | int(0), speed_floor ] | max, cap ] | min }}{% endif %}
 
 # Bind the optional MAX helper for the template triggers below. An OPTIONAL input
 # cannot be a state-trigger entity_id (an unset input fails to load), but it CAN be
@@ -423,6 +444,7 @@ variables:
 # false -> nothing tracked, never fires, blueprint still loads.
 trigger_variables:
   force_max_entity: !input force_max_boolean
+  force_off_entity: !input force_off_boolean
 
 trigger:
   # Instant whole-house MAX, both edges (unset-safe; see trigger_variables above).
@@ -435,6 +457,14 @@ trigger:
   - platform: template
     value_template: >-
       {{ force_max_entity not in [none, 'none', ''] and is_state(force_max_entity, 'off') }}
+  # Instant whole-house silence/OFF, both edges (same unset-safe pattern as MAX).
+  # ON gives immediate 0%; OFF immediately reclaims control (resuming automation).
+  - platform: template
+    value_template: >-
+      {{ force_off_entity not in [none, 'none', ''] and is_state(force_off_entity, 'on') }}
+  - platform: template
+    value_template: >-
+      {{ force_off_entity not in [none, 'none', ''] and is_state(force_off_entity, 'off') }}
   - platform: state
     entity_id: !input room_sensor
   - platform: state
@@ -453,9 +483,12 @@ trigger:
     minutes: /10 # safety re-eval + night boundary rollover + speed-floor pickup
 
 # Respect a manual OFF (baseline is always >0, so an off fan is a human signal).
+# Allow action if: force_manage/max/off are on, OR the fan is manually on, AND it's not offline.
 condition:
   - condition: template
-    value_template: "{{ force_manage or force_max or not is_state(booster_fan, 'off') }}"
+    value_template: >-
+      {{ (force_manage or force_max or force_off or not is_state(booster_fan, 'off'))
+      and states(booster_fan) not in ['unavailable', 'unknown'] }}
 
 action:
   # Re-command only when current speed is more than one fan-step (>4%) off desired.
@@ -463,7 +496,8 @@ action:
       - conditions:
           - condition: template
             value_template: >-
-              {{ ((state_attr(booster_fan, 'percentage') | int(-1)) - final_speed) | abs > 4 }}
+              {{ states(booster_fan) not in ['unavailable', 'unknown']
+              and ((state_attr(booster_fan, 'percentage') | int(-1)) - final_speed) | abs > 4 }}
         sequence:
           - service: fan.set_percentage
             target:
