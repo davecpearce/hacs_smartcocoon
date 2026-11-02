@@ -89,7 +89,7 @@ python -m pytest tests/components/smartcocoon/
 ## 📁 Project Structure
 
 ```
-hacs_smartcocoon/
+ha-smartcocoon/
 ├── custom_components/smartcocoon/    # Main integration code
 ├── tests/                            # Test files
 ├── .devcontainer/                    # Devcontainer configuration

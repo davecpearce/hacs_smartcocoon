@@ -3,6 +3,13 @@
   "name": "SmartCocoon",
   "dockerFile": "Dockerfile",
   "context": "..",
+  // Fixed rather than derived. By default the workspace mounts at
+  // /workspaces/<local folder name>, but the Dockerfile and the settings below
+  // hardcode this path -- so a clone in a differently named folder (an old
+  // checkout from before the hacs_smartcocoon -> ha-smartcocoon rename, say)
+  // would build a container whose paths point at nothing.
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/ha-smartcocoon,type=bind",
+  "workspaceFolder": "/workspaces/ha-smartcocoon",
   "appPort": ["9123:9123"],
   "runArgs": [
     "-v",
@@ -43,7 +50,7 @@
         },
         "python.analysis.extraPaths": [
           "/opt/hass",
-          "/workspaces/hacs_smartcocoon/custom_components"
+          "/workspaces/ha-smartcocoon/custom_components"
         ],
         "python.testing.pytestEnabled": true,
         "python.testing.pytestArgs": ["tests"],

@@ -5,7 +5,7 @@
 -P ubuntu-latest=catthehacker/ubuntu:act-latest
 
 # Bind mount the current directory
--W /workspaces/hacs_smartcocoon
+-W /workspaces/ha-smartcocoon
 
 # Use secrets from .env file if it exists
 --secret-file .devcontainer/.env
