@@ -14,6 +14,12 @@ DEFAULT_MAX_RECOVERY_ATTEMPTS_PER_HOUR = 5  # 5 attempts
 DEFAULT_RECOVERY_RESET_INTERVAL = 60  # 60 minutes
 DEFAULT_CONNECTION_CHECK_INTERVAL = 1  # 1 hour
 DOMAIN = "smartcocoon"
+# How often every fan is refreshed from the cloud, in one request.
+SCAN_INTERVAL_SECONDS = 60
+# The top of the API's `speed_level` scale. Inferred, not documented: a fan at
+# full power reported 12, and the app's 17% for a fan reporting level 2 is
+# 2/12. Used to turn the level into the percentage Home Assistant displays.
+SPEED_LEVEL_MAX = 12
 SC_PRESET_MODE_AUTO = "auto"
 SC_PRESET_MODE_ECO = "eco"
 SC_PRESET_MODES = [SC_PRESET_MODE_AUTO, SC_PRESET_MODE_ECO]

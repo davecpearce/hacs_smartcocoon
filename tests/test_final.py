@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, PropertyMock, patch
 
 # Import for testing
 from pysmartcocoon.errors import UnauthorizedError
@@ -26,6 +26,7 @@ from custom_components.smartcocoon.const import (
     DOMAIN,
     SC_PRESET_MODES,
 )
+from custom_components.smartcocoon.coordinator import SmartCocoonCoordinator
 from custom_components.smartcocoon.fan import (
     SmartCocoonFan,
     async_setup_entry as fan_async_setup_entry,
@@ -754,15 +755,22 @@ async def test_async_setup_entry(hass: HomeAssistant) -> None:
         subentries_data=[],
     )
 
-    mock_controller = MagicMock(spec=SmartCocoonController)
-    mock_controller.scmanager = MagicMock()
-    mock_controller.scmanager.fans = {}
-    mock_controller.enable_preset_modes = True
-
     with (
         patch.object(
             SmartCocoonController, "async_start", return_value=True
         ) as mock_start,
+        # async_start is patched out, so supply the manager it would create.
+        patch.object(
+            SmartCocoonController,
+            "scmanager",
+            new_callable=PropertyMock,
+            return_value=MagicMock(fans={}),
+        ),
+        patch.object(
+            SmartCocoonCoordinator,
+            "async_config_entry_first_refresh",
+            new_callable=AsyncMock,
+        ) as mock_first_refresh,
         patch.object(
             hass.config_entries, "async_forward_entry_setups", return_value=None
         ) as mock_forward,
@@ -774,6 +782,10 @@ async def test_async_setup_entry(hass: HomeAssistant) -> None:
         assert config_entry.entry_id in hass.data[DOMAIN]
         mock_start.assert_called_once()
         mock_forward.assert_called_once()
+        # Fans start from fresh data, and the entities get the coordinator.
+        mock_first_refresh.assert_awaited_once()
+        controller = hass.data[DOMAIN][config_entry.entry_id]
+        assert isinstance(controller.coordinator, SmartCocoonCoordinator)
 
 
 async def test_async_unload_entry(hass: HomeAssistant) -> None:
