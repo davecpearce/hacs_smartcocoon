@@ -31,6 +31,7 @@ from .const import (
     DEFAULT_RECOVERY_RESET_INTERVAL,
     DOMAIN,
 )
+from .coordinator import SmartCocoonCoordinator
 from .error_handler import RetryConfig, SmartCocoonErrorHandler
 
 _LOGGER = logging.getLogger(__name__)
@@ -60,6 +61,7 @@ class SmartCocoonController:
         self._hass: HomeAssistant = hass
         self._session: ClientSession | None = None
         self._connection_monitor: ConnectionMonitor | None = None
+        self._coordinator: SmartCocoonCoordinator | None = None
         self._max_offline_duration = max_offline_duration
         self._recovery_attempt_interval = recovery_attempt_interval
         self._max_recovery_attempts_per_hour = max_recovery_attempts_per_hour
@@ -145,6 +147,15 @@ class SmartCocoonController:
         return self._error_handler
 
     @property
+    def coordinator(self) -> SmartCocoonCoordinator | None:
+        """Return the polling coordinator, once setup has created it."""
+        return self._coordinator
+
+    @coordinator.setter
+    def coordinator(self, coordinator: SmartCocoonCoordinator) -> None:
+        self._coordinator = coordinator
+
+    @property
     def connection_monitor(self) -> ConnectionMonitor | None:
         """Return the connection monitor instance."""
         return self._connection_monitor
@@ -196,6 +207,14 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
     )
 
     await smartcocoon.async_start()
+
+    # Fan state now arrives by polling. Refresh once before the entities are
+    # created so they start from current data; if that fails, Home Assistant
+    # retries setup later rather than starting with stale values.
+    assert smartcocoon.scmanager is not None  # set by async_start
+    coordinator = SmartCocoonCoordinator(hass, smartcocoon.scmanager, config_entry)
+    await coordinator.async_config_entry_first_refresh()
+    smartcocoon.coordinator = coordinator
 
     hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN][config_entry.entry_id] = smartcocoon

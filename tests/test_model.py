@@ -18,6 +18,7 @@ def test_fan_extra_attributes_typeddict() -> None:
         "connected",
         "fan_on",
         "mode",
+        "speed_level",
         "last_connected",
         "last_disconnected",
         "predicted_room_temperature",

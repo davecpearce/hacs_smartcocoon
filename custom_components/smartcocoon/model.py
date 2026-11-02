@@ -14,6 +14,7 @@ class FanExtraAttributes(TypedDict, total=False):
     connected: bool
     fan_on: bool
     mode: str
+    speed_level: int
     last_connected: str
     last_disconnected: str
     predicted_room_temperature: float

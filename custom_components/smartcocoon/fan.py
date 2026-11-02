@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 import logging
-from typing import Any
+from typing import Any, cast
 
 from pysmartcocoon.manager import SmartCocoonManager
 
@@ -14,10 +14,18 @@ from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity import async_generate_entity_id
+from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from . import SmartCocoonController
 from .connection_monitor import ConnectionMonitor
-from .const import DOMAIN, SC_PRESET_MODE_AUTO, SC_PRESET_MODE_ECO, SC_PRESET_MODES
+from .const import (
+    DOMAIN,
+    SC_PRESET_MODE_AUTO,
+    SC_PRESET_MODE_ECO,
+    SC_PRESET_MODES,
+    SPEED_LEVEL_MAX,
+)
+from .coordinator import SmartCocoonCoordinator
 from .model import FanExtraAttributes
 
 _LOGGER = logging.getLogger(__name__)
@@ -46,7 +54,10 @@ async def async_setup_entry(
     _LOGGER.debug("Completed async_setup_entry")
 
 
-class SmartCocoonFan(FanEntity):  # type: ignore[misc]
+class SmartCocoonFan(
+    CoordinatorEntity[SmartCocoonCoordinator],  # type: ignore[misc]
+    FanEntity,  # type: ignore[misc]
+):
     """A SmartCocoon fan entity."""
 
     def __init__(
@@ -56,6 +67,9 @@ class SmartCocoonFan(FanEntity):  # type: ignore[misc]
         fan_id: str,
     ) -> None:
         """Initialize the SmartCocoon entity."""
+        if smartcocoon.coordinator is None:
+            raise ValueError("SmartCocoon coordinator is not initialized")
+        super().__init__(smartcocoon.coordinator)
 
         self._fan_id = fan_id
         self._smartcocoon = smartcocoon
@@ -69,14 +83,6 @@ class SmartCocoonFan(FanEntity):  # type: ignore[misc]
             ENTITY_ID_FORMAT,
             f"{self._scmanager.fans[self._fan_id].room_name}_{self._fan_id}",
             hass=hass,
-        )
-
-        # The fan can be updated directly by the SmartCocoon app.
-        # Register callback without static private access.
-        setattr(
-            self._scmanager.fans[self._fan_id],
-            "_async_update_fan_callback",
-            self.async_update_fan_callback,
         )
 
         _LOGGER.debug("Initialized fan_id: %s", self._fan_id)
@@ -115,9 +121,9 @@ class SmartCocoonFan(FanEntity):  # type: ignore[misc]
             fan_data = self._get_fan_data()
             connected = getattr(fan_data, "connected", False)
 
-            # With pysmartcocoon 1.4.2+, the connected flag is reliable
-            # We trust it directly but include error handling as a safeguard
-            result = bool(connected)
+            # A failed refresh means `connected` may be stale, so the fan is
+            # only available when the coordinator's last poll succeeded too.
+            result = bool(super().available) and bool(connected)
 
             _LOGGER.debug(
                 "Fan %s: Availability check - connected=%s, available=%s",
@@ -179,33 +185,14 @@ class SmartCocoonFan(FanEntity):  # type: ignore[misc]
 
         try:
             attrs["fan_id"] = self._fan_id
-            extracted = self._extract_pysmartcocoon_attrs(fan_data)
-            if "firmware_version" in extracted:
-                attrs["firmware_version"] = extracted["firmware_version"]
-            if "connected" in extracted:
-                attrs["connected"] = extracted["connected"]
-            if "fan_on" in extracted:
-                attrs["fan_on"] = extracted["fan_on"]
-            if "mode" in extracted:
-                attrs["mode"] = extracted["mode"]
-            if "predicted_room_temperature" in extracted:
-                attrs["predicted_room_temperature"] = extracted[
-                    "predicted_room_temperature"
-                ]
-            if "is_room_estimating" in extracted:
-                attrs["is_room_estimating"] = extracted["is_room_estimating"]
-            if "thermostat_vendor" in extracted:
-                attrs["thermostat_vendor"] = extracted["thermostat_vendor"]
-            if "room_id" in extracted:
-                attrs["room_id"] = extracted["room_id"]
-            if "identifier" in extracted:
-                attrs["identifier"] = extracted["identifier"]
-
-            cm_attrs = self._extract_connection_monitor_attrs()
-            if "last_connected" in cm_attrs:
-                attrs["last_connected"] = cm_attrs["last_connected"]
-            if "last_disconnected" in cm_attrs:
-                attrs["last_disconnected"] = cm_attrs["last_disconnected"]
+            # Both helpers only include keys whose values are valid, so a
+            # plain update copies exactly what is present.
+            attrs.update(
+                cast("FanExtraAttributes", self._extract_pysmartcocoon_attrs(fan_data))
+            )
+            attrs.update(
+                cast("FanExtraAttributes", self._extract_connection_monitor_attrs())
+            )
         except (AttributeError, KeyError, TypeError):
             pass
 
@@ -237,6 +224,10 @@ class SmartCocoonFan(FanEntity):  # type: ignore[misc]
         if isinstance(value, str):
             extracted["mode"] = value
 
+        value = getattr(fan_data, "speed_level", None)
+        if isinstance(value, int) and not isinstance(value, bool):
+            extracted["speed_level"] = value
+
         value = getattr(fan_data, "predicted_room_temperature", None)
         if isinstance(value, (int, float)):
             extracted["predicted_room_temperature"] = float(value)
@@ -249,13 +240,15 @@ class SmartCocoonFan(FanEntity):  # type: ignore[misc]
         if isinstance(value, str):
             extracted["thermostat_vendor"] = value
 
+        # The library supplies these as ints; accepting only str silently
+        # dropped both attributes.
         value = getattr(fan_data, "room_id", None)
-        if isinstance(value, str):
-            extracted["room_id"] = value
+        if isinstance(value, (str, int)) and not isinstance(value, bool):
+            extracted["room_id"] = str(value)
 
         value = getattr(fan_data, "identifier", None)
-        if isinstance(value, str):
-            extracted["identifier"] = value
+        if isinstance(value, (str, int)) and not isinstance(value, bool):
+            extracted["identifier"] = str(value)
 
         return extracted
 
@@ -307,8 +300,18 @@ class SmartCocoonFan(FanEntity):  # type: ignore[misc]
 
     @property
     def percentage(self) -> int | None:
-        """Return the current speed as a percentage (0-100)."""
+        """Return the current speed as a percentage (0-100).
+
+        In eco and auto the cloud picks the speed and reports it as
+        `speed_level`, while `power` keeps the last manual setting. Showing
+        `power` there is what made Home Assistant disagree with the app
+        (38% against 17% in ha-smartcocoon#421). In always-on and off,
+        `power` is the speed that was set, so it stays.
+        """
         fan_data = self._get_fan_data()
+        level = getattr(fan_data, "speed_level", None)
+        if fan_data.mode in SC_PRESET_MODES and isinstance(level, int):
+            return round(min(max(level, 0), SPEED_LEVEL_MAX) * 100 / SPEED_LEVEL_MAX)
         speed_pct = fan_data.speed_pct
         _LOGGER.debug(
             "Fan %s: Speed percentage from pysmartcocoon: %s (type: %s)",
@@ -334,11 +337,6 @@ class SmartCocoonFan(FanEntity):  # type: ignore[misc]
             return SC_PRESET_MODES
 
         return None
-
-    @property
-    def should_poll(self) -> bool:
-        """No polling needed, updates come from MQTT."""
-        return False
 
     @property
     def speed_count(self) -> int:
