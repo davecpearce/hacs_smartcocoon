@@ -1,5 +1,19 @@
 ---
 repos:
+  # Guard the pins below. pylint, ruff and mypy are pinned both here as a
+  # `rev` and in requirements_test.txt, and pre-commit is what gates CI --
+  # so when the two drift, the linter judging a pull request is not the one
+  # anyone runs locally. Dependabot only ever sees requirements_test.txt and
+  # these updates auto-merge, so it causes this unattended. Four times so far.
+  - repo: local
+    hooks:
+      - id: check-tool-pins
+        name: tools pinned in two files must agree
+        entry: python scripts/check_tool_pins.py
+        language: python
+        additional_dependencies: ["pyyaml"]
+        pass_filenames: false
+        files: ^(\.pre-commit-config\.yaml|requirements_test\.txt)$
   - repo: https://github.com/asottile/pyupgrade
     rev: v3.21.0
     hooks:
