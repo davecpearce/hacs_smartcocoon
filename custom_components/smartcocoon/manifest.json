@@ -3,9 +3,9 @@
   "name": "SmartCocoon",
   "codeowners": ["@davecpearce"],
   "config_flow": true,
-  "documentation": "https://github.com/davecpearce/hacs_smartcocoon/blob/main/README.md",
+  "documentation": "https://github.com/davecpearce/ha-smartcocoon/blob/main/README.md",
   "iot_class": "cloud_push",
-  "issue_tracker": "https://github.com/davecpearce/hacs_smartcocoon/issues",
+  "issue_tracker": "https://github.com/davecpearce/ha-smartcocoon/issues",
   "loggers": ["pysmartcocoon"],
   "requirements": ["pysmartcocoon==1.4.6"],
   "version": "1.3.8"

@@ -50,7 +50,7 @@ pre-commit run --all-files
 The `.actrc` file contains default configuration:
 
 - Uses `catthehacker/ubuntu:act-latest` runner image
-- Binds current directory to `/workspaces/hacs_smartcocoon`
+- Binds current directory to `/workspaces/ha-smartcocoon`
 - Uses secrets from `.devcontainer/.env` if available
 - Enables verbose output
 

@@ -45,7 +45,7 @@ blueprint:
     evening). Only an active heating/cooling boost may exceed baseline at night.
     A manually-off fan is respected unless Force manage.
   domain: automation
-  source_url: https://github.com/davecpearce/hacs_smartcocoon/blob/main/blueprints/automation/smartcocoon/room_climate_boost.yaml
+  source_url: https://github.com/davecpearce/ha-smartcocoon/blob/main/blueprints/automation/smartcocoon/room_climate_boost.yaml
   homeassistant:
     min_version: "2026.2.3"
   input:

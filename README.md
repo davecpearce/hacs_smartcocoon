@@ -35,20 +35,20 @@ This Integration can be installed in two ways:
 
 In HACS, open the **⋮** menu (top right) → **Custom repositories**, then add:
 
-- Repository: `davecpearce/hacs_smartcocoon`
+- Repository: `davecpearce/ha-smartcocoon`
 - Type: `Integration`
 
 Then search for **SmartCocoon** in HACS and download it.
 
 **Manual Installation**
 
-1. Use Git to clone the repo to a local directory by entering <br/>`git clone https://github.com/davecpearce/hacs_smartcocoon.git`
+1. Use Git to clone the repo to a local directory by entering <br/>`git clone https://github.com/davecpearce/ha-smartcocoon.git`
 1. If you do not already have a `custom_components` directory in your Home Assistant config directory, create it.
-1. Copy or move the `smartcocoon` folder from `hacs_smartcocoon/custom_components` you cloned from step 1 to the `custom_components` folder in your Home Assistant `config` folder.
+1. Copy or move the `smartcocoon` folder from `ha-smartcocoon/custom_components` you cloned from step 1 to the `custom_components` folder in your Home Assistant `config` folder.
 
 ## Release notes
 
-See the [releases page](https://github.com/davecpearce/hacs_smartcocoon/releases) for
+See the [releases page](https://github.com/davecpearce/ha-smartcocoon/releases) for
 what changed in each version.
 
 ## Track Updates
@@ -119,7 +119,7 @@ symmetrically for **cooling and heating**.
 Import the blueprint (works with any `climate` entity that reports `hvac_action`;
 developed and tested against Ecobee):
 
-[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fdavecpearce%2Fhacs_smartcocoon%2Fblob%2Fmain%2Fblueprints%2Fautomation%2Fsmartcocoon%2Froom_climate_boost.yaml)
+[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fdavecpearce%2Fha-smartcocoon%2Fblob%2Fmain%2Fblueprints%2Fautomation%2Fsmartcocoon%2Froom_climate_boost.yaml)
 
 See [`docs/AUTOMATIONS.md`](docs/AUTOMATIONS.md) for the full walkthrough.
 
@@ -139,16 +139,16 @@ Code template was mainly taken from [@Ludeeus](https://github.com/ludeeus)'s [in
 [black-shield]: https://img.shields.io/badge/code%20style-black-000000.svg?style=for-the-badge
 [buymecoffee]: https://www.buymeacoffee.com/davepearce
 [buymecoffeebadge]: https://img.shields.io/badge/buy%20me%20a%20coffee-donate-yellow.svg?style=for-the-badge
-[commits-shield]: https://img.shields.io/github/commit-activity/y/davecpearce/hacs_smartcocoon.svg?style=for-the-badge
-[commits]: https://github.com/davecpearce/hacs_smartcocoon/commits/main
+[commits-shield]: https://img.shields.io/github/commit-activity/y/davecpearce/ha-smartcocoon.svg?style=for-the-badge
+[commits]: https://github.com/davecpearce/ha-smartcocoon/commits/main
 [hacs]: https://hacs.xyz
 [hacsbadge]: https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge
 [forum-shield]: https://img.shields.io/badge/community-forum-brightgreen.svg?style=for-the-badge
 [forum]: https://community.home-assistant.io/
-[license-shield]: https://img.shields.io/github/license/davecpearce/hacs_smartcocoon.svg?style=for-the-badge
+[license-shield]: https://img.shields.io/github/license/davecpearce/ha-smartcocoon.svg?style=for-the-badge
 [maintenance-shield]: https://img.shields.io/badge/maintainer-%40davecpearce-blue.svg?style=for-the-badge
 [pre-commit]: https://github.com/pre-commit/pre-commit
 [pre-commit-shield]: https://img.shields.io/badge/pre--commit-enabled-brightgreen?style=for-the-badge
-[releases-shield]: https://img.shields.io/github/release/davecpearce/hacs_smartcocoon.svg?style=for-the-badge
-[releases]: https://github.com/davecpearce/hacs_smartcocoon/releases
+[releases-shield]: https://img.shields.io/github/v/release/davecpearce/ha-smartcocoon.svg?style=for-the-badge
+[releases]: https://github.com/davecpearce/ha-smartcocoon/releases
 [user_profile]: https://github.com/davecpearce

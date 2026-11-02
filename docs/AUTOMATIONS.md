@@ -273,13 +273,13 @@ and night suppression. Turn it off per room with **Enable HVAC-off equalizer**.
 
 ### Importing the blueprint
 
-[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fdavecpearce%2Fhacs_smartcocoon%2Fblob%2Fmain%2Fblueprints%2Fautomation%2Fsmartcocoon%2Froom_climate_boost.yaml)
+[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fdavecpearce%2Fha-smartcocoon%2Fblob%2Fmain%2Fblueprints%2Fautomation%2Fsmartcocoon%2Froom_climate_boost.yaml)
 
 Or manually: **Settings → Automations & Scenes → Blueprints → Import Blueprint**, and
 paste:
 
 ```
-https://github.com/davecpearce/hacs_smartcocoon/blob/main/blueprints/automation/smartcocoon/room_climate_boost.yaml
+https://github.com/davecpearce/ha-smartcocoon/blob/main/blueprints/automation/smartcocoon/room_climate_boost.yaml
 ```
 
 > Blueprints bundled inside an integration repo are **not** auto-distributed by HACS —
