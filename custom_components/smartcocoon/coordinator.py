@@ -5,10 +5,12 @@ from __future__ import annotations
 from datetime import timedelta
 import logging
 
+from pysmartcocoon.errors import UnauthorizedError
 from pysmartcocoon.manager import SmartCocoonManager
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .const import DOMAIN, SCAN_INTERVAL_SECONDS
@@ -51,7 +53,16 @@ class SmartCocoonCoordinator(DataUpdateCoordinator[None]):  # type: ignore[misc]
 
     async def _async_update_data(self) -> None:
         """Fetch every fan in one request."""
-        if not await self._scmanager.async_refresh_fans():
+        try:
+            refreshed = await self._scmanager.async_refresh_fans()
+        except UnauthorizedError as err:
+            # The library has already tried a fresh login. Raising this, not
+            # UpdateFailed, is what makes Home Assistant ask for a new
+            # password; otherwise polling would fail quietly every minute.
+            raise ConfigEntryAuthFailed(
+                "SmartCocoon rejected the stored credentials"
+            ) from err
+        if not refreshed:
             # The fans keep their previous values; marking the update failed
             # makes the entities unavailable rather than quietly stale.
             raise UpdateFailed("Could not refresh SmartCocoon fans")

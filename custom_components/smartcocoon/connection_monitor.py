@@ -1,10 +1,12 @@
 """Connection monitoring and recovery for SmartCocoon devices."""
 
+from collections.abc import Callable
 from datetime import datetime
 import logging
 from typing import Any
 
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.event import async_call_later
 from homeassistant.util import dt as dt_util
@@ -65,9 +67,11 @@ class ConnectionMonitor:
         scmanager: Any,
         error_handler: SmartCocoonErrorHandler,
         config: ConnectionMonitorConfig,
+        on_auth_failed: Callable[[], None] | None = None,
     ) -> None:
         """Initialize the connection monitor."""
         self._hass = hass
+        self._on_auth_failed = on_auth_failed
         self._scmanager = scmanager
         self._error_handler = error_handler
         self._max_offline_duration = config.max_offline_duration
@@ -335,7 +339,7 @@ class ConnectionMonitor:
         except (AttributeError, KeyError, TypeError, ValueError) as exc:
             _LOGGER.debug("Could not notify fan entity for %s: %s", fan_id, exc)
 
-    async def _attempt_device_recovery(
+    async def _attempt_device_recovery(  # pylint: disable=too-many-branches
         self, fan_id: str, fan: Any, device_state: dict[str, Any]
     ) -> None:
         """Attempt to recover a disconnected device."""
@@ -449,6 +453,16 @@ class ConnectionMonitor:
                 # Schedule next recovery attempt
                 await self._schedule_next_recovery(fan_id, fan, device_state)
 
+        except ConfigEntryAuthFailed:
+            # Retrying cannot help until the user enters a new password, and
+            # previously this escaped the timer callback, so recovery simply
+            # stopped with nothing asking the user anything.
+            _LOGGER.warning(
+                "Fan %s recovery stopped: SmartCocoon rejected the credentials",
+                fan_id,
+            )
+            if self._on_auth_failed is not None:
+                self._on_auth_failed()
         except (AttributeError, KeyError, TypeError, ValueError) as exc:
             _LOGGER.warning(
                 "Fan %s recovery attempt %d failed: %s",
