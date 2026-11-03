@@ -11,7 +11,7 @@ from pysmartcocoon.manager import SmartCocoonManager
 from homeassistant.components.fan import ENTITY_ID_FORMAT, FanEntity, FanEntityFeature
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from homeassistant.exceptions import ConfigEntryAuthFailed, HomeAssistantError
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity import async_generate_entity_id
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
@@ -403,6 +403,21 @@ class SmartCocoonFan(
             pass
         super().async_write_ha_state()
 
+    async def _async_command(self, **kwargs: Any) -> Any:
+        """Run a fan command through the retry handler.
+
+        A rejected login surfaces here as ConfigEntryAuthFailed. Home
+        Assistant only starts reauth for that on its own during setup or a
+        coordinator update, so a command used to fail with nothing asking
+        the user for a new password. Start reauth, then re-raise so the
+        command still reports its failure.
+        """
+        try:
+            return await self._smartcocoon.error_handler.async_retry_operation(**kwargs)
+        except ConfigEntryAuthFailed:
+            self._smartcocoon.start_reauth()
+            raise
+
     def _raise_if_rejected(self, accepted: bool, action: str) -> None:
         """Fail loudly when the fan did not accept a command.
 
@@ -428,7 +443,7 @@ class SmartCocoonFan(
         )
         assert self._scmanager is not None  # Checked in constructor
         scmanager = self._scmanager  # Store reference to avoid mypy issues
-        accepted = await self._smartcocoon.error_handler.async_retry_operation(
+        accepted = await self._async_command(
             operation=lambda: scmanager.async_set_fan_speed(self._fan_id, percentage),
             operation_name=f"set fan speed to {percentage}%",
             context={"fan_id": self._fan_id, "percentage": percentage},
@@ -450,7 +465,7 @@ class SmartCocoonFan(
         assert self._scmanager is not None  # Checked in constructor
         scmanager = self._scmanager  # Store reference to avoid mypy issues
         if preset_mode == SC_PRESET_MODE_AUTO:
-            accepted = await self._smartcocoon.error_handler.async_retry_operation(
+            accepted = await self._async_command(
                 operation=lambda: scmanager.async_set_fan_auto(self._fan_id),
                 operation_name="set fan to auto mode",
                 context={"fan_id": self._fan_id, "preset_mode": preset_mode},
@@ -458,7 +473,7 @@ class SmartCocoonFan(
             self._raise_if_rejected(accepted, "set auto mode")
             _LOGGER.debug("Fan %s: Successfully set to auto mode", self._fan_id)
         elif preset_mode == SC_PRESET_MODE_ECO:
-            accepted = await self._smartcocoon.error_handler.async_retry_operation(
+            accepted = await self._async_command(
                 operation=lambda: scmanager.async_set_fan_eco(self._fan_id),
                 operation_name="set fan to eco mode",
                 context={"fan_id": self._fan_id, "preset_mode": preset_mode},
@@ -475,7 +490,7 @@ class SmartCocoonFan(
         _LOGGER.debug("Fan %s: Turning off", self._fan_id)
         assert self._scmanager is not None  # Checked in constructor
         scmanager = self._scmanager  # Store reference to avoid mypy issues
-        accepted = await self._smartcocoon.error_handler.async_retry_operation(
+        accepted = await self._async_command(
             operation=lambda: scmanager.async_fan_turn_off(self._fan_id),
             operation_name="turn off fan",
             context={"fan_id": self._fan_id},
@@ -506,7 +521,7 @@ class SmartCocoonFan(
 
         assert self._scmanager is not None  # Checked in constructor
         scmanager = self._scmanager  # Store reference to avoid mypy issues
-        accepted = await self._smartcocoon.error_handler.async_retry_operation(
+        accepted = await self._async_command(
             operation=lambda: scmanager.async_fan_turn_on(self._fan_id),
             operation_name="turn on fan",
             context={"fan_id": self._fan_id},

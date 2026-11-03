@@ -53,8 +53,10 @@ class SmartCocoonController:
         max_recovery_attempts_per_hour: int = DEFAULT_MAX_RECOVERY_ATTEMPTS_PER_HOUR,
         recovery_reset_interval: int = DEFAULT_RECOVERY_RESET_INTERVAL,
         connection_check_interval: int = DEFAULT_CONNECTION_CHECK_INTERVAL,
+        config_entry: ConfigEntry | None = None,
     ) -> None:
         """Initialize."""
+        self._config_entry = config_entry
         self._username = username
         self._password = password
         self._scmanager: SmartCocoonManager | None = None
@@ -136,6 +138,7 @@ class SmartCocoonController:
             scmanager=self._scmanager,
             error_handler=self._error_handler,
             config=config,
+            on_auth_failed=self.start_reauth,
         )
         await self._connection_monitor.start_monitoring()
 
@@ -159,6 +162,17 @@ class SmartCocoonController:
     def connection_monitor(self) -> ConnectionMonitor | None:
         """Return the connection monitor instance."""
         return self._connection_monitor
+
+    def start_reauth(self) -> None:
+        """Ask the user for new credentials after SmartCocoon rejected them.
+
+        Home Assistant starts reauth by itself when ConfigEntryAuthFailed is
+        raised from setup or from a coordinator update. Commands and the
+        recovery timer are outside both, so they call this instead; otherwise
+        the error was logged and the user was never asked.
+        """
+        if self._config_entry is not None:
+            self._config_entry.async_start_reauth(self._hass)
 
     async def async_stop(self) -> None:
         """Stop the SmartCocoon Manager and cleanup resources."""
@@ -204,7 +218,15 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
         max_recovery_attempts_per_hour=max_recovery_attempts_per_hour,
         recovery_reset_interval=recovery_reset_interval,
         connection_check_interval=connection_check_interval,
+        config_entry=config_entry,
     )
+
+    # Registered before async_start creates the connection monitor, whose
+    # timers reschedule themselves. Home Assistant runs this on unload --
+    # including the reload after every options save -- and also when setup
+    # fails partway, e.g. a first refresh that raises ConfigEntryNotReady.
+    # Without it each reload or setup retry left another monitor polling.
+    config_entry.async_on_unload(smartcocoon.async_stop)
 
     await smartcocoon.async_start()
 

@@ -1,7 +1,8 @@
 {
   "config": {
     "abort": {
-      "already_configured": "Device is already configured"
+      "already_configured": "Device is already configured",
+      "reauth_successful": "Re-authentication was successful"
     },
     "error": {
       "cannot_connect": "Failed to connect",
@@ -14,6 +15,13 @@
           "username": "Username",
           "password": "Password",
           "enable_preset_mode": "Enable Preset Modes"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Re-authenticate SmartCocoon",
+        "description": "SmartCocoon no longer accepts the saved password for {username}. Enter the current password to reconnect.",
+        "data": {
+          "password": "Password"
         }
       }
     }

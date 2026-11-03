@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 import logging
 from typing import Any
 
+from pysmartcocoon.errors import RequestError, UnauthorizedError
 from pysmartcocoon.manager import SmartCocoonManager
 import voluptuous as vol
 
@@ -37,6 +39,8 @@ _LOGGER = logging.getLogger(__name__)
 STEP_USER_DATA_SCHEMA = vol.Schema(
     {vol.Required(CONF_USERNAME): cv.string, vol.Required(CONF_PASSWORD): cv.string}
 )
+# The username is the entry's unique id, so reauth only asks for the password.
+STEP_REAUTH_DATA_SCHEMA = vol.Schema({vol.Required(CONF_PASSWORD): cv.string})
 
 
 async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str, Any]:
@@ -49,9 +53,18 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
 
     scmanager = SmartCocoonManager(session)
 
-    if not await scmanager.async_start_services(
-        data[CONF_USERNAME], data[CONF_PASSWORD]
-    ):
+    # A rejected login raises rather than returning False, so without these
+    # a wrong password fell through to the generic handler and the user saw
+    # "Unexpected error" instead of "Invalid authentication".
+    try:
+        started = await scmanager.async_start_services(
+            data[CONF_USERNAME], data[CONF_PASSWORD]
+        )
+    except UnauthorizedError as err:
+        raise InvalidAuth from err
+    except RequestError as err:
+        raise CannotConnect from err
+    if not started:
         raise InvalidAuth
 
     return {"title": data[CONF_USERNAME]}
@@ -96,6 +109,49 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[misc
 
         return self.async_show_form(
             step_id="user", data_schema=STEP_USER_DATA_SCHEMA, errors=errors
+        )
+
+    async def async_step_reauth(self, entry_data: Mapping[str, Any]) -> Any:
+        """Start reauth when SmartCocoon rejects the stored credentials.
+
+        Home Assistant starts this when setup, polling or a command raises
+        ConfigEntryAuthFailed. Without it the user had no way to enter a new
+        password short of deleting and re-adding the integration.
+        """
+        return await self.async_step_reauth_confirm()
+
+    async def async_step_reauth_confirm(
+        self, user_input: dict[str, Any] | None = None
+    ) -> Any:
+        """Ask for the new password and check it before saving."""
+        reauth_entry = self._get_reauth_entry()
+        username = reauth_entry.data[CONF_USERNAME]
+        errors: dict[str, str] = {}
+
+        if user_input is not None:
+            try:
+                await validate_input(
+                    self.hass,
+                    {CONF_USERNAME: username, CONF_PASSWORD: user_input[CONF_PASSWORD]},
+                )
+            except CannotConnect:
+                errors["base"] = "cannot_connect"
+            except InvalidAuth:
+                errors["base"] = "invalid_auth"
+            except Exception:  # pylint: disable=broad-except
+                _LOGGER.exception("Unexpected exception")
+                errors["base"] = "unknown"
+            else:
+                return self.async_update_reload_and_abort(
+                    reauth_entry,
+                    data_updates={CONF_PASSWORD: user_input[CONF_PASSWORD]},
+                )
+
+        return self.async_show_form(
+            step_id="reauth_confirm",
+            data_schema=STEP_REAUTH_DATA_SCHEMA,
+            description_placeholders={"username": username},
+            errors=errors,
         )
 
 
