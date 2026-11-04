@@ -9,29 +9,27 @@ Issues not containing the minimum requirements will be closed:
 
 - Issues without a description (using the header is not good enough) will be closed.
 - Issues without debug logging will be closed.
-- Issues without configuration will be closed
 
 -->
 
-## Version of the custom_component
+## Versions
 
-<!-- If you are not using the newest version, download and try that before opening an issue
-If you are unsure about the version check the const.py file.
--->
+<!-- If you are not on the newest release, update and try again before opening an issue.
+The integration version is shown in HACS, or in custom_components/smartcocoon/manifest.json. -->
 
-## Configuration
-
-```yaml
-Add your logs here.
-```
+- Integration version:
+- Home Assistant version:
 
 ## Describe the bug
 
-A clear and concise description of what the bug is.
+A clear and concise description of what the bug is, and what you expected instead.
 
 ## Debug log
 
-<!-- To enable debug logs check this https://www.home-assistant.io/components/logger/ -->
+<!-- Settings → Devices & services → SmartCocoon → ⋮ → Enable debug logging.
+Reproduce the problem, then choose "Disable debug logging" to download the log.
+Passwords, tokens and your address are masked automatically, but room names are not:
+read the log before pasting it. -->
 
 ```text
 

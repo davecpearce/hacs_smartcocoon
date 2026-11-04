@@ -31,9 +31,15 @@ A few properties of the fan entity drive everything below:
 - **Preset modes (`auto` / `eco`) are optional** and configured in the SmartCocoon app.
   They're disabled by default and render poorly in Apple Home. For Home-Assistant-driven
   automation, prefer percentage control and leave presets off (see the README notes).
-- **The integration does not see app-side changes.** If you also drive a fan from the
-  SmartCocoon app, Home Assistant won't know. The cleanest automations treat Home
-  Assistant as the **sole writer** of a fan's speed — otherwise HA and the app fight.
+- **App-side changes arrive within a minute.** The integration polls every 60 seconds,
+  so a change made in the SmartCocoon app shows up shortly after. Even so, the cleanest
+  automations treat Home Assistant as the **sole writer** of a fan's speed — otherwise
+  an automation and the app keep overriding each other.
+- **In eco and auto modes, `percentage` is the speed the cloud chose**, in steps of
+  1/12 (≈8%), not the speed you last set. A percentage command changes the stored
+  speed but not the mode, so in eco or auto the reported speed may not move to what you
+  sent. Fans driven by speed automations (including the blueprint below) work best in
+  **always-on** mode, where `percentage` is exactly the speed you set.
 
 The current speed is exposed as the `percentage` attribute of the fan entity.
 
@@ -395,8 +401,11 @@ use_blueprint:
 
 ## Caveats
 
-- **Be the sole writer.** The integration doesn't see app-side changes, so let one
-  automation own each fan's speed. Mixing the app and HA causes them to fight.
+- **Be the sole writer.** App-side changes reach Home Assistant within a minute, but
+  if the app and an automation both set the speed they will keep overriding each other.
+  Let one automation own each fan's speed.
+- **Keep automated fans in always-on mode.** In eco or auto the cloud picks the running
+  speed, so a fan may not settle at the speed the automation asked for.
 - **The external speed floor isn't a trigger.** An optional input can't be a state-trigger
   entity_id (an unset one would make the blueprint fail to load), so a change to the speed
   floor is picked up on the next re-evaluation — a room/thermostat state change or the
