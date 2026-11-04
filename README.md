@@ -17,7 +17,7 @@
 This is not an official integration from, or supported by, SmartCocoon.
 
 **Introduction**
-This a _custom component_ for [Home Assistant](https://www.home-assistant.io/). It enables control of SmartCocoon Smart Vent / Register Booster Fans [SmartCocoon](https://mysmartcocoon.com/).
+This is a custom integration for [Home Assistant](https://www.home-assistant.io/). It enables control of SmartCocoon Smart Vent / Register Booster Fans [SmartCocoon](https://mysmartcocoon.com/).
 
 This integration will create one device and one fan entity for each of your fans.
 
@@ -38,16 +38,16 @@ This integration will create one device and one fan entity for each of your fans
 
 ## Installation
 
-This Integration can be installed in two ways:
+**HACS (recommended)**
 
-**HACS Installation**
+SmartCocoon is in the HACS default store. In HACS, search for **SmartCocoon**,
+download it, then restart Home Assistant. Or open it directly:
 
-In HACS, open the **⋮** menu (top right) → **Custom repositories**, then add:
+[![Open your Home Assistant instance and open this repository in HACS.][hacs-repo-badge]][hacs-repo]
 
-- Repository: `davecpearce/ha-smartcocoon`
-- Type: `Integration`
-
-Then search for **SmartCocoon** in HACS and download it.
+If it doesn't show up in the search, add it as a custom repository instead: open the
+**⋮** menu (top right) → **Custom repositories**, add `davecpearce/ha-smartcocoon`
+with type `Integration`, then search again.
 
 **Manual Installation**
 
@@ -178,7 +178,9 @@ Code template was mainly taken from [@Ludeeus](https://github.com/ludeeus)'s [in
 [commits-shield]: https://img.shields.io/github/commit-activity/y/davecpearce/ha-smartcocoon.svg?style=for-the-badge
 [commits]: https://github.com/davecpearce/ha-smartcocoon/commits/main
 [hacs]: https://hacs.xyz
-[hacsbadge]: https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge
+[hacsbadge]: https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=for-the-badge
+[hacs-repo-badge]: https://my.home-assistant.io/badges/hacs_repository.svg
+[hacs-repo]: https://my.home-assistant.io/redirect/hacs_repository/?owner=davecpearce&repository=ha-smartcocoon&category=integration
 [forum-shield]: https://img.shields.io/badge/community-forum-brightgreen.svg?style=for-the-badge
 [forum]: https://community.home-assistant.io/
 [license-shield]: https://img.shields.io/github/license/davecpearce/ha-smartcocoon.svg?style=for-the-badge
