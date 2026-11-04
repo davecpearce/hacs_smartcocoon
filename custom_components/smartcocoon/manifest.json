@@ -4,7 +4,7 @@
   "codeowners": ["@davecpearce"],
   "config_flow": true,
   "documentation": "https://github.com/davecpearce/ha-smartcocoon/blob/main/README.md",
-  "iot_class": "cloud_push",
+  "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/davecpearce/ha-smartcocoon/issues",
   "loggers": ["pysmartcocoon"],
   "requirements": ["pysmartcocoon==1.6.0"],

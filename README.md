@@ -5,7 +5,7 @@
 [![License][license-shield]](LICENSE)
 
 [![pre-commit][pre-commit-shield]][pre-commit]
-[![Black][black-shield]][black]
+[![Ruff][ruff-shield]][ruff]
 
 [![hacs][hacsbadge]][hacs]
 [![Project Maintenance][maintenance-shield]][user_profile]
@@ -14,7 +14,7 @@
 ![logo](logo.png)
 
 **Disclaimer**
-This is not an official integration from or supported by the SmartCocoon
+This is not an official integration from, or supported by, SmartCocoon.
 
 **Introduction**
 This a _custom component_ for [Home Assistant](https://www.home-assistant.io/). It enables control of SmartCocoon Smart Vent / Register Booster Fans [SmartCocoon](https://mysmartcocoon.com/).
@@ -23,9 +23,18 @@ This integration will create one device and one fan entity for each of your fans
 
 **Notes:**
 
-You have the option to include the 'auto' and 'eco' preset modes for your fan. The settings for the 'auto' mode will need to be made through the official SmartCocoon app. Preset modes work well in Home Assistant but render poorly in Apple Home fan entities. These modes are disabled by default, you may prefer to manage automations within Home Assistant and/or Node Red.
-
-At this time, if you control your fan from the SmartCocoon app, Home Assistant will not receive these updates.
+- **Home Assistant checks every fan once a minute**, so changes made in the SmartCocoon
+  app or by the fan itself show up within about 60 seconds. All fans are refreshed in
+  a single request.
+- **In eco and auto modes the speed shown is the speed the fan is actually running at**,
+  matching the SmartCocoon app. The cloud adjusts it in steps of 1/12 (about 8%), so
+  you'll see values like 17%, 25% and 33%. In always-on mode it is the speed you set.
+- You have the option to include the 'auto' and 'eco' preset modes for your fan. The
+  settings for the 'auto' mode will need to be made through the official SmartCocoon
+  app. Preset modes work well in Home Assistant but render poorly in Apple Home fan
+  entities. These modes are disabled by default, you may prefer to manage automations
+  within Home Assistant and/or Node Red.
+- A fan that loses its connection to the SmartCocoon cloud shows as **unavailable**.
 
 ## Installation
 
@@ -59,13 +68,36 @@ If installed via HACS, updates are flagged automatically. Otherwise, you will ha
 
 There is a config flow for this integration. After installing the custom component:
 
-1. Go to **Configuration**->**Integrations**
-2. Click **+ ADD INTEGRATION** to setup a new integration
+1. Go to **Settings** → **Devices & services**
+2. Click **+ ADD INTEGRATION** to set up a new integration
 3. Search for **SmartCocoon** and click on it
 4. You will be guided through the rest of the setup process via the config flow
    - You will have to provide the same 'username' and 'password' you use when logging into the official SmartCocoon iOS or Android application.
 5. You have the option to select the Area of each detected fan.
 6. After the installation completes, you will see a "Configure" button for the SmartCocoon integration where you have the option to "Enable Preset Modes" and connection monitoring options.
+
+### Changing your password
+
+If SmartCocoon stops accepting the saved password, for example after you change it in
+the app, Home Assistant shows a **Reconfigure** prompt for SmartCocoon under
+**Settings** → **Devices & services**. Enter the new password there. The integration
+reloads with it; there's no need to remove and re-add it, and your entities, areas and
+automations are kept.
+
+Expired sessions are renewed automatically and never need you.
+
+### Fan attributes
+
+Each fan entity carries these attributes alongside its state and `percentage`:
+
+| Attribute                                                                               | Meaning                                                  |
+| --------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| `mode`                                                                                  | `auto`, `eco`, `always_on` or `always_off`               |
+| `speed_level`                                                                           | The speed step the fan is running at, 1–12               |
+| `connected`                                                                             | Whether the fan is connected to the SmartCocoon cloud    |
+| `predicted_room_temperature`, `is_room_estimating`                                      | SmartCocoon's room temperature estimate                  |
+| `room_name`, `room_id`, `fan_id`, `identifier`, `firmware_version`, `thermostat_vendor` | Descriptive details                                      |
+| `last_connected`, `last_disconnected`                                                   | When the connection monitor last saw the fan come and go |
 
 ### Options
 
@@ -101,6 +133,12 @@ If `entity_id` is omitted, the service operates on all fans.
 
 ### Troubleshooting
 
+- To collect debug logs, open **Settings** → **Devices & services** → **SmartCocoon**
+  → **⋮** → **Enable debug logging**, reproduce the problem, then choose **Disable
+  debug logging** to download the log. Passwords, tokens and your address are masked,
+  but read the log before attaching it to an issue. See the
+  [library's debug guide](https://github.com/davecpearce/pysmartcocoon/blob/main/docs/DEBUG_GUIDE.md)
+  for more.
 - If a fan is unplugged and later plugged back in, the integration will attempt recovery automatically according to the options above.
 - To accelerate testing, temporarily lower the intervals in Options (e.g., 1 minute for checks/attempts) and restart Home Assistant.
 - Use the `smartcocoon.force_recovery` service to trigger an immediate recovery cycle.
@@ -135,8 +173,6 @@ Code template was mainly taken from [@Ludeeus](https://github.com/ludeeus)'s [in
 
 ---
 
-[black]: https://github.com/psf/black
-[black-shield]: https://img.shields.io/badge/code%20style-black-000000.svg?style=for-the-badge
 [buymecoffee]: https://www.buymeacoffee.com/davepearce
 [buymecoffeebadge]: https://img.shields.io/badge/buy%20me%20a%20coffee-donate-yellow.svg?style=for-the-badge
 [commits-shield]: https://img.shields.io/github/commit-activity/y/davecpearce/ha-smartcocoon.svg?style=for-the-badge
@@ -151,4 +187,6 @@ Code template was mainly taken from [@Ludeeus](https://github.com/ludeeus)'s [in
 [pre-commit-shield]: https://img.shields.io/badge/pre--commit-enabled-brightgreen?style=for-the-badge
 [releases-shield]: https://img.shields.io/github/v/release/davecpearce/ha-smartcocoon.svg?style=for-the-badge
 [releases]: https://github.com/davecpearce/ha-smartcocoon/releases
+[ruff]: https://github.com/astral-sh/ruff
+[ruff-shield]: https://img.shields.io/badge/code%20style-ruff-261230.svg?style=for-the-badge
 [user_profile]: https://github.com/davecpearce

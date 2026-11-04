@@ -7,13 +7,13 @@ This project supports running GitHub Actions locally using [nektos/act](https://
 ### Option 1: From devcontainer (after rebuild)
 
 ```bash
-./run-ci-local.sh
+./scripts/run-ci-local.sh
 ```
 
 ### Option 2: From host machine
 
 ```bash
-./run-act-host.sh
+./scripts/run-act-host.sh
 ```
 
 ## Setup Options
@@ -23,14 +23,14 @@ This project supports running GitHub Actions locally using [nektos/act](https://
 The devcontainer has been configured to mount the Docker socket. To enable act:
 
 1. Rebuild the devcontainer: `Ctrl+Shift+P` → `Dev Containers: Rebuild Container`
-2. Run: `./run-ci-local.sh`
+2. Run: `./scripts/run-ci-local.sh`
 
 ### 2. 🖥️ Run from host machine
 
 If you prefer to run act from your host machine:
 
 1. Install act on your host: https://github.com/nektos/act#installation
-2. Run: `./run-act-host.sh`
+2. Run: `./scripts/run-act-host.sh`
 
 ### 3. 🧪 Use pre-commit for local testing
 
@@ -50,7 +50,7 @@ pre-commit run --all-files
 The `.actrc` file contains default configuration:
 
 - Uses `catthehacker/ubuntu:act-latest` runner image
-- Binds current directory to `/workspaces/ha-smartcocoon`
+- Uses `/workspaces/ha-smartcocoon` as the working directory inside the container
 - Uses secrets from `.devcontainer/.env` if available
 - Enables verbose output
 
@@ -73,7 +73,7 @@ act push -j test
 ## Troubleshooting
 
 1. **Docker not running**: Make sure Docker is running in your devcontainer
-2. **Permission issues**: Run `chmod +x run-ci-local.sh`
+2. **Permission issues**: Run `chmod +x scripts/*.sh`
 3. **Secrets missing**: Check `.devcontainer/.env` file exists and has required secrets
 4. **Image pull issues**: Use `--pull=false` to use local images
 

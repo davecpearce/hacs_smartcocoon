@@ -15,8 +15,8 @@ Pull requests are the best way to propose changes to the codebase.
 
 1. Fork the repo and create your branch from `main`.
 2. If you've changed something, update the documentation.
-3. Make sure your code lints (using black).
-4. Test you contribution.
+3. Make sure your code lints (`make lint`).
+4. Test your contribution (`make test`).
 5. Issue that pull request!
 
 ## Any contributions you make will be under the MIT Software License
@@ -44,67 +44,33 @@ People _love_ thorough bug reports. I'm not even kidding.
 
 ## Use a Consistent Coding Style
 
-Use [black](https://github.com/ambv/black) and [prettier](https://prettier.io/)
-to make sure the code follows the style.
+Code is formatted and linted with [ruff](https://docs.astral.sh/ruff/), plus pylint,
+mypy and [prettier](https://prettier.io/), all run through
+[pre-commit](https://pre-commit.com/). CI runs exactly the same hooks:
 
-Or use the `pre-commit` settings implemented in this repository
-(see dedicated section below).
+```bash
+pip install pre-commit
+pre-commit install          # run the hooks on every commit
+pre-commit run --all-files  # or: make lint
+```
 
 ## Test your code modification
 
-This custom component is based on [integration_blueprint template](https://github.com/custom-components/integration_blueprint).
-
-It comes with development environment in a container, easy to launch
-if you use Visual Studio Code. With this container you will have a stand alone
-Home Assistant instance running and already configured with the included
-[`.devcontainer/configuration.yaml`](./.devcontainer/configuration.yaml)
-file.
-
-You can use the `pre-commit` settings implemented in this repository to have
-linting tool checking your contributions (see deicated section below).
-
-You should also verify that existing [tests](./tests) are still working
-and you are encouraged to add new ones.
-You can run the tests using the following commands from the root folder:
-
 ```bash
-# Using devcontainer (recommended)
-# The devcontainer automatically sets up the environment with all dependencies
-# Just run the tests directly:
-pytest --durations=10 --cov-report term-missing --cov=custom_components.smartcocoon tests
-
-# Alternative: Manual setup (if not using devcontainer)
-# Create a virtual environment
-python3 -m venv venv
-source venv/bin/activate
-# Install requirements
-pip install -r requirements_test.txt
-# Run tests and get a summary of successes/failures and code coverage
-pytest --durations=10 --cov-report term-missing --cov=custom_components.smartcocoon tests
+make install   # requirements_test.txt + editable install
+make test      # pytest with coverage
 ```
 
-If any of the tests fail, make the necessary changes to the tests as part of
-your changes to the integration.
+You need Python 3.13.2 or later, or use the VS Code devcontainer, which also runs a
+Home Assistant instance with the integration linked in. See
+[README_DEVELOPMENT.md](README_DEVELOPMENT.md) for the devcontainer and for the
+checks CI runs.
 
-## Pre-commit
+Add tests for what you change. For a bug fix, make sure the new test fails without
+the fix.
 
-You can use the [pre-commit](https://pre-commit.com/) settings included in the
-repostory to have code style and linting checks.
-
-With `pre-commit` tool already installed,
-activate the settings of the repository:
-
-```console
-$ pre-commit install
-```
-
-Now the pre-commit tests will be done every time you commit.
-
-You can run the tests on all repository file with the command:
-
-```console
-$ pre-commit run --all-files
-```
+Changes to how the integration talks to the SmartCocoon cloud usually belong in the
+[pysmartcocoon](https://github.com/davecpearce/pysmartcocoon) library, not here.
 
 ## License
 
