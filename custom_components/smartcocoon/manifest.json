@@ -1,6 +1,7 @@
 {
   "domain": "smartcocoon",
   "name": "SmartCocoon",
+  "categories": ["climate.fans_ventilation"],
   "codeowners": ["@davecpearce"],
   "config_flow": true,
   "documentation": "https://github.com/davecpearce/ha-smartcocoon/blob/main/README.md",

@@ -38,16 +38,20 @@ This integration will create one device and one fan entity for each of your fans
 
 ## Installation
 
-**HACS (recommended)**
+**Marketplace / HACS (recommended)**
 
-SmartCocoon is in the HACS default store. In HACS, search for **SmartCocoon**,
-download it, then restart Home Assistant. Or open it directly:
+SmartCocoon is in the Home Assistant community catalog. Or open it directly:
 
-[![Open your Home Assistant instance and open this repository in HACS.][hacs-repo-badge]][hacs-repo]
+[![Open your Home Assistant instance and open this repository in the Marketplace.][hacs-repo-badge]][hacs-repo]
 
-If it doesn't show up in the search, add it as a custom repository instead: open the
-**⋮** menu (top right) → **Custom repositories**, add `davecpearce/ha-smartcocoon`
-with type `Integration`, then search again.
+- **Home Assistant 2026.11 or newer:** go to **Settings → Marketplace**, search for
+  **SmartCocoon**, select **Install**, then restart Home Assistant.
+- **Home Assistant 2026.10 or older:** open **HACS**, search for **SmartCocoon**,
+  download it, then restart Home Assistant.
+
+If it doesn't show up, add `davecpearce/ha-smartcocoon` as a custom repository: in the
+Marketplace use **Add from link**, or in HACS use **⋮ → Custom repositories** with
+type `Integration`.
 
 **Manual Installation**
 
@@ -178,7 +182,7 @@ Code template was mainly taken from [@Ludeeus](https://github.com/ludeeus)'s [in
 [commits-shield]: https://img.shields.io/github/commit-activity/y/davecpearce/ha-smartcocoon.svg?style=for-the-badge
 [commits]: https://github.com/davecpearce/ha-smartcocoon/commits/main
 [hacs]: https://hacs.xyz
-[hacsbadge]: https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=for-the-badge
+[hacsbadge]: https://img.shields.io/badge/Marketplace%20%2F%20HACS-Default-41BDF5.svg?style=for-the-badge
 [hacs-repo-badge]: https://my.home-assistant.io/badges/hacs_repository.svg
 [hacs-repo]: https://my.home-assistant.io/redirect/hacs_repository/?owner=davecpearce&repository=ha-smartcocoon&category=integration
 [forum-shield]: https://img.shields.io/badge/community-forum-brightgreen.svg?style=for-the-badge
