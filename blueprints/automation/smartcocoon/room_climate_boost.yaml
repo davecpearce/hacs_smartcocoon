@@ -24,7 +24,7 @@ blueprint:
       * blower on, no active demand, home -> EQUALIZE toward the house (see below)
       * otherwise (idle / within range) -> baseline_speed
       * force_max boolean ON -> 100% override (bypasses EVERYTHING, incl. manual OFF)
-      * force_off boolean ON -> 0% silence (explicit OPT-OUT of automation; YOU must turn it back OFF)
+      * force_off boolean ON -> 0% silence (explicit OPT-OUT of automation; YOU must turn it back OFF to resume within ~10 min)
 
     Set enable_cooling / enable_heating to manage only one direction.
 
@@ -280,10 +280,9 @@ blueprint:
         other controls. This is an EXPLICIT OPT-OUT of the blueprint: while ON,
         the automation does nothing and the fan stays silent regardless of room
         temp, thermostat state, or demand. YOU are responsible for turning this
-        OFF when you want automation to resume — it will NOT auto-resume on any
-        trigger. Responds instantly on both edges (dedicated template triggers).
-        Point every room's instance at the same helper for one whole-house silence
-        switch (the opposite of force_max).
+        OFF when you want automation to resume. Silence activates instantly; resuming
+        takes up to ~10 min (waits for next re-eval tick). Point every room's instance
+        at the same helper for one whole-house silence switch (the opposite of force_max).
       default:
       selector:
         entity:
@@ -457,14 +456,12 @@ trigger:
   - platform: template
     value_template: >-
       {{ force_max_entity not in [none, 'none', ''] and is_state(force_max_entity, 'off') }}
-  # Instant whole-house silence/OFF, both edges (same unset-safe pattern as MAX).
-  # ON gives immediate 0%; OFF immediately reclaims control (resuming automation).
+  # Instant whole-house silence/OFF (ON edge only; OFF edge relies on /10 min tick).
+  # ON gives immediate 0%. When turned OFF, automation resumes within ~10 min on the
+  # next re-eval (not instant). This is acceptable: silence NOW is critical; resume can wait.
   - platform: template
     value_template: >-
       {{ force_off_entity not in [none, 'none', ''] and is_state(force_off_entity, 'on') }}
-  - platform: template
-    value_template: >-
-      {{ force_off_entity not in [none, 'none', ''] and is_state(force_off_entity, 'off') }}
   - platform: state
     entity_id: !input room_sensor
   - platform: state

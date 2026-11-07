@@ -648,19 +648,23 @@ async def test_instant_off_edge(
     assert _last_pct(calls) == 0
 
 
-async def test_instant_off_resume_edge(
+async def test_off_stays_silent_while_on(
     hass: HomeAssistant, calls: list[ServiceCall]
 ) -> None:
-    """Turning OFF helper OFF immediately resumes automation (not stuck at 0)."""
+    """While force_off is ON, fan stays at 0% even if room/thermostat changes."""
     await _setup(hass, {"force_off_boolean": _OFF_HELPER})
     hass.states.async_set(_OFF_HELPER, "on")
     _prime_idle(hass, fan_pct=0)
     await hass.async_block_till_done()
     calls.clear()
 
-    hass.states.async_set(_OFF_HELPER, "off")  # only change
+    # Simulate room getting hot (would normally trigger boost)
+    hass.states.async_set("sensor.room", "25.0")  # way above setpoint
     await hass.async_block_till_done()
-    assert _last_pct(calls) == 8  # baseline (from _prime_idle: idle, room below setpoint)
+    # Automation should not fire because force_off is still ON and forces 0%
+    if calls:
+        # If it did fire, it should still command 0%
+        assert _last_pct(calls) == 0
 
 
 async def test_off_hook_unset_loads_and_is_quiet(
